@@ -1,6 +1,6 @@
 ## Interview Questions
 
-The following interview questions are prepared for different stakeholders.
+The following interview questions are prepared for different stakeholders. THrough the interview, questions might change to better understand the stakeholders' requirements.
 
 ### Questions for Teaching Assistants (Applicants)
 
@@ -25,3 +25,11 @@ The following interview questions are prepared for different stakeholders.
 3. What information would you like to see in a TA management system?
 4. How important is it to track TA workload across different modules?
 5. What administrative features should be included in the system?
+
+## Interview Results
+
+Here are the feedbacks that I got from the administrators and MO:
+
+1.Admin should banlance the work, if one TA send plenty of CVs and was chosen by multiple MOs, then he/she can only accept one offer, meaning that the admin has to control the number of jobs a TA can do.
+
+2.Currently is using excel to pass around and input information, this is too complecated, MO wants it to be like a list of CVs to choose from(like an interface) and be able to give offer.
