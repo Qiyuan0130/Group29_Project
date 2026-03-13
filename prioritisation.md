@@ -15,10 +15,8 @@ To ensure the most important features are implemented first, the **MoSCoW** prio
 | **Must Have** | Upload CV | TAs can submit CVs when applying. |
 | **Must Have** | Apply for jobs | Core recruitment functionality. |
 | **Must Have** | MO posts jobs | Staff can create job opportunities. |
-| **Should Have** | Application status tracking | TAs can check application progress. |
-| **Should Have** | Admin workload overview | Admin can monitor TA's overall workload. |
-| **Could Have** | Skill matching | AI-assisted matching between jobs and applicants. |
-| **Could Have** | Skill gap suggestions | Identifying missing skills for applicants using AI. |
+| **should Have** | Admin workload overview | Admin can monitor TA's overall workload. |
+| **Could Have** | Application status tracking | TAs can check application progress. |
 | **Won’t Have** | Advanced analytics | Considered for future development. |
 
 This prioritisation ensures that the **CORE functions** of the recruitment workflow are implemented first, adhering to Agile principles of incremental delivery.
