@@ -19,4 +19,6 @@ To ensure the most important features are implemented first, the **MoSCoW** prio
 | **Could Have** | Application status tracking | TAs can check application progress. |
 | **Won’t Have** | Advanced analytics | Considered for future development. |
 
+**must have** refers to priority of **very high** and **high** in user stories, **should have** refers to priority of **medium** in user stories, **could have** refers to priority of **low** in user stories, **won't have** refers to priority of **very low** in user stories.
+
 This prioritisation ensures that the **CORE functions** of the recruitment workflow are implemented first, adhering to Agile principles of incremental delivery.
