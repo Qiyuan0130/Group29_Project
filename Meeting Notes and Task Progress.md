@@ -1,2 +1,3 @@
 &nbsp;On March 10, after two hours of active discussion, we established the project's current objectives and outlined our general division of responsibilities. Each member's tasks are closely interconnected, fostering ongoing communication and integration. My role is to coordinate with the students to be interviewed and draft user stories.
 
+&nbsp;On March 18, after the first meeting, our team decided that I would be responsible for writing the user stories for the Assistant Recruitment System Administrator. I drafted an initial version in a table format. Following yesterday's second meeting, after careful consideration and trade-offs, I finalized the third version of the table.
