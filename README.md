@@ -3,8 +3,8 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 
 # Group Name-List
 
-- GitHub Account: QMID(Lead/Member)
-- qrsikno2: :190898878(Support TA) 
-- ACCOUNT for Mengdi Yang: QMID(L/M)
-- ACCOUNT for Zixin Xiong: QMID(L/M)
+- GitHub Account:QMID(Lead/Member)
+- qrsikno2:190898878(Support TA) 
+- ACCOUNT for Mengdi Yang:QMID(L/M)
+- ACCOUNT for Zixin Xiong:QMID(L/M)
 - Info of others
