@@ -8,5 +8,6 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 - ACCOUNT for Mengdi Yang:QMID(L/M)
 - ACCOUNT for Zixin Xiong:231220149(L/M)
 - ACCOUNT for Songqi Zhang:231220541(L/M)
+- ACCOUNT for Jingyi Wang:231220644(L/M)
 - ACCOUNT for Yangxinyue Zhou:231222800(L/M)
 - Info of others
