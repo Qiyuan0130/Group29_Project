@@ -44,4 +44,5 @@ We further analyzed the main tasks required for the second phase of the group as
 
 6. **Yangxinyue Zhou**
    - Registration and Login (for three types of users)
+- Info of others
 
