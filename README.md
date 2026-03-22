@@ -10,4 +10,6 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 - ACCOUNT for Songqi Zhang:231220541(L/M)
 - ACCOUNT for Xinyi li:231221630(L/M)
 - ACCOUNT for Jingyi Wang:231220644(L/M)
+- ACCOUNT for Yangxinyue Zhou:231222800(L/M)
 - Info of others
+
