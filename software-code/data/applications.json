@@ -1,0 +1,26 @@
+{
+  "nextApplicationId": 4,
+  "applications": [
+    {
+      "id": 1,
+      "jobId": 1,
+      "applicantId": 1,
+      "status": "PENDING",
+      "appliedAt": "2026-04-03T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "jobId": 2,
+      "applicantId": 1,
+      "status": "ACCEPTED",
+      "appliedAt": "2026-04-01T09:00:00Z"
+    },
+    {
+      "id": 3,
+      "jobId": 1,
+      "applicantId": 2,
+      "status": "REJECTED",
+      "appliedAt": "2026-03-29T12:00:00Z"
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MO Dashboard — TA Recruitment</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <aside class="dashboard__sidebar">
+        <div class="dashboard__sidebar-title">Navigation bar</div>
+        <button type="button" class="nav-link is-active" data-mo-section="post" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Post Job</button>
+        <button type="button" class="nav-link" data-mo-section="applications" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Select Applications</button>
+        <button type="button" class="nav-link" data-mo-section="ai" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Match Applications With AI</button>
+      </aside>
+
+      <div class="dashboard__main">
+        <h2 class="dashboard__title">MO Dashboard</h2>
+
+        <!-- Post Job -->
+        <div data-mo-panel="post" class="panel">
+          <h3 class="panel__head">Post your job here</h3>
+          <form action="#" onsubmit="event.preventDefault(); window.taRecruitment.showToast('Job submitted (demo)');">
+            <div class="form-group">
+              <label>Job Title</label>
+              <input class="form-control" name="title" placeholder="e.g. TA for EBU6304" required />
+            </div>
+            <div class="form-group">
+              <label>Required Technical Ability</label>
+              <textarea class="form-control" name="skills" placeholder="Basic Java, teamwork..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Working Hours</label>
+              <input class="form-control" name="hours" placeholder="e.g. 4 hrs/week" />
+            </div>
+            <div class="form-group">
+              <label>Deadline</label>
+              <input class="form-control" name="deadline" type="date" />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+
+        <!-- Select Applications -->
+        <div data-mo-panel="applications" class="panel hidden">
+          <h3 class="panel__head">Select Applications</h3>
+          <div class="toolbar" style="margin-bottom: 1rem">
+            <div class="form-group">
+              <label>job</label>
+              <select class="form-control" style="min-width: 180px">
+                <option>job1</option>
+                <option>job2</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Applicant Name</th>
+                  <th>CV</th>
+                  <th>Application Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Alice</td>
+                  <td><a href="#">View</a></td>
+                  <td><span class="status-pill status-pending">Uploaded</span></td>
+                  <td>
+                    <button type="button" class="btn btn-sm btn-success">Accept</button>
+                    <button type="button" class="btn btn-sm btn-danger">Reject</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Bob</td>
+                  <td><a href="#">View</a></td>
+                  <td><span class="status-pill status-approved">Accepted</span></td>
+                  <td><span class="status-pill status-approved">Operated</span></td>
+                </tr>
+                <tr>
+                  <td>Charlie</td>
+                  <td><a href="#">View</a></td>
+                  <td><span class="status-pill status-rejected">Rejected</span></td>
+                  <td><span class="status-pill status-approved">Operated</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- AI Match intro -->
+        <div data-mo-panel="ai" class="panel hidden">
+          <h3 class="panel__head">Match Applications With AI</h3>
+          <p style="color: var(--muted); margin-top: 0">Compare applicants against job requirements with explainable scores.</p>
+          <a class="btn btn-primary" href="ai-matching.html">Open AI Matching Dashboard (MO)</a>
+        </div>
+      </div>
+    </div>
+
+    <p class="page-footer-hint">MO prototype — backend APIs to be wired</p>
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+      document.getElementById("logout-btn").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.taApi.logout().finally(function () {
+          location.href = "../index.html";
+        });
+      });
+    </script>
+  </body>
+</html>

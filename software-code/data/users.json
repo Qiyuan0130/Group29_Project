@@ -1,0 +1,71 @@
+{
+  "nextUserId": 7,
+  "users": [
+    {
+      "id": 1,
+      "username": "alice",
+      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
+      "role": "TA",
+      "qmNumber": "QM230001",
+      "name": "Alice",
+      "major": "Software Engineering",
+      "technicalAbility": "Java, Git, teamwork, communication",
+      "contact": "alice@bupt.edu"
+    },
+    {
+      "id": 2,
+      "username": "bob",
+      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
+      "role": "TA",
+      "qmNumber": "QM230002",
+      "name": "Bob",
+      "major": "Computer Networks",
+      "technicalAbility": "Java, routing basics",
+      "contact": "bob@bupt.edu"
+    },
+    {
+      "id": 3,
+      "username": "charlie",
+      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
+      "role": "TA",
+      "qmNumber": "QM230003",
+      "name": "Charlie",
+      "major": "Software Engineering",
+      "technicalAbility": "Python",
+      "contact": "charlie@bupt.edu"
+    },
+    {
+      "id": 4,
+      "username": "mo1",
+      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
+      "role": "MO",
+      "qmNumber": "QM200001",
+      "name": "Dr. MO",
+      "major": "School",
+      "technicalAbility": "Module organisation",
+      "contact": "mo@bupt.edu"
+    },
+    {
+      "id": 5,
+      "username": "admin1",
+      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
+      "role": "ADMIN",
+      "qmNumber": "QM100001",
+      "name": "Admin User",
+      "major": "—",
+      "technicalAbility": "—",
+      "contact": "admin@bupt.edu"
+    },
+    {
+      "id": 6,
+      "username": "11",
+      "passwordHash": "$2a$10$yy/5AkWjcFghMvTthpy7FOTMhf1KoYXMUdLv2xSSDAgwrSex4DD6q",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "11",
+      "major": "",
+      "technicalAbility": "",
+      "contact": ""
+    }
+  ]
+}

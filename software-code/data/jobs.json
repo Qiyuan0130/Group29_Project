@@ -1,0 +1,32 @@
+{
+  "nextJobId": 4,
+  "jobs": [
+    {
+      "id": 1,
+      "title": "TA for EBU6304",
+      "module": "Software Engineering",
+      "requirements": "Basic Java, teamwork, communication skills",
+      "workingHours": "4 hrs/week",
+      "deadline": "2026-04-10",
+      "organizerId": 4
+    },
+    {
+      "id": 2,
+      "title": "Exam Invigilation Assistant",
+      "module": "School-wide",
+      "requirements": "Punctuality, responsibility",
+      "workingHours": "As scheduled",
+      "deadline": "2026-04-15",
+      "organizerId": 4
+    },
+    {
+      "id": 3,
+      "title": "TA for EBU5002",
+      "module": "Computer Networks",
+      "requirements": "Network stack, troubleshooting, communication",
+      "workingHours": "3 hrs/week",
+      "deadline": "2026-04-20",
+      "organizerId": 4
+    }
+  ]
+}
