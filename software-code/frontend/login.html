@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login — TA Recruitment</title>
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <a href="index.html" class="sys-title" style="color: #fff; text-decoration: none">BUPT International School TA Recruitment System</a>
+      </div>
+    </header>
+
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <h1>Login</h1>
+        <p class="subtitle">Sign in with your account (demo redirects by role).</p>
+        <form id="form-login" action="#" method="post" autocomplete="on">
+          <div class="form-group">
+            <label for="username">User Name</label>
+            <input class="form-control" id="username" name="username" type="text" autocomplete="username" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required />
+          </div>
+          <div class="form-group">
+            <span>Your Character:</span>
+            <div class="role-row" style="margin-top: 0.5rem">
+              <label><input type="radio" name="character" value="TA" checked /> TA</label>
+              <label><input type="radio" name="character" value="MO" /> MO</label>
+              <label><input type="radio" name="character" value="ADMIN" /> Admin</label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <a class="btn btn-secondary" href="index.html">Return</a>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      document.getElementById("form-login").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var u = document.getElementById("username").value;
+        var p = document.getElementById("password").value;
+        var role = document.querySelector('input[name="character"]:checked').value;
+        window.taApi
+          .login(u, p)
+          .then(function (data) {
+            var r = data.user && data.user.role ? data.user.role : role;
+            if (r === "TA") location.href = "ta/dashboard.html";
+            else if (r === "MO") location.href = "mo/dashboard.html";
+            else if (r === "ADMIN") location.href = "admin/dashboard.html";
+            else location.href = "ta/dashboard.html";
+          })
+          .catch(function (err) {
+            alert(err.message || "Login failed");
+          });
+      });
+    </script>
+  </body>
+</html>
