@@ -37,15 +37,14 @@
 
   global.taApi = {
     url: apiUrl,
-    login: function (username, password) {
-      return request("POST", "auth/login", { username: username, password: password });
+    login: function (login, password) {
+      return request("POST", "auth/login", { login: login, password: password });
     },
-    register: function (username, password, role, qmNumber) {
+    register: function (name, email, password) {
       return request("POST", "auth/register", {
-        username: username,
+        name: name,
+        email: email,
         password: password,
-        role: role,
-        qmNumber: qmNumber || "",
       });
     },
     logout: function () {

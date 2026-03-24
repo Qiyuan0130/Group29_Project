@@ -9,10 +9,14 @@ import org.mindrot.jbcrypt.BCrypt;
 import jakarta.servlet.ServletContext;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public final class UserRepository {
 
     private static final String FILE = "users.json";
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,10}$");
     private final ServletContext ctx;
 
     public UserRepository(ServletContext ctx) {
@@ -83,6 +87,47 @@ public final class UserRepository {
         return Optional.empty();
     }
 
+    public Optional<User> findByName(String name) throws IOException {
+        if (name == null) {
+            return Optional.empty();
+        }
+        String n = name.trim();
+        for (User x : load().users) {
+            if (x.name != null && n.equalsIgnoreCase(x.name.trim())) {
+                return Optional.of(x);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<User> findByEmail(String email) throws IOException {
+        if (email == null) {
+            return Optional.empty();
+        }
+        String e = email.trim();
+        for (User x : load().users) {
+            if (x.contact != null && e.equalsIgnoreCase(x.contact.trim())) {
+                return Optional.of(x);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<User> findByLogin(String login) throws IOException {
+        if (login == null) {
+            return Optional.empty();
+        }
+        String key = login.trim();
+        if (key.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<User> byEmail = findByEmail(key);
+        if (byEmail.isPresent()) {
+            return byEmail;
+        }
+        return findByName(key);
+    }
+
     public Optional<User> findById(long id) throws IOException {
         for (User x : load().users) {
             if (x.id != null && x.id == id) {
@@ -92,21 +137,36 @@ public final class UserRepository {
         return Optional.empty();
     }
 
-    public synchronized User register(String username, String password, String role, String qmNumber) throws IOException {
-        if (findByUsername(username).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+    public synchronized User registerTa(String name, String email, String password) throws IOException {
+        String cleanName = name == null ? "" : name.trim();
+        String cleanEmail = email == null ? "" : email.trim().toLowerCase();
+        String rawPassword = password == null ? "" : password;
+        if (!NAME_PATTERN.matcher(cleanName).matches()) {
+            throw new IllegalArgumentException("姓名只能包含字母和数字");
+        }
+        if (!EMAIL_PATTERN.matcher(cleanEmail).matches()) {
+            throw new IllegalArgumentException("邮箱格式不正确");
+        }
+        if (!PASSWORD_PATTERN.matcher(rawPassword).matches()) {
+            throw new IllegalArgumentException("密码需为6-10位，且必须同时包含字母和数字");
+        }
+        if (findByName(cleanName).isPresent()) {
+            throw new IllegalArgumentException("姓名已被注册");
+        }
+        if (findByEmail(cleanEmail).isPresent()) {
+            throw new IllegalArgumentException("邮箱已被注册");
         }
         UserDatabase db = load();
         User u = new User();
         u.id = db.nextUserId++;
-        u.username = username.trim();
-        u.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt(10)));
-        u.role = role;
-        u.qmNumber = qmNumber == null ? "" : qmNumber.trim();
-        u.name = username.trim();
+        u.username = cleanName;
+        u.setPasswordHash(BCrypt.hashpw(rawPassword, BCrypt.gensalt(10)));
+        u.role = Roles.TA;
+        u.qmNumber = "";
+        u.name = cleanName;
         u.major = "";
         u.technicalAbility = "";
-        u.contact = "";
+        u.contact = cleanEmail;
         db.users.add(u);
         save(db);
         return u;
