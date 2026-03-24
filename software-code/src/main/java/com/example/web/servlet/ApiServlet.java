@@ -38,8 +38,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
+    private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -312,20 +313,42 @@ public class ApiServlet extends HttpServlet {
         if (part == null || part.getSize() == 0) {
             throw new IllegalArgumentException("file part required");
         }
+        if (part.getSize() > MAX_CV_SIZE_BYTES) {
+            throw new IllegalArgumentException("PDF too large. Max 5MB");
+        }
         String submitted = part.getSubmittedFileName();
         String original = submitted != null ? submitted : "upload.bin";
         String lower = original.toLowerCase();
-        if (!lower.endsWith(".pdf") && !lower.endsWith(".doc") && !lower.endsWith(".docx")) {
-            throw new IllegalArgumentException("Only PDF or DOC/DOCX allowed");
+        String contentType = part.getContentType() == null ? "" : part.getContentType().toLowerCase();
+        if (!lower.endsWith(".pdf")) {
+            throw new IllegalArgumentException("Only PDF allowed");
         }
-        String ext = original.contains(".") ? original.substring(original.lastIndexOf('.')) : "";
-        String stored = UUID.randomUUID() + ext;
+        if (!contentType.isEmpty() && !contentType.contains("pdf")) {
+            throw new IllegalArgumentException("Only PDF allowed");
+        }
         Path dir = JsonPaths.uploadsCvDirectory(getServletContext());
         Files.createDirectories(dir);
+        String stored = generateStoredCvName(u.username, dir);
         Path target = dir.resolve(stored);
         part.write(target.toAbsolutePath().toString());
         CvRecord rec = app.cvs.add(u.id, original, stored, part.getSize());
         HttpJson.write(resp, 200, rec);
+    }
+
+    private static String generateStoredCvName(String username, Path dir) {
+        String base = username == null ? "user" : username.trim();
+        if (base.isEmpty()) {
+            base = "user";
+        }
+        String safeBase = base.replaceAll("[^A-Za-z0-9_-]", "_");
+        for (int i = 0; i < 100; i++) {
+            int n = ThreadLocalRandom.current().nextInt(0, 10000);
+            String candidate = safeBase + String.format("%04d", n) + ".pdf";
+            if (!Files.exists(dir.resolve(candidate))) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("Failed to generate unique CV file name");
     }
 
     private static List<Map<String, Object>> buildWorkloadRows(UserRepository ur, JobRepository jr, ApplicationRepository ar)
