@@ -79,15 +79,16 @@
             <!-- CV -->
             <section id="ta-panel-cv" class="panel hidden">
               <h3 class="panel__head">CV Upload</h3>
-              <p class="badge-limit">Support PDF/DOCX (max 5MB)</p>
+              <p class="badge-limit">Support PDF only (max 5MB)</p>
               <div id="cv-dropzone" class="dropzone" style="margin-top: 1rem">
                 <strong>Drag &amp; Drop your CV here</strong>
                 <p class="dropzone__hint">Or click to browse files</p>
-                <input type="file" id="cv-file-input" class="hidden" accept=".pdf,.doc,.docx" />
+                <input type="file" id="cv-file-input" class="hidden" accept=".pdf,application/pdf" />
               </div>
+              <p id="cv-selected-file" style="margin-top: 0.5rem; color: var(--muted)">No file selected</p>
               <div class="form-actions" style="margin-top: 1rem">
-                <button type="button" class="btn btn-primary" onclick="window.taRecruitment.showToast('Upload CV (demo)')">Upload CV</button>
-                <button type="button" class="btn btn-secondary" onclick="window.taRecruitment.showToast('Cancelled')">Cancel</button>
+                <button type="button" id="cv-upload-btn" class="btn btn-primary">Upload CV</button>
+                <button type="button" id="cv-cancel-btn" class="btn btn-secondary">Cancel</button>
               </div>
               <h4 style="margin: 1.5rem 0 0.5rem; font-size: 0.95rem">Uploaded Files</h4>
               <div class="table-wrap">
@@ -97,22 +98,10 @@
                       <th>#</th>
                       <th>File</th>
                       <th>Date</th>
-                      <th>Status</th>
                       <th></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>CV_Li_Ming.pdf</td>
-                      <td>2026-03-17</td>
-                      <td><span class="status-pill status-approved">Uploaded successfully</span></td>
-                      <td>
-                        <button type="button" class="btn btn-sm btn-secondary">View</button>
-                        <button type="button" class="btn btn-sm btn-danger">Delete</button>
-                      </td>
-                    </tr>
-                  </tbody>
+                  <tbody id="cv-files-body"></tbody>
                 </table>
               </div>
             </section>
@@ -232,6 +221,121 @@
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script>
+      (function () {
+        var selectedFile = null;
+
+        function formatDate(iso) {
+          if (!iso) return "-";
+          var d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return iso;
+          return d.toLocaleString();
+        }
+
+        function setSelectedFile(file) {
+          selectedFile = file || null;
+          var info = document.getElementById("cv-selected-file");
+          info.textContent = selectedFile ? ("Selected: " + selectedFile.name) : "No file selected";
+        }
+
+        function renderCvRows(files) {
+          var body = document.getElementById("cv-files-body");
+          body.innerHTML = "";
+          if (!files || !files.length) {
+            body.innerHTML = '<tr><td colspan="4">No uploaded CV files yet.</td></tr>';
+            return;
+          }
+          files.forEach(function (f, idx) {
+            var tr = document.createElement("tr");
+            tr.innerHTML =
+              "<td>" + (idx + 1) + "</td>" +
+              "<td>" + (f.originalName || "-") + "</td>" +
+              "<td>" + formatDate(f.uploadedAt) + "</td>" +
+              "<td><button type=\"button\" class=\"btn btn-sm btn-danger\" data-cv-del=\"" + f.id + "\">Delete</button></td>";
+            body.appendChild(tr);
+          });
+        }
+
+        function loadCvList() {
+          return window.taApi.cvList()
+            .then(function (res) {
+              renderCvRows(res && res.files ? res.files : []);
+            })
+            .catch(function (err) {
+              window.taRecruitment.showToast("Load CV list failed: " + err.message);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          var input = document.getElementById("cv-file-input");
+          var zone = document.getElementById("cv-dropzone");
+          var uploadBtn = document.getElementById("cv-upload-btn");
+          var cancelBtn = document.getElementById("cv-cancel-btn");
+          var navCv = document.querySelector('.ta-nav-link[data-tab="cv"]');
+          var body = document.getElementById("cv-files-body");
+
+          if (input) {
+            input.addEventListener("change", function () {
+              setSelectedFile(input.files && input.files[0] ? input.files[0] : null);
+            });
+          }
+          if (zone) {
+            zone.addEventListener("drop", function (e) {
+              var files = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files : null;
+              setSelectedFile(files && files[0] ? files[0] : null);
+            });
+          }
+          if (cancelBtn) {
+            cancelBtn.addEventListener("click", function () {
+              if (input) input.value = "";
+              setSelectedFile(null);
+            });
+          }
+          if (uploadBtn) {
+            uploadBtn.addEventListener("click", function () {
+              if (!selectedFile) {
+                window.taRecruitment.showToast("Please choose a PDF first");
+                return;
+              }
+              uploadBtn.disabled = true;
+              window.taApi.cvUpload(selectedFile)
+                .then(function () {
+                  window.taRecruitment.showToast("CV uploaded");
+                  if (input) input.value = "";
+                  setSelectedFile(null);
+                  return loadCvList();
+                })
+                .catch(function (err) {
+                  window.taRecruitment.showToast("Upload failed: " + err.message);
+                })
+                .finally(function () {
+                  uploadBtn.disabled = false;
+                });
+            });
+          }
+          if (navCv) {
+            navCv.addEventListener("click", function () {
+              loadCvList();
+            });
+          }
+          if (body) {
+            body.addEventListener("click", function (e) {
+              var btn = e.target.closest("[data-cv-del]");
+              if (!btn) return;
+              var id = btn.getAttribute("data-cv-del");
+              window.taApi.cvDelete(id)
+                .then(function () {
+                  window.taRecruitment.showToast("Deleted");
+                  return loadCvList();
+                })
+                .catch(function (err) {
+                  window.taRecruitment.showToast("Delete failed: " + err.message);
+                });
+            });
+          }
+          loadCvList();
+        });
+      })();
+
       document.getElementById("logout-btn").addEventListener("click", function (e) {
         e.preventDefault();
         window.taApi.logout().finally(function () {
