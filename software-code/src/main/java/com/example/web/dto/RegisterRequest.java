@@ -2,8 +2,7 @@ package com.example.web.dto;
 
 public class RegisterRequest {
 
-    public String username;
+    public String name;
+    public String email;
     public String password;
-    public String role;
-    public String qmNumber;
 }

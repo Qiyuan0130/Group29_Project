@@ -78,9 +78,9 @@ public class ApiServlet extends HttpServlet {
 
         if ("/api/auth/login".equals(path) && "POST".equals(method)) {
             LoginRequest body = HttpJson.readBody(req, LoginRequest.class);
-            Optional<User> u = ur.findByUsername(body.username);
+            Optional<User> u = ur.findByLogin(body.login);
             if (u.isEmpty() || !ur.verifyPassword(u.get(), body.password)) {
-                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password");
+                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "姓名/邮箱或密码错误");
                 return;
             }
             HttpSession session = req.getSession(true);
@@ -92,17 +92,13 @@ public class ApiServlet extends HttpServlet {
         }
         if ("/api/auth/register".equals(path) && "POST".equals(method)) {
             RegisterRequest body = HttpJson.readBody(req, RegisterRequest.class);
-            if (body.username == null || body.password == null || body.role == null) {
-                throw new IllegalArgumentException("username, password, role required");
+            if (body.name == null || body.email == null || body.password == null) {
+                throw new IllegalArgumentException("name, email, password required");
             }
-            if (!Roles.TA.equals(body.role) && !Roles.MO.equals(body.role) && !Roles.ADMIN.equals(body.role)) {
-                throw new IllegalArgumentException("Invalid role");
-            }
-            User created = ur.register(body.username, body.password, body.role, body.qmNumber);
-            HttpSession session = req.getSession(true);
-            session.setAttribute("USER_ID", created.id);
-            Map<String, Object> out = new HashMap<>();
-            out.put("user", UserPublic.from(created));
+            User created = ur.registerTa(body.name, body.email, body.password);
+            Map<String, Object> out = new LinkedHashMap<>();
+            out.put("ok", true);
+            out.put("message", "注册成功，请登录");
             HttpJson.write(resp, 200, out);
             return;
         }
