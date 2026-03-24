@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -230,6 +231,27 @@ public class ApiServlet extends HttpServlet {
         if ("/api/cv/list".equals(path) && "GET".equals(method)) {
             User u = requireUser(ur, req);
             HttpJson.write(resp, 200, Map.of("files", cr.findByUser(u.id)));
+            return;
+        }
+
+        if (path.matches("/api/cv/\\d+/view") && "GET".equals(method)) {
+            User u = requireUser(ur, req);
+            long cvId = Long.parseLong(path.replaceFirst("/api/cv/(\\d+)/view", "$1"));
+            CvRecord c = cr.findById(cvId).orElseThrow(() -> new IllegalArgumentException("CV not found"));
+            if (!u.id.equals(c.userId)) {
+                throw new SecurityException("Not your file");
+            }
+            Path file = JsonPaths.uploadsCvDirectory(getServletContext()).resolve(c.storedName == null ? "" : c.storedName);
+            if (!Files.exists(file)) {
+                throw new IllegalArgumentException("CV file missing on server");
+            }
+            resp.setStatus(200);
+            resp.setContentType("application/pdf");
+            resp.setHeader("Content-Disposition", "inline; filename=\"" + (c.originalName == null ? "cv.pdf" : c.originalName) + "\"");
+            resp.setContentLengthLong(Files.size(file));
+            try (InputStream in = Files.newInputStream(file)) {
+                in.transferTo(resp.getOutputStream());
+            }
             return;
         }
 
