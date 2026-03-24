@@ -83,5 +83,8 @@
     cvDelete: function (id) {
       return request("DELETE", "cv/" + id, null);
     },
+    cvViewUrl: function (id) {
+      return apiUrl("cv/" + id + "/view");
+    },
   };
 })(typeof window !== "undefined" ? window : this);

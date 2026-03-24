@@ -246,11 +246,15 @@
           }
           files.forEach(function (f, idx) {
             var tr = document.createElement("tr");
+            var viewUrl = window.taApi.cvViewUrl(f.id);
             tr.innerHTML =
               "<td>" + (idx + 1) + "</td>" +
               "<td>" + (f.originalName || "-") + "</td>" +
               "<td>" + formatDate(f.uploadedAt) + "</td>" +
-              "<td><button type=\"button\" class=\"btn btn-sm btn-danger\" data-cv-del=\"" + f.id + "\">Delete</button></td>";
+              "<td>" +
+              "<a class=\"btn btn-sm btn-secondary\" href=\"" + viewUrl + "\" target=\"_blank\" rel=\"noopener\">View</a> " +
+              "<button type=\"button\" class=\"btn btn-sm btn-danger\" data-cv-del=\"" + f.id + "\">Delete</button>" +
+              "</td>";
             body.appendChild(tr);
           });
         }
