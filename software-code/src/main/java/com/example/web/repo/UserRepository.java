@@ -31,10 +31,18 @@ public final class UserRepository {
         if (db.users == null) {
             db.users = new java.util.ArrayList<>();
         }
+        for (User u : db.users) {
+            normalizeUserFields(u);
+        }
         return db;
     }
 
     public synchronized void save(UserDatabase db) throws IOException {
+        if (db != null && db.users != null) {
+            for (User u : db.users) {
+                normalizeUserFields(u);
+            }
+        }
         JsonFileStore.write(ctx, FILE, db);
     }
 
@@ -51,10 +59,10 @@ public final class UserRepository {
                 "Java, routing basics", "bob@bupt.edu"));
         db.users.add(seedUser(id++, "charlie", hash, Roles.TA, "QM230003", "Charlie", "Software Engineering",
                 "Python", "charlie@bupt.edu"));
-        db.users.add(seedUser(id++, "mo1", hash, Roles.MO, "QM200001", "Dr. MO", "School",
-                "Module organisation", "mo@bupt.edu"));
-        db.users.add(seedUser(id++, "admin1", hash, Roles.ADMIN, "QM100001", "Admin User", "—",
-                "—", "admin@bupt.edu"));
+        db.users.add(seedUser(id++, "mo1", hash, Roles.MO, "QM200001", "Dr. MO", "",
+                "", "mo@bupt.edu"));
+        db.users.add(seedUser(id++, "admin1", hash, Roles.ADMIN, "QM100001", "Admin User", "",
+                "", "admin@bupt.edu"));
         db.nextUserId = id;
         save(db);
     }
@@ -174,6 +182,27 @@ public final class UserRepository {
         db.users.add(u);
         save(db);
         return u;
+    }
+
+    private static void normalizeUserFields(User u) {
+        if (u == null) {
+            return;
+        }
+        u.username = normalizeText(u.username);
+        u.role = normalizeText(u.role);
+        u.qmNumber = normalizeText(u.qmNumber);
+        u.name = normalizeText(u.name);
+        u.major = normalizeText(u.major);
+        u.technicalAbility = normalizeText(u.technicalAbility);
+        u.contact = normalizeText(u.contact);
+    }
+
+    private static String normalizeText(String v) {
+        if (v == null) {
+            return "";
+        }
+        String t = v.trim();
+        return "—".equals(t) ? "" : t;
     }
 
     private static boolean isValidEmailAddress(String email) {
