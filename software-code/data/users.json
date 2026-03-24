@@ -1,9 +1,10 @@
 {
-  "nextUserId": 9,
+  "nextUserId": 10,
   "users": [
     {
       "id": 1,
       "username": "alice",
+      "password": "password",
       "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
       "role": "TA",
       "qmNumber": "QM230001",
@@ -15,6 +16,7 @@
     {
       "id": 2,
       "username": "bob",
+      "password": "password",
       "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
       "role": "TA",
       "qmNumber": "QM230002",
@@ -26,6 +28,7 @@
     {
       "id": 3,
       "username": "charlie",
+      "password": "password",
       "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
       "role": "TA",
       "qmNumber": "QM230003",
@@ -37,6 +40,7 @@
     {
       "id": 4,
       "username": "mo1",
+      "password": "password",
       "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
       "role": "MO",
       "qmNumber": "QM200001",
@@ -48,6 +52,7 @@
     {
       "id": 5,
       "username": "admin1",
+      "password": "password",
       "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
       "role": "ADMIN",
       "qmNumber": "QM100001",
@@ -59,6 +64,7 @@
     {
       "id": 7,
       "username": "Qiyuan",
+      "password": "",
       "passwordHash": "$2a$10$ZlL.O89F6AlQN.ZhVZnAaekx2S4pDfAw4JWTB.U/6qB/GJh8vN4A6",
       "role": "TA",
       "qmNumber": "",
@@ -70,6 +76,7 @@
     {
       "id": 8,
       "username": "Qiyao",
+      "password": "",
       "passwordHash": "$2a$10$l4qz7ELaBZ27K55qCjDGjOle4sVWfPlwyGnVzEErrnjvzOEzuO3La",
       "role": "TA",
       "qmNumber": "",
@@ -77,6 +84,18 @@
       "major": "",
       "technicalAbility": "",
       "contact": "2200192596@qq.com"
+    },
+    {
+      "id": 9,
+      "username": "Qiyao111",
+      "password": "12456a",
+      "passwordHash": "$2a$10$OC367s0P2lkedId62YO0AOth4wtn7WjaNiq38c7N/t9g5TmoxYlgG",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Qiyao111",
+      "major": "",
+      "technicalAbility": "",
+      "contact": "220019596@qq.com"
     }
   ]
 }

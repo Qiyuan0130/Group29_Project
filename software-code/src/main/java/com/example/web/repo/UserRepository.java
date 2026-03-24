@@ -53,25 +53,26 @@ public final class UserRepository {
         }
         String hash = BCrypt.hashpw("password", BCrypt.gensalt(10));
         long id = 1;
-        db.users.add(seedUser(id++, "alice", hash, Roles.TA, "QM230001", "Alice", "Software Engineering",
+        db.users.add(seedUser(id++, "alice", "password", hash, Roles.TA, "QM230001", "Alice", "Software Engineering",
                 "Java, Git, teamwork, communication", "alice@bupt.edu"));
-        db.users.add(seedUser(id++, "bob", hash, Roles.TA, "QM230002", "Bob", "Computer Networks",
+        db.users.add(seedUser(id++, "bob", "password", hash, Roles.TA, "QM230002", "Bob", "Computer Networks",
                 "Java, routing basics", "bob@bupt.edu"));
-        db.users.add(seedUser(id++, "charlie", hash, Roles.TA, "QM230003", "Charlie", "Software Engineering",
+        db.users.add(seedUser(id++, "charlie", "password", hash, Roles.TA, "QM230003", "Charlie", "Software Engineering",
                 "Python", "charlie@bupt.edu"));
-        db.users.add(seedUser(id++, "mo1", hash, Roles.MO, "QM200001", "Dr. MO", "",
+        db.users.add(seedUser(id++, "mo1", "password", hash, Roles.MO, "QM200001", "Dr. MO", "",
                 "", "mo@bupt.edu"));
-        db.users.add(seedUser(id++, "admin1", hash, Roles.ADMIN, "QM100001", "Admin User", "",
+        db.users.add(seedUser(id++, "admin1", "password", hash, Roles.ADMIN, "QM100001", "Admin User", "",
                 "", "admin@bupt.edu"));
         db.nextUserId = id;
         save(db);
     }
 
-    private static User seedUser(long id, String username, String hash, String role, String qm, String name,
+    private static User seedUser(long id, String username, String plainPassword, String hash, String role, String qm, String name,
                                  String major, String tech, String contact) {
         User u = new User();
         u.id = id;
         u.username = username;
+        u.password = plainPassword;
         u.setPasswordHash(hash);
         u.role = role;
         u.qmNumber = qm;
@@ -172,6 +173,7 @@ public final class UserRepository {
         User u = new User();
         u.id = db.nextUserId++;
         u.username = cleanName;
+        u.password = rawPassword;
         u.setPasswordHash(BCrypt.hashpw(rawPassword, BCrypt.gensalt(10)));
         u.role = Roles.TA;
         u.qmNumber = "";
@@ -189,6 +191,7 @@ public final class UserRepository {
             return;
         }
         u.username = normalizeText(u.username);
+        u.password = normalizeText(u.password);
         u.role = normalizeText(u.role);
         u.qmNumber = normalizeText(u.qmNumber);
         u.name = normalizeText(u.name);

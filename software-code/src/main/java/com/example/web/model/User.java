@@ -7,6 +7,7 @@ public class User {
 
     public Long id;
     public String username;
+    public String password;
     private String passwordHash;
     public String role;
     public String qmNumber;
