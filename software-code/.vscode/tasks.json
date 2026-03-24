@@ -2,15 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Run Web App (One Click)",
+      "label": "Dev Rebuild (Optional Tomcat Clean + WAR)",
       "type": "shell",
       "command": "powershell",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
         "Bypass",
-        "-Command",
-        "& \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\bin\\shutdown.bat\"; Start-Sleep -Seconds 2; Remove-Item -Path \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\webapps\\java-web-json.war\" -Force -ErrorAction SilentlyContinue; if (Test-Path \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\webapps\\java-web-json\") { Remove-Item -Path \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\webapps\\java-web-json\" -Recurse -Force }; if (Test-Path \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\work\\Catalina\\localhost\\java-web-json\") { Remove-Item -Path \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\work\\Catalina\\localhost\\java-web-json\" -Recurse -Force }; if (Test-Path \"${workspaceFolder}\\build\") { Remove-Item -Path \"${workspaceFolder}\\build\" -Recurse -Force }; if (Test-Path \"${workspaceFolder}\\target\") { Remove-Item -Path \"${workspaceFolder}\\target\" -Recurse -Force }; & \"${workspaceFolder}\\build-no-maven.ps1\"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Copy-Item -Path \"${workspaceFolder}\\build\\java-web-json.war\" -Destination \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\webapps\\java-web-json.war\" -Force; & \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\bin\\startup.bat\"; Start-Process \"http://localhost:8080/java-web-json/\""
+        "-File",
+        "${workspaceFolder}\\dev-rebuild.ps1"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -20,9 +20,26 @@
         "panel": "shared",
         "clear": true
       },
-      "group": {
-        "kind": "build",
-        "isDefault": true
+      "problemMatcher": []
+    },
+    {
+      "label": "Build WAR (Use VSCode Tomcat Plugin)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Test-Path \"${workspaceFolder}\\build\") { Remove-Item -Path \"${workspaceFolder}\\build\" -Recurse -Force }; if (Test-Path \"${workspaceFolder}\\target\") { Remove-Item -Path \"${workspaceFolder}\\target\" -Recurse -Force }; & \"${workspaceFolder}\\build-no-maven.ps1\"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Write-Host \"WAR built: ${workspaceFolder}\\build\\java-web-json.war\"; Write-Host \"Next: deploy/run this WAR from VSCode Tomcat plugin.\""
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
       },
       "problemMatcher": []
     }
