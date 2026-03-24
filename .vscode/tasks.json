@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Web App (One Click)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& \"${workspaceFolder}\\software-code\\build-no-maven.ps1\"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Copy-Item -Path \"${workspaceFolder}\\software-code\\build\\java-web-json.war\" -Destination \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\webapps\\java-web-json.war\" -Force; & \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\bin\\shutdown.bat\"; Start-Sleep -Seconds 2; & \"C:\\Users\\22001\\.rsp\\redhat-community-server-connector\\runtimes\\installations\\tomcat-11.0.0-M6\\apache-tomcat-11.0.0-M6\\bin\\startup.bat\"; Start-Process \"http://localhost:8080/java-web-json/\""
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}
