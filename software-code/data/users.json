@@ -1,5 +1,5 @@
 {
-  "nextUserId": 7,
+  "nextUserId": 8,
   "users": [
     {
       "id": 1,
@@ -57,15 +57,15 @@
       "contact": "admin@bupt.edu"
     },
     {
-      "id": 6,
-      "username": "11",
-      "passwordHash": "$2a$10$yy/5AkWjcFghMvTthpy7FOTMhf1KoYXMUdLv2xSSDAgwrSex4DD6q",
+      "id": 7,
+      "username": "Qiyuan",
+      "passwordHash": "$2a$10$ZlL.O89F6AlQN.ZhVZnAaekx2S4pDfAw4JWTB.U/6qB/GJh8vN4A6",
       "role": "TA",
       "qmNumber": "",
-      "name": "11",
+      "name": "Qiyuan",
       "major": "",
       "technicalAbility": "",
-      "contact": ""
+      "contact": "123456@qq.com"
     }
   ]
 }
