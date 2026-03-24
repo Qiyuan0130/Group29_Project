@@ -148,7 +148,7 @@ public final class UserRepository {
         if (!NAME_PATTERN.matcher(cleanName).matches()) {
             throw new IllegalArgumentException("姓名只能包含字母和数字");
         }
-        if (!EMAIL_PATTERN.matcher(cleanEmail).matches()) {
+        if (!isValidEmailAddress(cleanEmail)) {
             throw new IllegalArgumentException("邮箱格式不正确");
         }
         if (!PASSWORD_PATTERN.matcher(rawPassword).matches()) {
@@ -174,6 +174,31 @@ public final class UserRepository {
         db.users.add(u);
         save(db);
         return u;
+    }
+
+    private static boolean isValidEmailAddress(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            return false;
+        }
+        int at = email.indexOf('@');
+        if (at <= 0 || at != email.lastIndexOf('@')) {
+            return false;
+        }
+        String local = email.substring(0, at);
+        String domain = email.substring(at + 1);
+        if (local.startsWith(".") || local.endsWith(".")) {
+            return false;
+        }
+        if (domain.startsWith(".") || domain.endsWith(".") || !domain.contains(".")) {
+            return false;
+        }
+        if (domain.contains("..")) {
+            return false;
+        }
+        return true;
     }
 
     public boolean verifyPassword(User user, String plain) {
