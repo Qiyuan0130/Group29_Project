@@ -15,7 +15,7 @@ public final class UserRepository {
 
     private static final String FILE = "users.json";
     private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,10}$");
     private final ServletContext ctx;
 
@@ -94,6 +94,10 @@ public final class UserRepository {
         String n = name.trim();
         for (User x : load().users) {
             if (x.name != null && n.equalsIgnoreCase(x.name.trim())) {
+                return Optional.of(x);
+            }
+            // 兼容历史数据：部分账号把姓名存进了 username 字段
+            if (x.username != null && n.equalsIgnoreCase(x.username.trim())) {
                 return Optional.of(x);
             }
         }

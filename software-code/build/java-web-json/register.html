@@ -49,7 +49,7 @@
         return /^[A-Za-z0-9]+$/.test(name);
       }
       function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
       }
       function isValidPassword(password) {
         return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,10}$/.test(password);
