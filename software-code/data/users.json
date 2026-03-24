@@ -1,71 +1,29 @@
 {
-  "nextUserId": 7,
+  "nextUserId": 3,
   "users": [
     {
       "id": 1,
-      "username": "alice",
-      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
+      "username": "Qiyao111",
+      "password": "12456a",
+      "passwordHash": "$2a$10$OC367s0P2lkedId62YO0AOth4wtn7WjaNiq38c7N/t9g5TmoxYlgG",
       "role": "TA",
-      "qmNumber": "QM230001",
-      "name": "Alice",
-      "major": "Software Engineering",
-      "technicalAbility": "Java, Git, teamwork, communication",
-      "contact": "alice@bupt.edu"
+      "qmNumber": "",
+      "name": "Qiyao111",
+      "major": "",
+      "technicalAbility": "",
+      "contact": "220019596@qq.com"
     },
     {
       "id": 2,
-      "username": "bob",
-      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
-      "role": "TA",
-      "qmNumber": "QM230002",
-      "name": "Bob",
-      "major": "Computer Networks",
-      "technicalAbility": "Java, routing basics",
-      "contact": "bob@bupt.edu"
-    },
-    {
-      "id": 3,
-      "username": "charlie",
-      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
-      "role": "TA",
-      "qmNumber": "QM230003",
-      "name": "Charlie",
-      "major": "Software Engineering",
-      "technicalAbility": "Python",
-      "contact": "charlie@bupt.edu"
-    },
-    {
-      "id": 4,
-      "username": "mo1",
-      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
-      "role": "MO",
-      "qmNumber": "QM200001",
-      "name": "Dr. MO",
-      "major": "School",
-      "technicalAbility": "Module organisation",
-      "contact": "mo@bupt.edu"
-    },
-    {
-      "id": 5,
-      "username": "admin1",
-      "passwordHash": "$2a$10$Q/XCRPB2mYsab1fY6W2/Tuz2TP8LAMUrPzAZRgWKNPT1E3w3xeDKS",
-      "role": "ADMIN",
-      "qmNumber": "QM100001",
-      "name": "Admin User",
-      "major": "—",
-      "technicalAbility": "—",
-      "contact": "admin@bupt.edu"
-    },
-    {
-      "id": 6,
-      "username": "11",
-      "passwordHash": "$2a$10$yy/5AkWjcFghMvTthpy7FOTMhf1KoYXMUdLv2xSSDAgwrSex4DD6q",
+      "username": "Qiyuan",
+      "password": "123456a",
+      "passwordHash": "$2a$10$2J5Ia3UM4xG.PU3qi.SqAO7oYeNwBtPWNcWKa68ELX4OGo2e3s.72",
       "role": "TA",
       "qmNumber": "",
-      "name": "11",
+      "name": "Qiyuan",
       "major": "",
       "technicalAbility": "",
-      "contact": ""
+      "contact": "xiongzixin@bupt.edu.cn"
     }
   ]
 }

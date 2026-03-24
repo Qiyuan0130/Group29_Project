@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -38,8 +39,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
+    private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -78,9 +80,9 @@ public class ApiServlet extends HttpServlet {
 
         if ("/api/auth/login".equals(path) && "POST".equals(method)) {
             LoginRequest body = HttpJson.readBody(req, LoginRequest.class);
-            Optional<User> u = ur.findByUsername(body.username);
+            Optional<User> u = ur.findByLogin(body.login);
             if (u.isEmpty() || !ur.verifyPassword(u.get(), body.password)) {
-                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password");
+                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "姓名/邮箱或密码错误");
                 return;
             }
             HttpSession session = req.getSession(true);
@@ -92,17 +94,13 @@ public class ApiServlet extends HttpServlet {
         }
         if ("/api/auth/register".equals(path) && "POST".equals(method)) {
             RegisterRequest body = HttpJson.readBody(req, RegisterRequest.class);
-            if (body.username == null || body.password == null || body.role == null) {
-                throw new IllegalArgumentException("username, password, role required");
+            if (body.name == null || body.email == null || body.password == null) {
+                throw new IllegalArgumentException("name, email, password required");
             }
-            if (!Roles.TA.equals(body.role) && !Roles.MO.equals(body.role) && !Roles.ADMIN.equals(body.role)) {
-                throw new IllegalArgumentException("Invalid role");
-            }
-            User created = ur.register(body.username, body.password, body.role, body.qmNumber);
-            HttpSession session = req.getSession(true);
-            session.setAttribute("USER_ID", created.id);
-            Map<String, Object> out = new HashMap<>();
-            out.put("user", UserPublic.from(created));
+            User created = ur.registerTa(body.name, body.email, body.password);
+            Map<String, Object> out = new LinkedHashMap<>();
+            out.put("ok", true);
+            out.put("message", "注册成功，请登录");
             HttpJson.write(resp, 200, out);
             return;
         }
@@ -236,6 +234,27 @@ public class ApiServlet extends HttpServlet {
             return;
         }
 
+        if (path.matches("/api/cv/\\d+/view") && "GET".equals(method)) {
+            User u = requireUser(ur, req);
+            long cvId = Long.parseLong(path.replaceFirst("/api/cv/(\\d+)/view", "$1"));
+            CvRecord c = cr.findById(cvId).orElseThrow(() -> new IllegalArgumentException("CV not found"));
+            if (!u.id.equals(c.userId)) {
+                throw new SecurityException("Not your file");
+            }
+            Path file = JsonPaths.uploadsCvDirectory(getServletContext()).resolve(c.storedName == null ? "" : c.storedName);
+            if (!Files.exists(file)) {
+                throw new IllegalArgumentException("CV file missing on server");
+            }
+            resp.setStatus(200);
+            resp.setContentType("application/pdf");
+            resp.setHeader("Content-Disposition", "inline; filename=\"" + (c.originalName == null ? "cv.pdf" : c.originalName) + "\"");
+            resp.setContentLengthLong(Files.size(file));
+            try (InputStream in = Files.newInputStream(file)) {
+                in.transferTo(resp.getOutputStream());
+            }
+            return;
+        }
+
         if (path.matches("/api/cv/\\d+") && "DELETE".equals(method)) {
             User u = requireUser(ur, req);
             long cvId = Long.parseLong(path.replace("/api/cv/", ""));
@@ -316,20 +335,42 @@ public class ApiServlet extends HttpServlet {
         if (part == null || part.getSize() == 0) {
             throw new IllegalArgumentException("file part required");
         }
+        if (part.getSize() > MAX_CV_SIZE_BYTES) {
+            throw new IllegalArgumentException("PDF too large. Max 5MB");
+        }
         String submitted = part.getSubmittedFileName();
         String original = submitted != null ? submitted : "upload.bin";
         String lower = original.toLowerCase();
-        if (!lower.endsWith(".pdf") && !lower.endsWith(".doc") && !lower.endsWith(".docx")) {
-            throw new IllegalArgumentException("Only PDF or DOC/DOCX allowed");
+        String contentType = part.getContentType() == null ? "" : part.getContentType().toLowerCase();
+        if (!lower.endsWith(".pdf")) {
+            throw new IllegalArgumentException("Only PDF allowed");
         }
-        String ext = original.contains(".") ? original.substring(original.lastIndexOf('.')) : "";
-        String stored = UUID.randomUUID() + ext;
+        if (!contentType.isEmpty() && !contentType.contains("pdf")) {
+            throw new IllegalArgumentException("Only PDF allowed");
+        }
         Path dir = JsonPaths.uploadsCvDirectory(getServletContext());
         Files.createDirectories(dir);
+        String stored = generateStoredCvName(u.username, dir);
         Path target = dir.resolve(stored);
         part.write(target.toAbsolutePath().toString());
         CvRecord rec = app.cvs.add(u.id, original, stored, part.getSize());
         HttpJson.write(resp, 200, rec);
+    }
+
+    private static String generateStoredCvName(String username, Path dir) {
+        String base = username == null ? "user" : username.trim();
+        if (base.isEmpty()) {
+            base = "user";
+        }
+        String safeBase = base.replaceAll("[^A-Za-z0-9_-]", "_");
+        for (int i = 0; i < 100; i++) {
+            int n = ThreadLocalRandom.current().nextInt(0, 10000);
+            String candidate = safeBase + String.format("%04d", n) + ".pdf";
+            if (!Files.exists(dir.resolve(candidate))) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("Failed to generate unique CV file name");
     }
 
     private static List<Map<String, Object>> buildWorkloadRows(UserRepository ur, JobRepository jr, ApplicationRepository ar)

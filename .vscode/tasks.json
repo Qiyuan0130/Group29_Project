@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev Rebuild (Optional Tomcat Clean + WAR)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\software-code\\dev-rebuild.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build WAR (Use VSCode Tomcat Plugin)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Test-Path \"${workspaceFolder}\\software-code\\build\") { Remove-Item -Path \"${workspaceFolder}\\software-code\\build\" -Recurse -Force }; if (Test-Path \"${workspaceFolder}\\software-code\\target\") { Remove-Item -Path \"${workspaceFolder}\\software-code\\target\" -Recurse -Force }; & \"${workspaceFolder}\\software-code\\build-no-maven.ps1\"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Write-Host \"WAR built: ${workspaceFolder}\\software-code\\build\\java-web-json.war\"; Write-Host \"Next: deploy/run this WAR from VSCode Tomcat plugin.\""
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}
