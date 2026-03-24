@@ -1,0 +1,4 @@
+{
+  "message": "示例数据：所有持久化请使用 WEB-INF/data 下的 JSON 文件",
+  "version": 1
+}

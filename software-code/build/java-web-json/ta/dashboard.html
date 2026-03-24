@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TA Dashboard — TA Recruitment</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <aside class="dashboard__sidebar">
+        <div class="dashboard__sidebar-title">Navigation bar</div>
+        <a class="nav-link ta-nav-link is-active" href="#" data-tab="profile">Profile</a>
+        <a class="nav-link ta-nav-link" href="#" data-tab="cv">CV Upload</a>
+        <a class="nav-link ta-nav-link" href="#" data-tab="jobs">Jobs</a>
+        <a class="nav-link ta-nav-link" href="#" data-tab="status">Status</a>
+      </aside>
+
+      <div class="dashboard__main">
+        <h2 class="dashboard__title">TA Dashboard</h2>
+
+        <div class="ta-layout">
+          <div>
+            <!-- Profile -->
+            <section id="ta-panel-profile" class="panel">
+              <h3 class="panel__head">Profile</h3>
+              <div class="profile-grid">
+                <div class="profile-card panel" style="margin: 0; box-shadow: none">
+                  <h3>Profile</h3>
+                  <dl class="kv-list">
+                    <dt>Name</dt>
+                    <dd>Alice</dd>
+                    <dt>QM Number</dt>
+                    <dd>QM23001234</dd>
+                    <dt>Major</dt>
+                    <dd>Software Engineering</dd>
+                    <dt>Technical Ability</dt>
+                    <dd>Java, Git, teamwork</dd>
+                    <dt>Contact Information</dt>
+                    <dd>alice@example.edu</dd>
+                  </dl>
+                </div>
+                <div class="profile-card panel" style="margin: 0; box-shadow: none">
+                  <h3>Profile 1 — Edit Profile</h3>
+                  <form action="#" onsubmit="event.preventDefault(); window.taRecruitment.showToast('Saved (demo)');">
+                    <div class="form-group">
+                      <label>Name</label>
+                      <input class="form-control" value="Alice" />
+                    </div>
+                    <div class="form-group">
+                      <label>QM Number</label>
+                      <input class="form-control" value="QM23001234" />
+                    </div>
+                    <div class="form-group">
+                      <label>Major</label>
+                      <input class="form-control" value="Software Engineering" />
+                    </div>
+                    <div class="form-group">
+                      <label>Technical Ability</label>
+                      <textarea class="form-control">Java, Git, teamwork</textarea>
+                    </div>
+                    <div class="form-group">
+                      <label>Contact Information</label>
+                      <input class="form-control" value="alice@example.edu" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Change</button>
+                  </form>
+                </div>
+              </div>
+            </section>
+
+            <!-- CV -->
+            <section id="ta-panel-cv" class="panel hidden">
+              <h3 class="panel__head">CV Upload</h3>
+              <p class="badge-limit">Support PDF/DOCX (max 5MB)</p>
+              <div id="cv-dropzone" class="dropzone" style="margin-top: 1rem">
+                <strong>Drag &amp; Drop your CV here</strong>
+                <p class="dropzone__hint">Or click to browse files</p>
+                <input type="file" id="cv-file-input" class="hidden" accept=".pdf,.doc,.docx" />
+              </div>
+              <div class="form-actions" style="margin-top: 1rem">
+                <button type="button" class="btn btn-primary" onclick="window.taRecruitment.showToast('Upload CV (demo)')">Upload CV</button>
+                <button type="button" class="btn btn-secondary" onclick="window.taRecruitment.showToast('Cancelled')">Cancel</button>
+              </div>
+              <h4 style="margin: 1.5rem 0 0.5rem; font-size: 0.95rem">Uploaded Files</h4>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>File</th>
+                      <th>Date</th>
+                      <th>Status</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>CV_Li_Ming.pdf</td>
+                      <td>2026-03-17</td>
+                      <td><span class="status-pill status-approved">Uploaded successfully</span></td>
+                      <td>
+                        <button type="button" class="btn btn-sm btn-secondary">View</button>
+                        <button type="button" class="btn btn-sm btn-danger">Delete</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Jobs -->
+            <section id="ta-panel-jobs" class="panel hidden">
+              <h3 class="panel__head">Jobs</h3>
+              <div class="toolbar">
+                <div class="form-group">
+                  <label>Search</label>
+                  <input class="form-control" type="search" placeholder="Job title or module..." />
+                </div>
+                <div class="form-group">
+                  <label>Job Type</label>
+                  <select class="form-control">
+                    <option>Module</option>
+                    <option>Module Invigilation</option>
+                    <option>Lab</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Deadline</label>
+                  <select class="form-control">
+                    <option>All</option>
+                    <option>This week</option>
+                    <option>This month</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Sort by</label>
+                  <select class="form-control">
+                    <option>Latest</option>
+                    <option>Most relevant</option>
+                  </select>
+                </div>
+                <button type="button" class="btn btn-accent">search</button>
+              </div>
+              <div class="filter-chips">
+                <span class="chip is-active">All</span>
+                <span class="chip">This week</span>
+                <span class="chip">This month</span>
+                <span class="chip">Latest</span>
+                <span class="chip">Most relevant</span>
+              </div>
+              <div class="job-list">
+                <article class="job-card">
+                  <h4 class="job-card__title">Job Title：TA for EBU6304</h4>
+                  <p class="job-card__module">Software Engineering</p>
+                  <p class="job-card__req"><strong>requirement：</strong>Basic Java, teamwork, communication skills</p>
+                  <p class="job-card__meta">Module Organiser: Dr. XXX · Deadline: 2026-04-10</p>
+                  <div class="job-card__actions">
+                    <a class="btn btn-primary" href="#">Apply Now</a>
+                  </div>
+                </article>
+                <article class="job-card">
+                  <h4 class="job-card__title">Exam Invigilation Assistant</h4>
+                  <p class="job-card__module">School-wide</p>
+                  <p class="job-card__req"><strong>requirement：</strong>Punctuality, responsibility</p>
+                  <p class="job-card__meta">Deadline: 2026-04-15</p>
+                  <div class="job-card__actions">
+                    <a class="btn btn-primary" href="#">Apply Now</a>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <!-- Status -->
+            <section id="ta-panel-status" class="panel hidden">
+              <h3 class="panel__head">Status</h3>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Job Title</th>
+                      <th>Application Time</th>
+                      <th>Application State</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>TA for EBU6304<br /><small>Software Engineering</small></td>
+                      <td>2026-04-03</td>
+                      <td><span class="status-pill status-pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                      <td>Exam Invigilation Assistant</td>
+                      <td>2026-04-01</td>
+                      <td><span class="status-pill status-approved">Approved</span></td>
+                    </tr>
+                    <tr>
+                      <td>TA for EBU5002<br /><small>Computer Networks</small></td>
+                      <td>2026-03-29</td>
+                      <td><span class="status-pill status-rejected">Rejected</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+
+          <aside class="ai-widget">
+            <h4>My AI matching recommendation</h4>
+            <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--muted)">
+              Based on your profile, you are a strong match for <strong>EBU6304 TA</strong> (Java &amp; teamwork).
+            </p>
+            <ul>
+              <li>Highlight communication skills in CV</li>
+              <li>Consider invigilation roles for flexible hours</li>
+            </ul>
+            <a class="btn btn-primary" href="ai-matching.html" style="width: 100%; margin-top: 0.75rem">Open AI Matching Dashboard</a>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <p class="page-footer-hint">TA prototype — connect to Servlet API later</p>
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+      document.getElementById("logout-btn").addEventListener("click", function (e) {
+        e.preventDefault();
+        window.taApi.logout().finally(function () {
+          location.href = "../index.html";
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+/**
+ * 与后端 Servlet API 通信（同域部署时相对路径）。
+ */
+(function (global) {
+  "use strict";
+
+  function apiUrl(path) {
+    var p = path.replace(/^\//, "");
+    if (/\/(ta|mo|admin)\//.test(location.pathname)) {
+      return "../api/" + p;
+    }
+    return "api/" + p;
+  }
+
+  function request(method, path, bodyObj) {
+    var opts = {
+      method: method,
+      credentials: "same-origin",
+      headers: {},
+    };
+    if (bodyObj !== undefined && bodyObj !== null) {
+      opts.headers["Content-Type"] = "application/json;charset=UTF-8";
+      opts.body = JSON.stringify(bodyObj);
+    }
+    return fetch(apiUrl(path), opts).then(function (res) {
+      var ct = res.headers.get("Content-Type") || "";
+      var isJson = ct.indexOf("application/json") !== -1;
+      return (isJson ? res.json() : res.text()).then(function (data) {
+        if (!res.ok) {
+          var msg = data && data.error ? data.error : res.statusText;
+          throw new Error(msg || "Request failed");
+        }
+        return data;
+      });
+    });
+  }
+
+  global.taApi = {
+    url: apiUrl,
+    login: function (username, password) {
+      return request("POST", "auth/login", { username: username, password: password });
+    },
+    register: function (username, password, role, qmNumber) {
+      return request("POST", "auth/register", {
+        username: username,
+        password: password,
+        role: role,
+        qmNumber: qmNumber || "",
+      });
+    },
+    logout: function () {
+      return request("POST", "auth/logout", {});
+    },
+    me: function () {
+      return request("GET", "auth/me", null);
+    },
+  };
+})(typeof window !== "undefined" ? window : this);
