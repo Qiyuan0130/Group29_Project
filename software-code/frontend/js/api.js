@@ -35,6 +35,25 @@
     });
   }
 
+  function requestFormData(method, path, formData) {
+    var opts = {
+      method: method,
+      credentials: "same-origin",
+      body: formData,
+    };
+    return fetch(apiUrl(path), opts).then(function (res) {
+      var ct = res.headers.get("Content-Type") || "";
+      var isJson = ct.indexOf("application/json") !== -1;
+      return (isJson ? res.json() : res.text()).then(function (data) {
+        if (!res.ok) {
+          var msg = data && data.error ? data.error : res.statusText;
+          throw new Error(msg || "Request failed");
+        }
+        return data;
+      });
+    });
+  }
+
   global.taApi = {
     url: apiUrl,
     login: function (login, password) {
@@ -52,6 +71,17 @@
     },
     me: function () {
       return request("GET", "auth/me", null);
+    },
+    cvUpload: function (file) {
+      var fd = new FormData();
+      fd.append("file", file);
+      return requestFormData("POST", "cv/upload", fd);
+    },
+    cvList: function () {
+      return request("GET", "cv/list", null);
+    },
+    cvDelete: function (id) {
+      return request("DELETE", "cv/" + id, null);
     },
   };
 })(typeof window !== "undefined" ? window : this);
