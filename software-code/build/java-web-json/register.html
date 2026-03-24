@@ -24,7 +24,14 @@
           </div>
           <div class="form-group">
             <label for="reg-email">Email</label>
-            <input class="form-control" id="reg-email" name="email" type="email" required />
+            <input
+              class="form-control"
+              id="reg-email"
+              name="email"
+              type="email"
+              pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+              required
+            />
           </div>
           <div class="form-group">
             <label for="reg-password">Password</label>
@@ -59,6 +66,7 @@
         e.preventDefault();
         var name = document.getElementById("reg-name").value.trim();
         var email = document.getElementById("reg-email").value.trim();
+        var emailInput = document.getElementById("reg-email");
         var p = document.getElementById("reg-password").value;
         var p2 = document.getElementById("reg-password2").value;
         if (!isValidName(name)) {
@@ -67,8 +75,12 @@
         }
         if (!isValidEmail(email)) {
           alert("邮箱格式不正确");
+          emailInput.focus();
+          emailInput.setCustomValidity("邮箱格式不正确");
+          emailInput.reportValidity();
           return;
         }
+        emailInput.setCustomValidity("");
         if (!isValidPassword(p)) {
           alert("密码需为6-10位，且必须同时包含字母和数字");
           return;
