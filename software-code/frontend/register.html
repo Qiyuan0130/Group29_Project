@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -70,19 +70,19 @@
         var p = document.getElementById("reg-password").value;
         var p2 = document.getElementById("reg-password2").value;
         if (!isValidName(name)) {
-          alert("姓名只能包含字母和数字");
+          alert("Name may only contain letters and numbers.");
           return;
         }
         if (!isValidEmail(email)) {
-          alert("邮箱格式不正确");
+          alert("Invalid email format.");
           emailInput.focus();
-          emailInput.setCustomValidity("邮箱格式不正确");
+          emailInput.setCustomValidity("Invalid email format.");
           emailInput.reportValidity();
           return;
         }
         emailInput.setCustomValidity("");
         if (!isValidPassword(p)) {
-          alert("密码需为6-10位，且必须同时包含字母和数字");
+          alert("Password must be 6–10 characters and include both letters and numbers.");
           return;
         }
         if (p !== p2) {
@@ -92,7 +92,7 @@
         window.taApi
           .register(name, email, p)
           .then(function () {
-            alert("注册成功，请登录");
+            alert("Registration successful. Please sign in.");
             location.href = "login.html";
           })
           .catch(function (err) {
