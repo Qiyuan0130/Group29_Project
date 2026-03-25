@@ -1,13 +1,4 @@
 {
   "nextCvId": 4,
-  "cvs": [
-    {
-      "id": 3,
-      "userId": 2,
-      "originalName": "resume.pdf",
-      "storedName": "Qiyuan9544.pdf",
-      "uploadedAt": "2026-03-25T02:47:50.522282400Z",
-      "sizeBytes": 1345
-    }
-  ]
+  "cvs": []
 }

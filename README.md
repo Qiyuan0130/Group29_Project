@@ -46,3 +46,20 @@ We further analyzed the main tasks required for the second phase of the group as
    - Registration and Login (for three types of users)
 - Info of others
 
+# 任务进度
+
+Use this section to log **weekly completed work per member**. Update after each week or team sync (replace dates, add new `### Week N` blocks as needed).
+
+### Week 1 (YYYY-MM-DD ~ YYYY-MM-DD)
+
+| Member | Completed tasks |
+|--------|-----------------|
+| Jingyi Wang | |
+| Zixin Xiong | |
+| Xinyi Li | |
+| Mengdi Yang | |
+| Songqi Zhang | |
+| Yangxinyue Zhou | |
+| (Support TA) qrsikno2 | |
+
+<!-- Copy the Week block above for Week 2, Week 3, … -->
