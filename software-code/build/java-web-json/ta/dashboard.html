@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -218,6 +218,18 @@
     </div>
 
     <p class="page-footer-hint">TA prototype — connect to Servlet API later</p>
+
+    <div id="cv-delete-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="cv-delete-modal-title" aria-hidden="true">
+      <div class="modal__card">
+        <h2 id="cv-delete-modal-title" class="modal__title">Delete this CV?</h2>
+        <p class="modal__text">This file will be removed permanently.</p>
+        <div class="modal__actions">
+          <button type="button" class="btn btn-secondary" id="cv-delete-modal-cancel">Cancel</button>
+          <button type="button" class="btn btn-danger" id="cv-delete-modal-confirm">Delete</button>
+        </div>
+      </div>
+    </div>
+
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script>
@@ -267,6 +279,39 @@
             .catch(function (err) {
               window.taRecruitment.showToast("Load CV list failed: " + err.message);
             });
+        }
+
+        var cvDeletePendingId = null;
+        var cvDeleteModalEscHandler = null;
+
+        function openCvDeleteModal(id) {
+          cvDeletePendingId = id;
+          var modal = document.getElementById("cv-delete-modal");
+          var confirmBtn = document.getElementById("cv-delete-modal-confirm");
+          if (!modal) return;
+          if (confirmBtn) confirmBtn.disabled = false;
+          modal.removeAttribute("hidden");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+          if (confirmBtn) confirmBtn.focus();
+          cvDeleteModalEscHandler = function (ev) {
+            if (ev.key === "Escape") closeCvDeleteModal();
+          };
+          document.addEventListener("keydown", cvDeleteModalEscHandler);
+        }
+
+        function closeCvDeleteModal() {
+          cvDeletePendingId = null;
+          var modal = document.getElementById("cv-delete-modal");
+          if (modal) {
+            modal.setAttribute("hidden", "");
+            modal.setAttribute("aria-hidden", "true");
+          }
+          document.body.style.overflow = "";
+          if (cvDeleteModalEscHandler) {
+            document.removeEventListener("keydown", cvDeleteModalEscHandler);
+            cvDeleteModalEscHandler = null;
+          }
         }
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -326,16 +371,41 @@
               var btn = e.target.closest("[data-cv-del]");
               if (!btn) return;
               var id = btn.getAttribute("data-cv-del");
+              openCvDeleteModal(id);
+            });
+          }
+
+          (function bindCvDeleteModal() {
+            var modal = document.getElementById("cv-delete-modal");
+            var cancelBtn = document.getElementById("cv-delete-modal-cancel");
+            var confirmBtn = document.getElementById("cv-delete-modal-confirm");
+            if (!modal || !confirmBtn) return;
+
+            modal.addEventListener("click", function (e) {
+              if (e.target === modal) closeCvDeleteModal();
+            });
+            if (cancelBtn) {
+              cancelBtn.addEventListener("click", closeCvDeleteModal);
+            }
+            confirmBtn.addEventListener("click", function () {
+              var id = cvDeletePendingId;
+              if (id == null) return;
+              confirmBtn.disabled = true;
               window.taApi.cvDelete(id)
                 .then(function () {
+                  closeCvDeleteModal();
                   window.taRecruitment.showToast("Deleted");
                   return loadCvList();
                 })
                 .catch(function (err) {
                   window.taRecruitment.showToast("Delete failed: " + err.message);
+                })
+                .finally(function () {
+                  confirmBtn.disabled = false;
                 });
             });
-          }
+          })();
+
           loadCvList();
         });
       })();
