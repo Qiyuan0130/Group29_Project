@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -326,6 +326,9 @@
               var btn = e.target.closest("[data-cv-del]");
               if (!btn) return;
               var id = btn.getAttribute("data-cv-del");
+              if (!window.confirm("Delete this CV file? This cannot be undone.")) {
+                return;
+              }
               window.taApi.cvDelete(id)
                 .then(function () {
                   window.taRecruitment.showToast("Deleted");
