@@ -1,11 +1,11 @@
 /**
- * 公共脚本：登录/注册跳转、TA/MO 标签切换、拖拽上传 UI（无后端）
+ * Shared scripts: login/register navigation, TA/MO tabs, dropzone UI.
  */
 (function () {
   "use strict";
 
   window.taRecruitment = {
-    /** TA / MO 仪表板内 tab 切换 */
+    /** TA / MO dashboard tab switching */
     bindTabs: function (navSelector, panelPrefix) {
       var links = document.querySelectorAll(navSelector);
       links.forEach(function (link) {
@@ -26,7 +26,7 @@
       });
     },
 
-    /** MO 顶部子模块切换 */
+    /** MO top section tabs */
     bindMoSectionTabs: function () {
       var tabs = document.querySelectorAll("[data-mo-section]");
       tabs.forEach(function (btn) {
@@ -42,7 +42,7 @@
       });
     },
 
-    /** Admin 子视图 */
+    /** Admin sub-panels */
     bindAdminTabs: function () {
       var tabs = document.querySelectorAll("[data-admin-tab]");
       tabs.forEach(function (btn) {
@@ -58,7 +58,7 @@
       });
     },
 
-    /** TA Jobs：筛选 chips 仅前端演示 */
+    /** TA Jobs: filter chips (demo only) */
     bindJobChips: function () {
       var chips = document.querySelectorAll(".filter-chips .chip");
       chips.forEach(function (chip) {
@@ -72,7 +72,7 @@
     },
 
     /**
-     * AI Matching 页：底部单一按钮，一次性填充所有行的分数与说明（后端接入后可改为 fetch 结果）
+     * AI Matching page: one button fills scores/notes for all rows (replace with fetch when backend is ready).
      */
     initAiMatchingRunAll: function () {
       var btn = document.getElementById("ai-run-all-analysis");
@@ -107,7 +107,7 @@
         document.querySelectorAll(".ai-matching-row").forEach(fillRow);
         btn.disabled = true;
         btn.textContent = "Analysis complete";
-        window.taRecruitment.showToast("已为所有岗位/申请人生成分析");
+        window.taRecruitment.showToast("Analysis generated for all rows.");
       });
     },
 
@@ -139,12 +139,12 @@
       zone.addEventListener("drop", function (e) {
         var files = e.dataTransfer.files;
         if (files.length) {
-          window.taRecruitment.showToast("已选择文件（演示）：" + files[0].name);
+          window.taRecruitment.showToast("File selected (demo): " + files[0].name);
         }
       });
       input.addEventListener("change", function () {
         if (input.files.length) {
-          window.taRecruitment.showToast("已选择文件（演示）：" + input.files[0].name);
+          window.taRecruitment.showToast("File selected (demo): " + input.files[0].name);
         }
       });
     },
