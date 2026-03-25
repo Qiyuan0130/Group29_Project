@@ -1,5 +1,5 @@
 /**
- * 与后端 Servlet API 通信（同域部署时相对路径）。
+ * Servlet API client (relative paths when same-origin).
  */
 (function (global) {
   "use strict";
