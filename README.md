@@ -50,12 +50,12 @@ We further analyzed the main tasks required for the second phase of the group as
 
 Use this section to log **weekly completed work per member**. Update after each week or team sync (replace dates, add new `### Week N` blocks as needed).
 
-### Week 1 (YYYY-MM-DD ~ YYYY-MM-DD)
+### Week 1 
 
 | Member | Completed tasks |
 |--------|-----------------|
 | Jingyi Wang | |
-| Zixin Xiong | |
+| Zixin Xiong | Created `task.json` to streamline build/run workflows; defined validation rules for registration and login formats; designed the user data storage files under `data`; fixed core TA registration/login functionality; completed the TA CV upload feature; and improved the front-end experience. |
 | Xinyi Li | |
 | Mengdi Yang | |
 | Songqi Zhang | |
