@@ -94,13 +94,14 @@ public class ApiServlet extends HttpServlet {
         }
         if ("/api/auth/register".equals(path) && "POST".equals(method)) {
             RegisterRequest body = HttpJson.readBody(req, RegisterRequest.class);
-            if (body.name == null || body.email == null || body.password == null) {
-                throw new IllegalArgumentException("name, email, password required");
+            if (body.name == null || body.email == null || body.password == null || body.role == null) {
+                throw new IllegalArgumentException("name, email, password, role required");
             }
-            User created = ur.registerTa(body.name, body.email, body.password);
+            User created = ur.register(body.name, body.email, body.password, body.role);
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("ok", true);
             out.put("message", "注册成功，请登录");
+            out.put("role", created.role);
             HttpJson.write(resp, 200, out);
             return;
         }
