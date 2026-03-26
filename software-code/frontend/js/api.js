@@ -72,12 +72,13 @@
     login: function (login, password) {
       return request("POST", "auth/login", { login: login, password: password });
     },
-    register: function (name, email, password, role) {
+    register: function (name, email, password, role, moKey) {
       return request("POST", "auth/register", {
         name: name,
         email: email,
         password: password,
         role: role,
+        moKey: moKey || "",
       });
     },
     logout: function () {

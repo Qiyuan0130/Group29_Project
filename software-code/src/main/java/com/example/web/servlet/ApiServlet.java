@@ -42,6 +42,7 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
     private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
+    private static final String MO_REGISTER_KEY = "qwert1234";
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -96,6 +97,13 @@ public class ApiServlet extends HttpServlet {
             RegisterRequest body = HttpJson.readBody(req, RegisterRequest.class);
             if (body.name == null || body.email == null || body.password == null || body.role == null) {
                 throw new IllegalArgumentException("name, email, password, role required");
+            }
+            String role = body.role.trim().toUpperCase();
+            if (Roles.MO.equals(role)) {
+                String moKey = body.moKey == null ? "" : body.moKey.trim();
+                if (!MO_REGISTER_KEY.equals(moKey)) {
+                    throw new IllegalArgumentException("密钥错误，无法注册");
+                }
             }
             User created = ur.register(body.name, body.email, body.password, body.role);
             Map<String, Object> out = new LinkedHashMap<>();

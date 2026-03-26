@@ -50,6 +50,10 @@
             <label for="reg-password2">Again Password</label>
             <input class="form-control" id="reg-password2" name="password2" type="password" required />
           </div>
+          <div class="form-group hidden" id="reg-mo-key-group">
+            <label for="reg-mo-key">MO Key</label>
+            <input class="form-control" id="reg-mo-key" name="moKey" type="text" placeholder="Only required for MO registration" />
+          </div>
           <div class="form-actions">
             <a class="btn btn-secondary" href="index.html">Return</a>
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -69,6 +73,18 @@
       function isValidPassword(password) {
         return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,10}$/.test(password);
       }
+      function syncMoKeyVisibility() {
+        var role = document.getElementById("reg-role").value;
+        var group = document.getElementById("reg-mo-key-group");
+        var input = document.getElementById("reg-mo-key");
+        var isMo = role === "MO";
+        group.classList.toggle("hidden", !isMo);
+        input.required = isMo;
+        if (!isMo) input.value = "";
+      }
+
+      document.getElementById("reg-role").addEventListener("change", syncMoKeyVisibility);
+      syncMoKeyVisibility();
 
       document.getElementById("form-register").addEventListener("submit", function (e) {
         e.preventDefault();
@@ -78,8 +94,13 @@
         var emailInput = document.getElementById("reg-email");
         var p = document.getElementById("reg-password").value;
         var p2 = document.getElementById("reg-password2").value;
+        var moKey = document.getElementById("reg-mo-key").value.trim();
         if (["TA", "MO", "ADMIN"].indexOf(role) === -1) {
           alert("Invalid role.");
+          return;
+        }
+        if (role === "MO" && moKey !== "qwert1234") {
+          alert("密钥错误，无法注册");
           return;
         }
         if (!isValidName(name)) {
@@ -103,7 +124,7 @@
           return;
         }
         window.taApi
-          .register(name, email, p, role)
+          .register(name, email, p, role, moKey)
           .then(function () {
             alert("Registration successful. Please sign in.");
             location.href = "login.html";
