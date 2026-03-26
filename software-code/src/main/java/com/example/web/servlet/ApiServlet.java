@@ -102,7 +102,7 @@ public class ApiServlet extends HttpServlet {
             if (Roles.MO.equals(role)) {
                 String moKey = body.moKey == null ? "" : body.moKey.trim();
                 if (!MO_REGISTER_KEY.equals(moKey)) {
-                    throw new IllegalArgumentException("密钥错误，无法注册");
+                    throw new IllegalArgumentException("Invalid key. Registration not allowed.");
                 }
             }
             User created = ur.register(body.name, body.email, body.password, body.role);
