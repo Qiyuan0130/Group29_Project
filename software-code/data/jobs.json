@@ -1,5 +1,5 @@
 {
-  "nextJobId": 7,
+  "nextJobId": 9,
   "jobs": [
     {
       "id": 1,
@@ -38,7 +38,7 @@
         "java"
       ],
       "requirementsNote": "11111111111111",
-      "workingHours": "4 hours",
+      "workingHours": "44",
       "deadline": "2026-03-27",
       "organizerId": 3
     },
@@ -55,7 +55,7 @@
         "11111"
       ],
       "requirementsNote": "22333333",
-      "workingHours": "5 hours",
+      "workingHours": "2",
       "deadline": "2026-03-27",
       "organizerId": 3
     },
@@ -63,10 +63,35 @@
       "id": 6,
       "title": "123456",
       "module": "General",
-      "requirements": "java, python",
-      "requirementsNote": "11111111111111111111111111",
-      "workingHours": "5 hours",
+      "requirements": "github",
+      "requirementsTags": [
+        "github"
+      ],
+      "requirementsNote": "",
+      "workingHours": "2",
       "deadline": "2026-03-27",
+      "organizerId": 3
+    },
+    {
+      "id": 7,
+      "title": "123",
+      "module": "General",
+      "requirements": "",
+      "requirementsTags": [],
+      "requirementsNote": "66666",
+      "workingHours": "",
+      "deadline": "",
+      "organizerId": 3
+    },
+    {
+      "id": 8,
+      "title": "333",
+      "module": "General",
+      "requirements": "",
+      "requirementsTags": [],
+      "requirementsNote": "",
+      "workingHours": "123",
+      "deadline": "",
       "organizerId": 3
     }
   ]

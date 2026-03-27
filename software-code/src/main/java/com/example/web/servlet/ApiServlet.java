@@ -156,6 +156,7 @@ public class ApiServlet extends HttpServlet {
                 throw new SecurityException("MO only");
             }
             Job job = HttpJson.readBody(req, Job.class);
+            validateJobRequiredFields(job);
             validateRequirementTags(job);
             job.organizerId = u.id;
             jr.create(job);
@@ -172,6 +173,7 @@ public class ApiServlet extends HttpServlet {
             if (patch.title != null && patch.title.trim().isEmpty()) {
                 throw new IllegalArgumentException("title cannot be empty");
             }
+            validateJobRequiredFields(patch);
             validateRequirementTags(patch);
             Job updated = jr.updateByOrganizer(jobId, u.id, patch);
             HttpJson.write(resp, 200, updated);
@@ -467,6 +469,30 @@ public class ApiServlet extends HttpServlet {
             if (tag.length() > MAX_REQUIREMENT_TAG_LENGTH) {
                 throw new IllegalArgumentException("Each tag must be at most 10 characters.");
             }
+        }
+    }
+
+    private static void validateJobRequiredFields(Job job) {
+        if (job == null) {
+            throw new IllegalArgumentException("Job payload required.");
+        }
+        String title = job.title == null ? "" : job.title.trim();
+        if (title.isEmpty()) {
+            throw new IllegalArgumentException("Job title is required.");
+        }
+        if (job.requirementsTags == null || job.requirementsTags.isEmpty()) {
+            throw new IllegalArgumentException("At least one requirement tag is required.");
+        }
+        String hours = job.workingHours == null ? "" : job.workingHours.trim();
+        if (hours.isEmpty()) {
+            throw new IllegalArgumentException("Weekly working hours is required.");
+        }
+        if (!hours.matches("\\d+")) {
+            throw new IllegalArgumentException("Weekly working hours must contain digits only.");
+        }
+        String deadline = job.deadline == null ? "" : job.deadline.trim();
+        if (deadline.isEmpty()) {
+            throw new IllegalArgumentException("Deadline is required.");
         }
     }
 }

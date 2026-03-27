@@ -17,10 +17,10 @@
     <div class="dashboard">
       <aside class="dashboard__sidebar">
         <div class="dashboard__sidebar-title">Navigation bar</div>
-        <button type="button" class="nav-link is-active" data-mo-section="post" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Post Job</button>
+        <a class="nav-link is-active" href="#" data-mo-section="post">Post Job</a>
         <a class="nav-link" href="my-jobs.html">My Posted Jobs</a>
-        <button type="button" class="nav-link" data-mo-section="applications" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Select Applications</button>
-        <button type="button" class="nav-link" data-mo-section="ai" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Match Applications With AI</button>
+        <a class="nav-link" href="#" data-mo-section="applications">Select Applications</a>
+        <a class="nav-link" href="#" data-mo-section="ai">Match Applications With AI</a>
       </aside>
 
       <div class="dashboard__main">
@@ -29,10 +29,10 @@
         <!-- Post Job -->
         <div data-mo-panel="post" class="panel">
           <h3 class="panel__head">Post your job here</h3>
-          <form id="mo-post-job-form" action="#">
+          <form id="mo-post-job-form" action="#" novalidate>
             <div class="form-group">
               <label for="mo-job-title">Job Title</label>
-              <input id="mo-job-title" class="form-control" name="title" placeholder="e.g. TA for EBU6304" required />
+              <input id="mo-job-title" class="form-control" name="title" placeholder="e.g. TA for EBU6304" />
             </div>
             <div class="form-group">
               <label for="mo-job-requirements">Required Technical Ability</label>
@@ -47,8 +47,11 @@
               <textarea id="mo-job-requirements-note" class="form-control" rows="3" placeholder="Write additional details here. This description is saved but not shown in the Posted Jobs requirements tags."></textarea>
             </div>
             <div class="form-group">
-              <label for="mo-job-hours">Working Hours</label>
-              <input id="mo-job-hours" class="form-control" name="workingHours" placeholder="e.g. 4 hrs/week" />
+              <label for="mo-job-hours">Weekly Working Hours</label>
+              <div style="display:flex;align-items:center;gap:.5rem;">
+                <input id="mo-job-hours" class="form-control" name="workingHours" type="number" min="1" step="1" placeholder="e.g. 4" />
+                <span style="white-space:nowrap;color:var(--muted)">hours/week</span>
+              </div>
             </div>
             <div class="form-group">
               <label for="mo-job-deadline">Deadline</label>
@@ -217,6 +220,22 @@
         var deadline = document.getElementById("mo-job-deadline").value;
         if (!title) {
           alert("Job title is required.");
+          return;
+        }
+        if (!moRequirementTags.length) {
+          alert("At least one requirement tag is required.");
+          return;
+        }
+        if (!workingHours) {
+          alert("Weekly working hours is required.");
+          return;
+        }
+        if (!/^\d+$/.test(workingHours)) {
+          alert("Weekly working hours must contain digits only.");
+          return;
+        }
+        if (!deadline) {
+          alert("Deadline is required.");
           return;
         }
         btn.disabled = true;
