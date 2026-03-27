@@ -43,6 +43,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
     private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
     private static final String MO_REGISTER_KEY = "qwert1234";
+    private static final int MAX_REQUIREMENT_TAGS = 6;
+    private static final int MAX_REQUIREMENT_TAG_LENGTH = 10;
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -154,6 +156,7 @@ public class ApiServlet extends HttpServlet {
                 throw new SecurityException("MO only");
             }
             Job job = HttpJson.readBody(req, Job.class);
+            validateRequirementTags(job);
             job.organizerId = u.id;
             jr.create(job);
             HttpJson.write(resp, 200, job);
@@ -169,6 +172,7 @@ public class ApiServlet extends HttpServlet {
             if (patch.title != null && patch.title.trim().isEmpty()) {
                 throw new IllegalArgumentException("title cannot be empty");
             }
+            validateRequirementTags(patch);
             Job updated = jr.updateByOrganizer(jobId, u.id, patch);
             HttpJson.write(resp, 200, updated);
             return;
@@ -446,5 +450,23 @@ public class ApiServlet extends HttpServlet {
             throw new SecurityException("Not logged in");
         }
         return ur.findById((Long) uid).orElseThrow(() -> new SecurityException("User missing"));
+    }
+
+    private static void validateRequirementTags(Job job) {
+        if (job == null || job.requirementsTags == null) {
+            return;
+        }
+        if (job.requirementsTags.size() > MAX_REQUIREMENT_TAGS) {
+            throw new IllegalArgumentException("You can add up to 6 tags.");
+        }
+        for (String t : job.requirementsTags) {
+            String tag = t == null ? "" : t.trim();
+            if (tag.isEmpty()) {
+                throw new IllegalArgumentException("Tag cannot be empty.");
+            }
+            if (tag.length() > MAX_REQUIREMENT_TAG_LENGTH) {
+                throw new IllegalArgumentException("Each tag must be at most 10 characters.");
+            }
+        }
     }
 }
