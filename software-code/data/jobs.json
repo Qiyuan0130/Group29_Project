@@ -1,5 +1,5 @@
 {
-  "nextJobId": 6,
+  "nextJobId": 7,
   "jobs": [
     {
       "id": 1,
@@ -32,7 +32,12 @@
       "id": 4,
       "title": "567",
       "module": "General",
-      "requirements": "java,python",
+      "requirements": "python, java",
+      "requirementsTags": [
+        "python",
+        "java"
+      ],
+      "requirementsNote": "11111111111111",
       "workingHours": "4 hours",
       "deadline": "2026-03-27",
       "organizerId": 3
@@ -41,7 +46,25 @@
       "id": 5,
       "title": "333",
       "module": "General",
-      "requirements": "java",
+      "requirements": "java, github, 111, 1111, 11111",
+      "requirementsTags": [
+        "java",
+        "github",
+        "111",
+        "1111",
+        "11111"
+      ],
+      "requirementsNote": "22333333",
+      "workingHours": "5 hours",
+      "deadline": "2026-03-27",
+      "organizerId": 3
+    },
+    {
+      "id": 6,
+      "title": "123456",
+      "module": "General",
+      "requirements": "java, python",
+      "requirementsNote": "11111111111111111111111111",
       "workingHours": "5 hours",
       "deadline": "2026-03-27",
       "organizerId": 3

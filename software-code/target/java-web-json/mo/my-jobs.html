@@ -103,6 +103,16 @@
             .replace(/'/g, "&#39;");
         }
 
+        function reqTagsHtml(tagsValue) {
+          var tags = Array.isArray(tagsValue)
+            ? tagsValue.map(function (x) { return String(x || "").trim(); }).filter(function (x) { return x.length > 0; })
+            : [];
+          if (!tags.length) return "-";
+          return tags.map(function (t) {
+            return '<span class="chip" style="margin-right:.25rem;margin-bottom:.2rem;display:inline-block;">' + esc(t) + "</span>";
+          }).join("");
+        }
+
         function renderRows(rows, createdId) {
           var body = document.getElementById("my-jobs-body");
           var tip = document.getElementById("my-jobs-tip");
@@ -119,7 +129,7 @@
                 (isNew ? ' style="background:#f1f8ff;"' : "") +
                 ">" +
                 "<td>" + esc(j.title || "-") + "</td>" +
-                "<td>" + esc(j.requirements || "-") + "</td>" +
+                "<td>" + reqTagsHtml(j.requirementsTags) + "</td>" +
                 "<td>" + esc(j.workingHours || "-") + "</td>" +
                 "<td>" + esc(j.deadline || "-") + "</td>" +
                 "<td>" + esc(j.id || "-") + "</td>" +

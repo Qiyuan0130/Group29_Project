@@ -43,21 +43,23 @@ public final class JobRepository {
         long orgId = mo.map(u -> u.id).orElse(4L);
         long jid = db.nextJobId++;
         db.jobs.add(job(jid++, "TA for EBU6304", "Software Engineering",
-                "Basic Java, teamwork, communication skills", "4 hrs/week", "2026-04-10", orgId));
+                "Basic Java, teamwork, communication skills", "", "4 hrs/week", "2026-04-10", orgId));
         db.jobs.add(job(jid++, "Exam Invigilation Assistant", "School-wide",
-                "Punctuality, responsibility", "As scheduled", "2026-04-15", orgId));
+                "Punctuality, responsibility", "", "As scheduled", "2026-04-15", orgId));
         db.jobs.add(job(jid++, "TA for EBU5002", "Computer Networks",
-                "Network stack, troubleshooting, communication", "3 hrs/week", "2026-04-20", orgId));
+                "Network stack, troubleshooting, communication", "", "3 hrs/week", "2026-04-20", orgId));
         db.nextJobId = jid;
         save(db);
     }
 
-    private static Job job(long id, String title, String module, String req, String hours, String deadline, long org) {
+    private static Job job(long id, String title, String module, String req, String reqNote, String hours, String deadline, long org) {
         Job j = new Job();
         j.id = id;
         j.title = title;
         j.module = module;
         j.requirements = req;
+        j.requirementsTags = new ArrayList<>();
+        j.requirementsNote = reqNote;
         j.workingHours = hours;
         j.deadline = deadline;
         j.organizerId = org;
@@ -102,6 +104,12 @@ public final class JobRepository {
             }
             if (patch.requirements != null) {
                 j.requirements = patch.requirements;
+            }
+            if (patch.requirementsTags != null) {
+                j.requirementsTags = new ArrayList<>(patch.requirementsTags);
+            }
+            if (patch.requirementsNote != null) {
+                j.requirementsNote = patch.requirementsNote;
             }
             if (patch.workingHours != null) {
                 j.workingHours = patch.workingHours;
