@@ -262,8 +262,9 @@ textarea.form-control {
   text-decoration: none;
 }
 .nav-link.is-active {
-  background: rgba(13, 71, 161, 0.1);
+  background: #dfe7f3;
   border-left-color: var(--primary);
+  border-left-width: 6px;
   color: var(--primary);
   font-weight: 600;
 }
