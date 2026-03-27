@@ -4,16 +4,16 @@
     {
       "label": "Dev Rebuild (Optional Tomcat Clean + WAR)",
       "type": "shell",
-      "command": "powershell",
+      "command": "${env:SystemRoot}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
         "Bypass",
         "-File",
-        "${workspaceFolder}\\software-code\\dev-rebuild.ps1"
+        ".\\dev-rebuild.ps1"
       ],
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}\\software-code"
       },
       "presentation": {
         "reveal": "always",
@@ -25,16 +25,37 @@
     {
       "label": "Build WAR (Use VSCode Tomcat Plugin)",
       "type": "shell",
-      "command": "powershell",
+      "command": "${env:SystemRoot}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
       "args": [
         "-NoProfile",
         "-ExecutionPolicy",
         "Bypass",
         "-Command",
-        "if (Test-Path \"${workspaceFolder}\\software-code\\build\") { Remove-Item -Path \"${workspaceFolder}\\software-code\\build\" -Recurse -Force }; if (Test-Path \"${workspaceFolder}\\software-code\\target\") { Remove-Item -Path \"${workspaceFolder}\\software-code\\target\" -Recurse -Force }; & \"${workspaceFolder}\\software-code\\build-no-maven.ps1\"; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Write-Host \"WAR built: ${workspaceFolder}\\software-code\\build\\java-web-json.war\"; Write-Host \"Next: deploy/run this WAR from VSCode Tomcat plugin.\""
+        "$mvnCmd = $null; $mvn = Get-Command mvn -ErrorAction SilentlyContinue; if ($mvn) { $mvnCmd = $mvn.Source } elseif (Test-Path \"$env:USERPROFILE\\tools\\apache-maven-3.9.9\\bin\\mvn.cmd\") { $mvnCmd = \"$env:USERPROFILE\\tools\\apache-maven-3.9.9\\bin\\mvn.cmd\" }; if (-not $mvnCmd) { Write-Error \"Maven not found. Please install Maven or add mvn to PATH.\"; exit 1 }; if (Test-Path \".\\target\") { Remove-Item -Path \".\\target\" -Recurse -Force }; & $mvnCmd clean package -DskipTests; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $war = \".\\target\\java-web-json.war\"; if (-not (Test-Path $war)) { Write-Error \"WAR not found: $war\"; exit 1 }; Write-Host \"WAR built: ${workspaceFolder}\\software-code\\target\\java-web-json.war\"; Write-Host \"Next: deploy/run this WAR from VSCode Tomcat plugin.\""
       ],
       "options": {
-        "cwd": "${workspaceFolder}"
+        "cwd": "${workspaceFolder}\\software-code"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build + Deploy WAR to Local Tomcat",
+      "type": "shell",
+      "command": "${env:SystemRoot}\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "$tomcatWebapps = \"D:\\迅雷下载\\apache-tomcat-10.1.49\\apache-tomcat-10.1.49\\webapps\"; if (-not (Test-Path $tomcatWebapps)) { Write-Error \"Tomcat webapps path not found: $tomcatWebapps\"; exit 1 }; $mvnCmd = $null; $mvn = Get-Command mvn -ErrorAction SilentlyContinue; if ($mvn) { $mvnCmd = $mvn.Source } elseif (Test-Path \"$env:USERPROFILE\\tools\\apache-maven-3.9.9\\bin\\mvn.cmd\") { $mvnCmd = \"$env:USERPROFILE\\tools\\apache-maven-3.9.9\\bin\\mvn.cmd\" }; if (-not $mvnCmd) { Write-Error \"Maven not found. Please install Maven or add mvn to PATH.\"; exit 1 }; if (Test-Path \".\\target\") { Remove-Item -Path \".\\target\" -Recurse -Force }; & $mvnCmd clean package -DskipTests; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $war = \".\\target\\java-web-json.war\"; if (-not (Test-Path $war)) { Write-Error \"WAR not found: $war\"; exit 1 }; $destWar = Join-Path $tomcatWebapps \"java-web-json.war\"; $destDir = Join-Path $tomcatWebapps \"java-web-json\"; if (Test-Path $destWar) { Remove-Item -Path $destWar -Force -ErrorAction SilentlyContinue }; if (Test-Path $destDir) { Remove-Item -Path $destDir -Recurse -Force -ErrorAction SilentlyContinue }; Copy-Item -Path $war -Destination $destWar -Force; Write-Host \"Deploy done: $destWar\"; Write-Host \"Open: http://localhost:8080/java-web-json/register.html\""
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}\\software-code"
       },
       "presentation": {
         "reveal": "always",

@@ -150,10 +150,11 @@ public final class UserRepository {
         return Optional.empty();
     }
 
-    public synchronized User registerTa(String name, String email, String password) throws IOException {
+    public synchronized User register(String name, String email, String password, String role) throws IOException {
         String cleanName = name == null ? "" : name.trim();
         String cleanEmail = email == null ? "" : email.trim().toLowerCase();
         String rawPassword = password == null ? "" : password;
+        String cleanRole = role == null ? "" : role.trim().toUpperCase();
         if (!NAME_PATTERN.matcher(cleanName).matches()) {
             throw new IllegalArgumentException("姓名只能包含字母和数字");
         }
@@ -162,6 +163,9 @@ public final class UserRepository {
         }
         if (!PASSWORD_PATTERN.matcher(rawPassword).matches()) {
             throw new IllegalArgumentException("密码需为6-10位，且必须同时包含字母和数字");
+        }
+        if (!Roles.TA.equals(cleanRole) && !Roles.MO.equals(cleanRole) && !Roles.ADMIN.equals(cleanRole)) {
+            throw new IllegalArgumentException("角色不合法，可选值: TA/MO/ADMIN");
         }
         if (findByName(cleanName).isPresent()) {
             throw new IllegalArgumentException("姓名已被注册");
@@ -175,7 +179,7 @@ public final class UserRepository {
         u.username = cleanName;
         u.password = rawPassword;
         u.setPasswordHash(BCrypt.hashpw(rawPassword, BCrypt.gensalt(10)));
-        u.role = Roles.TA;
+        u.role = cleanRole;
         u.qmNumber = "";
         u.name = cleanName;
         u.major = "";
@@ -192,7 +196,7 @@ public final class UserRepository {
         }
         u.username = normalizeText(u.username);
         u.password = normalizeText(u.password);
-        u.role = normalizeText(u.role);
+        u.role = normalizeRole(u.role);
         u.qmNumber = normalizeText(u.qmNumber);
         u.name = normalizeText(u.name);
         u.major = normalizeText(u.major);
@@ -206,6 +210,14 @@ public final class UserRepository {
         }
         String t = v.trim();
         return "—".equals(t) ? "" : t;
+    }
+
+    private static String normalizeRole(String role) {
+        String r = normalizeText(role).toUpperCase();
+        if (Roles.TA.equals(r) || Roles.MO.equals(r) || Roles.ADMIN.equals(r)) {
+            return r;
+        }
+        return r;
     }
 
     private static boolean isValidEmailAddress(String email) {
