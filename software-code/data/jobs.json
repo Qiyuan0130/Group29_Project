@@ -1,5 +1,5 @@
 {
-  "nextJobId": 4,
+  "nextJobId": 6,
   "jobs": [
     {
       "id": 1,
@@ -27,6 +27,24 @@
       "workingHours": "3 hrs/week",
       "deadline": "2026-04-20",
       "organizerId": 4
+    },
+    {
+      "id": 4,
+      "title": "123",
+      "module": "General",
+      "requirements": "java",
+      "workingHours": "4 hours",
+      "deadline": "2026-03-27",
+      "organizerId": 3
+    },
+    {
+      "id": 5,
+      "title": "333",
+      "module": "General",
+      "requirements": "java",
+      "workingHours": "5 hours",
+      "deadline": "2026-03-27",
+      "organizerId": 3
     }
   ]
 }
