@@ -34,16 +34,20 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 
 Use this section to log **weekly completed work per member**. Update after each week or team sync (replace dates, add new `### Week N` blocks as needed).
 
-### Week 1 
+Here is the Markdown version of your table with the original English text preserved:
+
+### Week 1 
 
 | Member | Completed tasks |
-|--------|-----------------|
-| Jingyi Wang | |
-| Zixin Xiong | Created `task.json` to streamline build/run workflows; defined validation rules for registration and login formats; designed the user data storage files under `data`; fixed core TA registration/login functionality; completed the TA CV upload feature; and improved the front-end experience. |
-| Xinyi Li | | defined validation rules for registration and login formats in MO; create job dataset; modify the release job interface of MO; add tag function; fixe MO registration and login function; modify mo job list; unify the style of navigation bar; set job title, Required Technical Ability, Weekly Working Hours and Deadline to mandatory. |
-| Mengdi Yang | |
-| Songqi Zhang | |
-| Yangxinyue Zhou | |
-| (Support TA) qrsikno2 | |
+| :--- | :--- |
+| **Jingyi Wang** | |
+| **Zixin Xiong** | Created `task.json` to streamline build/run workflows; defined validation rules for registration and login formats; designed the user data storage files under `data`; fixed core TA registration/login functionality; completed the TA CV upload feature; and improved the front-end experience. |
+| **Xinyi Li** | Defined validation rules for registration and login formats in MO; created job dataset; modified the release job interface of MO; added tag function; fixed MO registration and login function; modified MO job list; unified the style of navigation bar; set job title, Required Technical Ability, Weekly Working Hours and Deadline to mandatory. |
+| **Mengdi Yang** | |
+| **Songqi Zhang** | |
+| **Yangxinyue Zhou** | |
+| **(Support TA) qrsikno2** | |
+
+Would you like me to add any specific task descriptions for the other members?
 
 <!-- Copy the Week block above for Week 2, Week 3, … -->
