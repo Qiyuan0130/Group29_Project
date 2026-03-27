@@ -101,5 +101,11 @@
     cvViewUrl: function (id) {
       return apiUrl("cv/" + id + "/view");
     },
+    jobsList: function () {
+      return request("GET", "jobs", null);
+    },
+    jobsCreate: function (job) {
+      return request("POST", "jobs", job || {});
+    },
   };
 })(typeof window !== "undefined" ? window : this);

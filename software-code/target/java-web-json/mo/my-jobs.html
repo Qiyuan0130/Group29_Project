@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Posted Jobs — MO</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <aside class="dashboard__sidebar">
+        <div class="dashboard__sidebar-title">Navigation bar</div>
+        <a class="nav-link" href="dashboard.html">Post Job</a>
+        <a class="nav-link is-active" href="my-jobs.html">My Posted Jobs</a>
+        <a class="nav-link" href="dashboard.html">Select Applications</a>
+        <a class="nav-link" href="ai-matching.html">Match Applications With AI</a>
+      </aside>
+
+      <div class="dashboard__main">
+        <h2 class="dashboard__title">My Posted Jobs</h2>
+        <div class="panel">
+          <h3 class="panel__head">All activities posted by you</h3>
+          <p id="my-jobs-tip" style="margin-top: 0; color: var(--muted)"></p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Job Title</th>
+                  <th>Requirements</th>
+                  <th>Working Hours</th>
+                  <th>Deadline</th>
+                  <th>ID</th>
+                </tr>
+              </thead>
+              <tbody id="my-jobs-body">
+                <tr><td colspan="5">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+      (function () {
+        function esc(v) {
+          return String(v == null ? "" : v)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function renderRows(rows, createdId) {
+          var body = document.getElementById("my-jobs-body");
+          var tip = document.getElementById("my-jobs-tip");
+          if (!rows.length) {
+            body.innerHTML = '<tr><td colspan="5">You have not posted any activities yet.</td></tr>';
+            tip.textContent = "No posted activities yet.";
+            return;
+          }
+          body.innerHTML = rows
+            .map(function (j) {
+              var isNew = createdId && String(j.id) === String(createdId);
+              return (
+                "<tr" +
+                (isNew ? ' style="background:#f1f8ff;"' : "") +
+                ">" +
+                "<td>" + esc(j.title || "-") + "</td>" +
+                "<td>" + esc(j.requirements || "-") + "</td>" +
+                "<td>" + esc(j.workingHours || "-") + "</td>" +
+                "<td>" + esc(j.deadline || "-") + "</td>" +
+                "<td>" + esc(j.id || "-") + "</td>" +
+                "</tr>"
+              );
+            })
+            .join("");
+          tip.textContent = "Total: " + rows.length + " posted activities.";
+        }
+
+        function loadMyJobs() {
+          var params = new URLSearchParams(location.search);
+          var createdId = params.get("createdId");
+          Promise.all([window.taApi.me(), window.taApi.jobsList()])
+            .then(function (arr) {
+              var me = arr[0] || {};
+              var jobs = Array.isArray(arr[1]) ? arr[1] : [];
+              var myJobs = jobs.filter(function (j) {
+                return String(j.organizerId) === String(me.id);
+              });
+              renderRows(myJobs, createdId);
+            })
+            .catch(function (err) {
+              document.getElementById("my-jobs-body").innerHTML =
+                '<tr><td colspan="5">Load failed: ' + esc(err.message || "Unknown error") + "</td></tr>";
+            });
+        }
+
+        document.getElementById("logout-btn").addEventListener("click", function (e) {
+          e.preventDefault();
+          window.taApi.logout().finally(function () {
+            location.href = "../index.html";
+          });
+        });
+
+        loadMyJobs();
+      })();
+    </script>
+  </body>
+</html>

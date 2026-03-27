@@ -18,6 +18,7 @@
       <aside class="dashboard__sidebar">
         <div class="dashboard__sidebar-title">Navigation bar</div>
         <button type="button" class="nav-link is-active" data-mo-section="post" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Post Job</button>
+        <a class="nav-link" href="my-jobs.html">My Posted Jobs</a>
         <button type="button" class="nav-link" data-mo-section="applications" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Select Applications</button>
         <button type="button" class="nav-link" data-mo-section="ai" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Match Applications With AI</button>
       </aside>
@@ -28,24 +29,24 @@
         <!-- Post Job -->
         <div data-mo-panel="post" class="panel">
           <h3 class="panel__head">Post your job here</h3>
-          <form action="#" onsubmit="event.preventDefault(); window.taRecruitment.showToast('Job submitted (demo)');">
+          <form id="mo-post-job-form" action="#">
             <div class="form-group">
-              <label>Job Title</label>
-              <input class="form-control" name="title" placeholder="e.g. TA for EBU6304" required />
+              <label for="mo-job-title">Job Title</label>
+              <input id="mo-job-title" class="form-control" name="title" placeholder="e.g. TA for EBU6304" required />
             </div>
             <div class="form-group">
-              <label>Required Technical Ability</label>
-              <textarea class="form-control" name="skills" placeholder="Basic Java, teamwork..."></textarea>
+              <label for="mo-job-requirements">Required Technical Ability</label>
+              <textarea id="mo-job-requirements" class="form-control" name="requirements" placeholder="Basic Java, teamwork..."></textarea>
             </div>
             <div class="form-group">
-              <label>Working Hours</label>
-              <input class="form-control" name="hours" placeholder="e.g. 4 hrs/week" />
+              <label for="mo-job-hours">Working Hours</label>
+              <input id="mo-job-hours" class="form-control" name="workingHours" placeholder="e.g. 4 hrs/week" />
             </div>
             <div class="form-group">
-              <label>Deadline</label>
-              <input class="form-control" name="deadline" type="date" />
+              <label for="mo-job-deadline">Deadline</label>
+              <input id="mo-job-deadline" class="form-control" name="deadline" type="date" />
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" id="mo-post-submit-btn" class="btn btn-primary">Submit</button>
           </form>
         </div>
 
@@ -111,6 +112,38 @@
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script>
+      document.getElementById("mo-post-job-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var btn = document.getElementById("mo-post-submit-btn");
+        var title = document.getElementById("mo-job-title").value.trim();
+        var requirements = document.getElementById("mo-job-requirements").value.trim();
+        var workingHours = document.getElementById("mo-job-hours").value.trim();
+        var deadline = document.getElementById("mo-job-deadline").value;
+        if (!title) {
+          alert("Job title is required.");
+          return;
+        }
+        btn.disabled = true;
+        window.taApi
+          .jobsCreate({
+            title: title,
+            module: "General",
+            requirements: requirements,
+            workingHours: workingHours,
+            deadline: deadline,
+          })
+          .then(function (created) {
+            var id = created && created.id ? created.id : "";
+            location.href = "my-jobs.html" + (id ? ("?createdId=" + encodeURIComponent(id)) : "");
+          })
+          .catch(function (err) {
+            alert(err.message || "Create job failed");
+          })
+          .finally(function () {
+            btn.disabled = false;
+          });
+      });
+
       document.getElementById("logout-btn").addEventListener("click", function (e) {
         e.preventDefault();
         window.taApi.logout().finally(function () {
