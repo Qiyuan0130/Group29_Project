@@ -107,5 +107,8 @@
     jobsCreate: function (job) {
       return request("POST", "jobs", job || {});
     },
+    jobsUpdate: function (id, job) {
+      return request("PUT", "jobs/" + id, job || {});
+    },
   };
 })(typeof window !== "undefined" ? window : this);

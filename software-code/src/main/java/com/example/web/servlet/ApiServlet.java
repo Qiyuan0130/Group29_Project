@@ -159,6 +159,20 @@ public class ApiServlet extends HttpServlet {
             HttpJson.write(resp, 200, job);
             return;
         }
+        if (path.matches("/api/jobs/\\d+") && "PUT".equals(method)) {
+            User u = requireUser(ur, req);
+            if (!Roles.MO.equals(u.role)) {
+                throw new SecurityException("MO only");
+            }
+            long jobId = Long.parseLong(path.replaceFirst("/api/jobs/(\\d+)", "$1"));
+            Job patch = HttpJson.readBody(req, Job.class);
+            if (patch.title != null && patch.title.trim().isEmpty()) {
+                throw new IllegalArgumentException("title cannot be empty");
+            }
+            Job updated = jr.updateByOrganizer(jobId, u.id, patch);
+            HttpJson.write(resp, 200, updated);
+            return;
+        }
         if ("/api/applications/me".equals(path) && "GET".equals(method)) {
             User u = requireUser(ur, req);
             if (!Roles.TA.equals(u.role)) {
