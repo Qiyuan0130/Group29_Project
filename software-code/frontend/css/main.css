@@ -262,11 +262,11 @@ textarea.form-control {
   text-decoration: none;
 }
 .nav-link.is-active {
-  background: #dfe7f3;
-  border-left-color: var(--primary);
-  border-left-width: 6px;
-  color: var(--primary);
-  font-weight: 600;
+  background: #dfe7f3 !important;
+  border-left-color: var(--primary) !important;
+  border-left-width: 6px !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
 }
 
 .dashboard__main {
