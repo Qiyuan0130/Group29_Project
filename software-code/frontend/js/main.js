@@ -29,17 +29,49 @@
     /** MO top section tabs */
     bindMoSectionTabs: function () {
       var tabs = document.querySelectorAll("[data-mo-section]");
+      if (!tabs.length) return;
+
+      function applySection(sec) {
+        tabs.forEach(function (b) {
+          b.classList.toggle("is-active", b.getAttribute("data-mo-section") === sec);
+        });
+        document.querySelectorAll("[data-mo-panel]").forEach(function (p) {
+          p.classList.toggle("hidden", p.getAttribute("data-mo-panel") !== sec);
+        });
+      }
+
       tabs.forEach(function (btn) {
-        btn.addEventListener("click", function () {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
           var sec = btn.getAttribute("data-mo-section");
-          tabs.forEach(function (b) {
-            b.classList.toggle("is-active", b === btn);
-          });
-          document.querySelectorAll("[data-mo-panel]").forEach(function (p) {
-            p.classList.toggle("hidden", p.getAttribute("data-mo-panel") !== sec);
-          });
+          if (!sec) return;
+          applySection(sec);
         });
       });
+
+      var params = new URLSearchParams(location.search);
+      var wanted = params.get("section");
+      var valid = false;
+      if (wanted) {
+        tabs.forEach(function (btn) {
+          if (btn.getAttribute("data-mo-section") === wanted) valid = true;
+        });
+      }
+      if (valid) {
+        applySection(wanted);
+        return;
+      }
+
+      var active = null;
+      tabs.forEach(function (btn) {
+        if (!active && btn.classList.contains("is-active")) {
+          active = btn.getAttribute("data-mo-section");
+        }
+      });
+      if (!active) {
+        active = tabs[0].getAttribute("data-mo-section");
+      }
+      applySection(active);
     },
 
     /** Admin sub-panels */
