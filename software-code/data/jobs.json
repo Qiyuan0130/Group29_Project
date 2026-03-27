@@ -30,9 +30,9 @@
     },
     {
       "id": 4,
-      "title": "123",
+      "title": "567",
       "module": "General",
-      "requirements": "java",
+      "requirements": "java,python",
       "workingHours": "4 hours",
       "deadline": "2026-03-27",
       "organizerId": 3

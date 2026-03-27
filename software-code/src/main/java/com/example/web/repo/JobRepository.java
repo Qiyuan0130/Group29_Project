@@ -84,4 +84,34 @@ public final class JobRepository {
         save(db);
         return job;
     }
+
+    public synchronized Job updateByOrganizer(long jobId, long organizerId, Job patch) throws IOException {
+        JobDatabase db = load();
+        for (Job j : db.jobs) {
+            if (j.id == null || j.id != jobId) {
+                continue;
+            }
+            if (j.organizerId == null || j.organizerId != organizerId) {
+                throw new SecurityException("Not your job");
+            }
+            if (patch.title != null) {
+                j.title = patch.title;
+            }
+            if (patch.module != null) {
+                j.module = patch.module;
+            }
+            if (patch.requirements != null) {
+                j.requirements = patch.requirements;
+            }
+            if (patch.workingHours != null) {
+                j.workingHours = patch.workingHours;
+            }
+            if (patch.deadline != null) {
+                j.deadline = patch.deadline;
+            }
+            save(db);
+            return j;
+        }
+        throw new IllegalArgumentException("Job not found");
+    }
 }
