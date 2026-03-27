@@ -40,7 +40,7 @@ Use this section to log **weekly completed work per member**. Update after each 
 |--------|-----------------|
 | Jingyi Wang | |
 | Zixin Xiong | Created `task.json` to streamline build/run workflows; defined validation rules for registration and login formats; designed the user data storage files under `data`; fixed core TA registration/login functionality; completed the TA CV upload feature; and improved the front-end experience. |
-| Xinyi Li | | defined validation rules for registration and login formats in MO; create job dataset; modify the release job interface of MO; add tag function; fixe MO registration and login function; modify mo job list; unify the style of navigation bar; set job title, Required Technical Ability, Weekly Working Hours and Deadline to mandatory.
+| Xinyi Li | | defined validation rules for registration and login formats in MO; create job dataset; modify the release job interface of MO; add tag function; fixe MO registration and login function; modify mo job list; unify the style of navigation bar; set job title, Required Technical Ability, Weekly Working Hours and Deadline to mandatory. |
 | Mengdi Yang | |
 | Songqi Zhang | |
 | Yangxinyue Zhou | |
