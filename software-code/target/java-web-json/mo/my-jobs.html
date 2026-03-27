@@ -52,6 +52,47 @@
     <script src="../js/main.js"></script>
     <script>
       (function () {
+        function getApiBase() {
+          if (window.taApi && typeof window.taApi.url === "function") {
+            var sample = window.taApi.url("auth/me");
+            return sample.replace(/auth\/me$/, "");
+          }
+          var seg = (location.pathname || "").split("/");
+          var ctx = seg.length > 1 ? seg[1] : "java-web-json";
+          return "/" + ctx + "/api/";
+        }
+
+        function apiFetch(method, path) {
+          return fetch(getApiBase() + path, {
+            method: method,
+            credentials: "same-origin",
+          }).then(function (res) {
+            var ct = res.headers.get("Content-Type") || "";
+            var isJson = ct.indexOf("application/json") !== -1;
+            return (isJson ? res.json() : res.text()).then(function (data) {
+              if (!res.ok) {
+                var msg = data && data.error ? data.error : res.statusText;
+                throw new Error(msg || "Request failed");
+              }
+              return data;
+            });
+          });
+        }
+
+        function loadMe() {
+          if (window.taApi && typeof window.taApi.me === "function") {
+            return window.taApi.me();
+          }
+          return apiFetch("GET", "auth/me");
+        }
+
+        function loadJobs() {
+          if (window.taApi && typeof window.taApi.jobsList === "function") {
+            return window.taApi.jobsList();
+          }
+          return apiFetch("GET", "jobs");
+        }
+
         function esc(v) {
           return String(v == null ? "" : v)
             .replace(/&/g, "&amp;")
@@ -91,7 +132,7 @@
         function loadMyJobs() {
           var params = new URLSearchParams(location.search);
           var createdId = params.get("createdId");
-          Promise.all([window.taApi.me(), window.taApi.jobsList()])
+          Promise.all([loadMe(), loadJobs()])
             .then(function (arr) {
               var me = arr[0] || {};
               var jobs = Array.isArray(arr[1]) ? arr[1] : [];
@@ -101,6 +142,7 @@
               renderRows(myJobs, createdId);
             })
             .catch(function (err) {
+              document.getElementById("my-jobs-tip").textContent = "Load failed.";
               document.getElementById("my-jobs-body").innerHTML =
                 '<tr><td colspan="5">Load failed: ' + esc(err.message || "Unknown error") + "</td></tr>";
             });

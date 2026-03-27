@@ -112,6 +112,33 @@
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script>
+      function createMoJob(payload) {
+        if (window.taApi && typeof window.taApi.jobsCreate === "function") {
+          return window.taApi.jobsCreate(payload);
+        }
+        var apiBase = "/java-web-json/api/";
+        if (window.taApi && typeof window.taApi.url === "function") {
+          var sample = window.taApi.url("auth/me");
+          apiBase = sample.replace(/auth\/me$/, "");
+        }
+        return fetch(apiBase + "jobs", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json;charset=UTF-8" },
+          body: JSON.stringify(payload || {}),
+        }).then(function (res) {
+          var ct = res.headers.get("Content-Type") || "";
+          var isJson = ct.indexOf("application/json") !== -1;
+          return (isJson ? res.json() : res.text()).then(function (data) {
+            if (!res.ok) {
+              var msg = data && data.error ? data.error : res.statusText;
+              throw new Error(msg || "Create job failed");
+            }
+            return data;
+          });
+        });
+      }
+
       document.getElementById("mo-post-job-form").addEventListener("submit", function (e) {
         e.preventDefault();
         var btn = document.getElementById("mo-post-submit-btn");
@@ -124,13 +151,15 @@
           return;
         }
         btn.disabled = true;
-        window.taApi
-          .jobsCreate({
-            title: title,
-            module: "General",
-            requirements: requirements,
-            workingHours: workingHours,
-            deadline: deadline,
+        Promise.resolve()
+          .then(function () {
+            return createMoJob({
+              title: title,
+              module: "General",
+              requirements: requirements,
+              workingHours: workingHours,
+              deadline: deadline,
+            });
           })
           .then(function (created) {
             var id = created && created.id ? created.id : "";
