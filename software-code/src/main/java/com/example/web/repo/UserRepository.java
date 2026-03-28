@@ -8,6 +8,8 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import jakarta.servlet.ServletContext;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -264,5 +266,16 @@ public final class UserRepository {
             }
         }
         throw new IllegalArgumentException("User not found");
+    }
+
+    /** All users with role TA (for admin / MO directory views). */
+    public synchronized List<User> listTaUsers() throws IOException {
+        List<User> out = new ArrayList<>();
+        for (User x : load().users) {
+            if (Roles.TA.equals(x.role)) {
+                out.add(x);
+            }
+        }
+        return out;
     }
 }

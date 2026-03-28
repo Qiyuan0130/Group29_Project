@@ -21,6 +21,7 @@
         <a class="nav-link" href="my-jobs.html">My Posted Jobs</a>
         <a class="nav-link" href="#" data-mo-section="applications">Select Applications</a>
         <a class="nav-link" href="#" data-mo-section="ai">Match Applications With AI</a>
+        <button type="button" class="nav-link" data-mo-section="ta-profiles" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">TA Profiles</button>
       </aside>
 
       <div class="dashboard__main">
@@ -116,12 +117,36 @@
           <p style="color: var(--muted); margin-top: 0">Compare applicants against job requirements with explainable scores.</p>
           <a class="btn btn-primary" href="ai-matching.html">Open AI Matching Dashboard (MO)</a>
         </div>
+
+        <!-- TA profiles -->
+        <div data-mo-panel="ta-profiles" class="panel hidden">
+          <h3 class="panel__head">TA Profiles</h3>
+          <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
+            Directory of TA accounts and the profile fields they saved.
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Login</th>
+                  <th>Name</th>
+                  <th>QM Number</th>
+                  <th>Major</th>
+                  <th>Technical Ability</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody id="mo-ta-profiles-body"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
     <p class="page-footer-hint">MO prototype — backend APIs to be wired</p>
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js/ta-profiles-list.js"></script>
     <script>
       function createMoJob(payload) {
         if (window.taApi && typeof window.taApi.jobsCreate === "function") {
