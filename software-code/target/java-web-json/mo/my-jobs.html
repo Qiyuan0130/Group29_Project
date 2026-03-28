@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Posted Jobs — MO</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      <aside class="dashboard__sidebar">
+        <div class="dashboard__sidebar-title">Navigation bar</div>
+        <a class="nav-link" href="dashboard.html?section=post">Post Job</a>
+        <a class="nav-link is-active" href="my-jobs.html">My Posted Jobs</a>
+        <a class="nav-link" href="dashboard.html?section=applications">Select Applications</a>
+        <a class="nav-link" href="dashboard.html?section=ai">Match Applications With AI</a>
+      </aside>
+
+      <div class="dashboard__main">
+        <h2 class="dashboard__title">My Posted Jobs</h2>
+        <div class="panel">
+          <h3 class="panel__head">All activities posted by you</h3>
+          <p id="my-jobs-tip" style="margin-top: 0; color: var(--muted)"></p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Job Title</th>
+                  <th>Requirements</th>
+                  <th style="text-align:center;vertical-align:middle;">Weekly Working Hours</th>
+                  <th>Deadline</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="my-jobs-body">
+                <tr><td colspan="5">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+      (function () {
+        function getApiBase() {
+          if (window.taApi && typeof window.taApi.url === "function") {
+            var sample = window.taApi.url("auth/me");
+            return sample.replace(/auth\/me$/, "");
+          }
+          var seg = (location.pathname || "").split("/");
+          var ctx = seg.length > 1 ? seg[1] : "java-web-json";
+          return "/" + ctx + "/api/";
+        }
+
+        function apiFetch(method, path) {
+          return fetch(getApiBase() + path, {
+            method: method,
+            credentials: "same-origin",
+          }).then(function (res) {
+            var ct = res.headers.get("Content-Type") || "";
+            var isJson = ct.indexOf("application/json") !== -1;
+            return (isJson ? res.json() : res.text()).then(function (data) {
+              if (!res.ok) {
+                var msg = data && data.error ? data.error : res.statusText;
+                throw new Error(msg || "Request failed");
+              }
+              return data;
+            });
+          });
+        }
+
+        function loadMe() {
+          if (window.taApi && typeof window.taApi.me === "function") {
+            return window.taApi.me();
+          }
+          return apiFetch("GET", "auth/me");
+        }
+
+        function loadJobs() {
+          if (window.taApi && typeof window.taApi.jobsList === "function") {
+            return window.taApi.jobsList();
+          }
+          return apiFetch("GET", "jobs");
+        }
+
+        function esc(v) {
+          return String(v == null ? "" : v)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function reqTagsHtml(tagsValue) {
+          var tags = Array.isArray(tagsValue)
+            ? tagsValue.map(function (x) { return String(x || "").trim(); }).filter(function (x) { return x.length > 0; })
+            : [];
+          if (!tags.length) return "-";
+          return tags.map(function (t) {
+            return '<span class="chip" style="margin-right:.25rem;margin-bottom:.2rem;display:inline-block;">' + esc(t) + "</span>";
+          }).join("");
+        }
+
+        function renderRows(rows, createdId) {
+          var body = document.getElementById("my-jobs-body");
+          var tip = document.getElementById("my-jobs-tip");
+          if (!rows.length) {
+            body.innerHTML = '<tr><td colspan="5">You have not posted any activities yet.</td></tr>';
+            tip.textContent = "No posted activities yet.";
+            return;
+          }
+          body.innerHTML = rows
+            .map(function (j) {
+              var isNew = createdId && String(j.id) === String(createdId);
+              return (
+                "<tr" +
+                (isNew ? ' style="background:#f1f8ff;"' : "") +
+                ">" +
+                "<td>" + esc(j.title || "-") + "</td>" +
+                "<td>" + reqTagsHtml(j.requirementsTags) + "</td>" +
+                "<td style=\"text-align:center;vertical-align:middle;\"><span style=\"display:inline-block;min-width:3ch;text-align:center;font-variant-numeric:tabular-nums;\">" + esc(j.workingHours || "-") + "</span></td>" +
+                "<td>" + esc(j.deadline || "-") + "</td>" +
+                "<td><a class=\"btn btn-sm btn-secondary\" href=\"edit-job.html?id=" + encodeURIComponent(j.id || "") + "\">Edit</a></td>" +
+                "</tr>"
+              );
+            })
+            .join("");
+          tip.textContent = "Total: " + rows.length + " posted activities.";
+        }
+
+        function loadMyJobs() {
+          var params = new URLSearchParams(location.search);
+          var createdId = params.get("createdId");
+          Promise.all([loadMe(), loadJobs()])
+            .then(function (arr) {
+              var me = arr[0] || {};
+              var jobs = Array.isArray(arr[1]) ? arr[1] : [];
+              var myJobs = jobs.filter(function (j) {
+                return String(j.organizerId) === String(me.id);
+              });
+              renderRows(myJobs, createdId);
+            })
+            .catch(function (err) {
+              document.getElementById("my-jobs-tip").textContent = "Load failed.";
+              document.getElementById("my-jobs-body").innerHTML =
+                '<tr><td colspan="5">Load failed: ' + esc(err.message || "Unknown error") + "</td></tr>";
+            });
+        }
+
+        document.getElementById("logout-btn").addEventListener("click", function (e) {
+          e.preventDefault();
+          window.taApi.logout().finally(function () {
+            location.href = "../index.html";
+          });
+        });
+
+        loadMyJobs();
+      })();
+    </script>
+  </body>
+</html>

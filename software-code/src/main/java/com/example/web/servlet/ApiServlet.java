@@ -43,6 +43,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
     private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
     private static final String MO_REGISTER_KEY = "qwert1234";
+    private static final int MAX_REQUIREMENT_TAGS = 6;
+    private static final int MAX_REQUIREMENT_TAG_LENGTH = 10;
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -154,9 +156,27 @@ public class ApiServlet extends HttpServlet {
                 throw new SecurityException("MO only");
             }
             Job job = HttpJson.readBody(req, Job.class);
+            validateJobRequiredFields(job);
+            validateRequirementTags(job);
             job.organizerId = u.id;
             jr.create(job);
             HttpJson.write(resp, 200, job);
+            return;
+        }
+        if (path.matches("/api/jobs/\\d+") && "PUT".equals(method)) {
+            User u = requireUser(ur, req);
+            if (!Roles.MO.equals(u.role)) {
+                throw new SecurityException("MO only");
+            }
+            long jobId = Long.parseLong(path.replaceFirst("/api/jobs/(\\d+)", "$1"));
+            Job patch = HttpJson.readBody(req, Job.class);
+            if (patch.title != null && patch.title.trim().isEmpty()) {
+                throw new IllegalArgumentException("title cannot be empty");
+            }
+            validateJobRequiredFields(patch);
+            validateRequirementTags(patch);
+            Job updated = jr.updateByOrganizer(jobId, u.id, patch);
+            HttpJson.write(resp, 200, updated);
             return;
         }
         if ("/api/applications/me".equals(path) && "GET".equals(method)) {
@@ -432,5 +452,47 @@ public class ApiServlet extends HttpServlet {
             throw new SecurityException("Not logged in");
         }
         return ur.findById((Long) uid).orElseThrow(() -> new SecurityException("User missing"));
+    }
+
+    private static void validateRequirementTags(Job job) {
+        if (job == null || job.requirementsTags == null) {
+            return;
+        }
+        if (job.requirementsTags.size() > MAX_REQUIREMENT_TAGS) {
+            throw new IllegalArgumentException("You can add up to 6 tags.");
+        }
+        for (String t : job.requirementsTags) {
+            String tag = t == null ? "" : t.trim();
+            if (tag.isEmpty()) {
+                throw new IllegalArgumentException("Tag cannot be empty.");
+            }
+            if (tag.length() > MAX_REQUIREMENT_TAG_LENGTH) {
+                throw new IllegalArgumentException("Each tag must be at most 10 characters.");
+            }
+        }
+    }
+
+    private static void validateJobRequiredFields(Job job) {
+        if (job == null) {
+            throw new IllegalArgumentException("Job payload required.");
+        }
+        String title = job.title == null ? "" : job.title.trim();
+        if (title.isEmpty()) {
+            throw new IllegalArgumentException("Job title is required.");
+        }
+        if (job.requirementsTags == null || job.requirementsTags.isEmpty()) {
+            throw new IllegalArgumentException("At least one requirement tag is required.");
+        }
+        String hours = job.workingHours == null ? "" : job.workingHours.trim();
+        if (hours.isEmpty()) {
+            throw new IllegalArgumentException("Weekly working hours is required.");
+        }
+        if (!hours.matches("\\d+")) {
+            throw new IllegalArgumentException("Weekly working hours must contain digits only.");
+        }
+        String deadline = job.deadline == null ? "" : job.deadline.trim();
+        if (deadline.isEmpty()) {
+            throw new IllegalArgumentException("Deadline is required.");
+        }
     }
 }

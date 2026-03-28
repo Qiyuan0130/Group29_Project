@@ -1,5 +1,5 @@
 {
-  "nextUserId": 3,
+  "nextUserId": 4,
   "users": [
     {
       "id": 1,
@@ -24,6 +24,18 @@
       "major": "",
       "technicalAbility": "",
       "contact": "xiongzixin@bupt.edu.cn"
+    },
+    {
+      "id": 3,
+      "username": "222",
+      "password": "123qwe",
+      "passwordHash": "$2a$10$4U4rPkbuVZw9sxvCq0s2PuLJjI64gPa0gGWmUt1alaBSbAJYcuznW",
+      "role": "MO",
+      "qmNumber": "",
+      "name": "222",
+      "major": "",
+      "technicalAbility": "",
+      "contact": "1234@qq.com"
     }
   ]
 }

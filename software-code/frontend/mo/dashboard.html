@@ -17,9 +17,10 @@
     <div class="dashboard">
       <aside class="dashboard__sidebar">
         <div class="dashboard__sidebar-title">Navigation bar</div>
-        <button type="button" class="nav-link is-active" data-mo-section="post" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Post Job</button>
-        <button type="button" class="nav-link" data-mo-section="applications" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Select Applications</button>
-        <button type="button" class="nav-link" data-mo-section="ai" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">Match Applications With AI</button>
+        <a class="nav-link is-active" href="#" data-mo-section="post">Post Job</a>
+        <a class="nav-link" href="my-jobs.html">My Posted Jobs</a>
+        <a class="nav-link" href="#" data-mo-section="applications">Select Applications</a>
+        <a class="nav-link" href="#" data-mo-section="ai">Match Applications With AI</a>
       </aside>
 
       <div class="dashboard__main">
@@ -28,24 +29,35 @@
         <!-- Post Job -->
         <div data-mo-panel="post" class="panel">
           <h3 class="panel__head">Post your job here</h3>
-          <form action="#" onsubmit="event.preventDefault(); window.taRecruitment.showToast('Job submitted (demo)');">
+          <form id="mo-post-job-form" action="#" novalidate>
             <div class="form-group">
-              <label>Job Title</label>
-              <input class="form-control" name="title" placeholder="e.g. TA for EBU6304" required />
+              <label for="mo-job-title">Job Title</label>
+              <input id="mo-job-title" class="form-control" name="title" placeholder="e.g. TA for EBU6304" />
             </div>
             <div class="form-group">
-              <label>Required Technical Ability</label>
-              <textarea class="form-control" name="skills" placeholder="Basic Java, teamwork..."></textarea>
+              <label for="mo-job-requirements">Required Technical Ability</label>
+              <div class="form-actions" style="margin-bottom: 0.5rem; justify-content: flex-start">
+                <input id="mo-tag-input" class="form-control" placeholder="e.g. Java" style="max-width: 320px" />
+                <button type="button" id="mo-add-tag-btn" class="btn btn-secondary">Add Tag</button>
+              </div>
+              <div id="mo-tag-list" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
             </div>
             <div class="form-group">
-              <label>Working Hours</label>
-              <input class="form-control" name="hours" placeholder="e.g. 4 hrs/week" />
+              <label for="mo-job-requirements-note">Technical Ability Description (optional)</label>
+              <textarea id="mo-job-requirements-note" class="form-control" rows="3"></textarea>
             </div>
             <div class="form-group">
-              <label>Deadline</label>
-              <input class="form-control" name="deadline" type="date" />
+              <label for="mo-job-hours">Weekly Working Hours</label>
+              <div style="display:flex;align-items:center;gap:.5rem;">
+                <input id="mo-job-hours" class="form-control" name="workingHours" type="number" min="1" step="1" placeholder="e.g. 4" />
+                <span style="white-space:nowrap;color:var(--muted)">hours/week</span>
+              </div>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <div class="form-group">
+              <label for="mo-job-deadline">Deadline</label>
+              <input id="mo-job-deadline" class="form-control" name="deadline" type="date" />
+            </div>
+            <button type="submit" id="mo-post-submit-btn" class="btn btn-primary">Submit</button>
           </form>
         </div>
 
@@ -111,6 +123,146 @@
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script>
+      function createMoJob(payload) {
+        if (window.taApi && typeof window.taApi.jobsCreate === "function") {
+          return window.taApi.jobsCreate(payload);
+        }
+        var apiBase = "/java-web-json/api/";
+        if (window.taApi && typeof window.taApi.url === "function") {
+          var sample = window.taApi.url("auth/me");
+          apiBase = sample.replace(/auth\/me$/, "");
+        }
+        return fetch(apiBase + "jobs", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json;charset=UTF-8" },
+          body: JSON.stringify(payload || {}),
+        }).then(function (res) {
+          var ct = res.headers.get("Content-Type") || "";
+          var isJson = ct.indexOf("application/json") !== -1;
+          return (isJson ? res.json() : res.text()).then(function (data) {
+            if (!res.ok) {
+              var msg = data && data.error ? data.error : res.statusText;
+              throw new Error(msg || "Create job failed");
+            }
+            return data;
+          });
+        });
+      }
+
+      var moRequirementTags = [];
+
+      function escHtml(v) {
+        return String(v == null ? "" : v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function renderMoTags() {
+        var list = document.getElementById("mo-tag-list");
+        list.innerHTML = "";
+        moRequirementTags.forEach(function (tag, idx) {
+          var el = document.createElement("span");
+          el.className = "chip";
+          el.innerHTML = escHtml(tag) + ' <button type="button" data-tag-index="' + idx + '" style="border:none;background:transparent;cursor:pointer;color:#666;">x</button>';
+          list.appendChild(el);
+        });
+      }
+
+      function addMoTag(raw) {
+        var tag = (raw || "").trim();
+        if (!tag) return;
+        if (tag.length > 10) {
+          alert("Each tag must be at most 10 characters.");
+          return;
+        }
+        if (moRequirementTags.length >= 6) {
+          alert("You can add up to 6 tags.");
+          return;
+        }
+        if (moRequirementTags.indexOf(tag) !== -1) return;
+        moRequirementTags.push(tag);
+        renderMoTags();
+      }
+
+      document.getElementById("mo-add-tag-btn").addEventListener("click", function () {
+        var input = document.getElementById("mo-tag-input");
+        addMoTag(input.value);
+        input.value = "";
+        input.focus();
+      });
+
+      document.getElementById("mo-tag-input").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          document.getElementById("mo-add-tag-btn").click();
+        }
+      });
+
+      document.getElementById("mo-tag-list").addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-tag-index]");
+        if (!btn) return;
+        var idx = Number(btn.getAttribute("data-tag-index"));
+        if (Number.isNaN(idx)) return;
+        moRequirementTags.splice(idx, 1);
+        renderMoTags();
+      });
+
+      document.getElementById("mo-post-job-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var btn = document.getElementById("mo-post-submit-btn");
+        var title = document.getElementById("mo-job-title").value.trim();
+        var requirementsNote = document.getElementById("mo-job-requirements-note").value.trim();
+        var workingHours = document.getElementById("mo-job-hours").value.trim();
+        var deadline = document.getElementById("mo-job-deadline").value;
+        if (!title) {
+          alert("Job title is required.");
+          return;
+        }
+        if (!moRequirementTags.length) {
+          alert("At least one requirement tag is required.");
+          return;
+        }
+        if (!workingHours) {
+          alert("Weekly working hours is required.");
+          return;
+        }
+        if (!/^\d+$/.test(workingHours)) {
+          alert("Weekly working hours must contain digits only.");
+          return;
+        }
+        if (!deadline) {
+          alert("Deadline is required.");
+          return;
+        }
+        btn.disabled = true;
+        Promise.resolve()
+          .then(function () {
+            return createMoJob({
+              title: title,
+              module: "General",
+              requirements: moRequirementTags.join(", "),
+              requirementsTags: moRequirementTags.slice(),
+              requirementsNote: requirementsNote,
+              workingHours: workingHours,
+              deadline: deadline,
+            });
+          })
+          .then(function (created) {
+            var id = created && created.id ? created.id : "";
+            location.href = "my-jobs.html" + (id ? ("?createdId=" + encodeURIComponent(id)) : "");
+          })
+          .catch(function (err) {
+            alert(err.message || "Create job failed");
+          })
+          .finally(function () {
+            btn.disabled = false;
+          });
+      });
+
       document.getElementById("logout-btn").addEventListener("click", function (e) {
         e.preventDefault();
         window.taApi.logout().finally(function () {
