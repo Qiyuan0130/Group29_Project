@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Edit Posted Job — MO</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+      </div>
+    </header>
+
+    <div class="auth-wrap" style="padding-top: 2rem">
+      <div class="auth-card" style="max-width: 860px">
+        <h1>Edit Posted Job</h1>
+        <p class="subtitle">Update your posted activity and save changes.</p>
+
+        <form id="edit-job-form" action="#" novalidate>
+          <div class="form-group">
+            <label for="edit-job-title">Job Title</label>
+            <input id="edit-job-title" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="edit-job-requirements">Requirements</label>
+            <div class="form-actions" style="margin-bottom: 0.5rem; justify-content: flex-start">
+              <input id="edit-tag-input" class="form-control" placeholder="e.g. Java" style="max-width: 320px" />
+              <button type="button" id="edit-add-tag-btn" class="btn btn-secondary">Add Tag</button>
+            </div>
+            <div id="edit-tag-list" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+          </div>
+          <div class="form-group">
+            <label for="edit-job-requirements-note">Technical Ability Description (optional)</label>
+            <textarea id="edit-job-requirements-note" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="edit-job-hours">Weekly Working Hours</label>
+            <div style="display:flex;align-items:center;gap:.5rem;">
+              <input id="edit-job-hours" class="form-control" type="number" min="1" step="1" />
+              <span style="white-space:nowrap;color:var(--muted)">hours/week</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-job-deadline">Deadline</label>
+            <input id="edit-job-deadline" class="form-control" type="date" />
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="edit-job-save-btn" class="btn btn-primary">Save</button>
+            <button type="button" id="edit-job-cancel-btn" class="btn btn-secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var jobId = params.get("id");
+        var editRequirementTags = [];
+
+        function backToPostedJobs() {
+          location.href = "my-jobs.html";
+        }
+
+        function getApiBase() {
+          if (window.taApi && typeof window.taApi.url === "function") {
+            var sample = window.taApi.url("auth/me");
+            return sample.replace(/auth\/me$/, "");
+          }
+          var seg = (location.pathname || "").split("/");
+          var ctx = seg.length > 1 ? seg[1] : "java-web-json";
+          return "/" + ctx + "/api/";
+        }
+
+        function escHtml(v) {
+          return String(v == null ? "" : v)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function parseTagsFromJob(job) {
+          if (job && Array.isArray(job.requirementsTags)) {
+            return job.requirementsTags
+              .map(function (x) { return String(x || "").trim(); })
+              .filter(function (x) { return x.length > 0; });
+          }
+          return [];
+        }
+
+        function renderEditTags() {
+          var list = document.getElementById("edit-tag-list");
+          list.innerHTML = "";
+          editRequirementTags.forEach(function (tag, idx) {
+            var el = document.createElement("span");
+            el.className = "chip";
+            el.innerHTML = escHtml(tag) + ' <button type="button" data-edit-tag-index="' + idx + '" style="border:none;background:transparent;cursor:pointer;color:#666;">x</button>';
+            list.appendChild(el);
+          });
+        }
+
+        function addEditTag(raw) {
+          var tag = (raw || "").trim();
+          if (!tag) return;
+          if (tag.length > 10) {
+            alert("Each tag must be at most 10 characters.");
+            return;
+          }
+          if (editRequirementTags.length >= 6) {
+            alert("You can add up to 6 tags.");
+            return;
+          }
+          if (editRequirementTags.indexOf(tag) !== -1) return;
+          editRequirementTags.push(tag);
+          renderEditTags();
+        }
+
+        function apiFetch(method, path, body) {
+          var opts = { method: method, credentials: "same-origin", headers: {} };
+          if (body != null) {
+            opts.headers["Content-Type"] = "application/json;charset=UTF-8";
+            opts.body = JSON.stringify(body);
+          }
+          return fetch(getApiBase() + path, opts).then(function (res) {
+            var ct = res.headers.get("Content-Type") || "";
+            var isJson = ct.indexOf("application/json") !== -1;
+            return (isJson ? res.json() : res.text()).then(function (data) {
+              if (!res.ok) {
+                var msg = data && data.error ? data.error : res.statusText;
+                throw new Error(msg || "Request failed");
+              }
+              return data;
+            });
+          });
+        }
+
+        function loadMe() {
+          if (window.taApi && typeof window.taApi.me === "function") {
+            return window.taApi.me();
+          }
+          return apiFetch("GET", "auth/me");
+        }
+
+        function loadJobs() {
+          if (window.taApi && typeof window.taApi.jobsList === "function") {
+            return window.taApi.jobsList();
+          }
+          return apiFetch("GET", "jobs");
+        }
+
+        if (!jobId) {
+          alert("Missing job id.");
+          backToPostedJobs();
+          return;
+        }
+
+        Promise.all([loadMe(), loadJobs()])
+          .then(function (arr) {
+            var me = arr[0] || {};
+            var jobs = Array.isArray(arr[1]) ? arr[1] : [];
+            var job = jobs.find(function (j) {
+              return String(j.id) === String(jobId);
+            });
+            if (!job) {
+              throw new Error("Job not found.");
+            }
+            if (String(job.organizerId) !== String(me.id)) {
+              throw new Error("You can only edit your own posted job.");
+            }
+            document.getElementById("edit-job-title").value = job.title || "";
+            editRequirementTags = parseTagsFromJob(job);
+            renderEditTags();
+            document.getElementById("edit-job-requirements-note").value = job.requirementsNote || "";
+            document.getElementById("edit-job-hours").value = job.workingHours || "";
+            document.getElementById("edit-job-deadline").value = job.deadline || "";
+          })
+          .catch(function (err) {
+            alert(err.message || "Load job failed");
+            backToPostedJobs();
+          });
+
+        document.getElementById("edit-job-cancel-btn").addEventListener("click", function () {
+          backToPostedJobs();
+        });
+
+        document.getElementById("edit-add-tag-btn").addEventListener("click", function () {
+          var input = document.getElementById("edit-tag-input");
+          addEditTag(input.value);
+          input.value = "";
+          input.focus();
+        });
+
+        document.getElementById("edit-tag-input").addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            document.getElementById("edit-add-tag-btn").click();
+          }
+        });
+
+        document.getElementById("edit-tag-list").addEventListener("click", function (e) {
+          var btn = e.target.closest("[data-edit-tag-index]");
+          if (!btn) return;
+          var idx = Number(btn.getAttribute("data-edit-tag-index"));
+          if (Number.isNaN(idx)) return;
+          editRequirementTags.splice(idx, 1);
+          renderEditTags();
+        });
+
+        document.getElementById("edit-job-form").addEventListener("submit", function (e) {
+          e.preventDefault();
+          var saveBtn = document.getElementById("edit-job-save-btn");
+          var payload = {
+            title: document.getElementById("edit-job-title").value.trim(),
+            requirements: editRequirementTags.join(", "),
+            requirementsTags: editRequirementTags.slice(),
+            requirementsNote: document.getElementById("edit-job-requirements-note").value.trim(),
+            workingHours: document.getElementById("edit-job-hours").value.trim(),
+            deadline: document.getElementById("edit-job-deadline").value,
+          };
+          if (!payload.title) {
+            alert("Job title is required.");
+            return;
+          }
+          if (!editRequirementTags.length) {
+            alert("At least one requirement tag is required.");
+            return;
+          }
+          if (!payload.workingHours) {
+            alert("Weekly working hours is required.");
+            return;
+          }
+          if (!/^\d+$/.test(payload.workingHours)) {
+            alert("Weekly working hours must contain digits only.");
+            return;
+          }
+          if (!payload.deadline) {
+            alert("Deadline is required.");
+            return;
+          }
+          saveBtn.disabled = true;
+          Promise.resolve()
+            .then(function () {
+              if (window.taApi && typeof window.taApi.jobsUpdate === "function") {
+                return window.taApi.jobsUpdate(jobId, payload);
+              }
+              return apiFetch("PUT", "jobs/" + jobId, payload);
+            })
+            .then(function () {
+              backToPostedJobs();
+            })
+            .catch(function (err) {
+              alert(err.message || "Save failed");
+            })
+            .finally(function () {
+              saveBtn.disabled = false;
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>
