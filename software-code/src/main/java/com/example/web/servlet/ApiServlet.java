@@ -147,7 +147,11 @@ public class ApiServlet extends HttpServlet {
         }
         if ("/api/jobs".equals(path) && "GET".equals(method)) {
             requireUser(ur, req);
-            HttpJson.write(resp, 200, jr.findAll());
+            List<Map<String, Object>> jobRows = new ArrayList<>();
+            for (Job j : jr.findAll()) {
+                jobRows.add(jobToPublicMap(j, ur));
+            }
+            HttpJson.write(resp, 200, jobRows);
             return;
         }
         if ("/api/jobs".equals(path) && "POST".equals(method)) {
@@ -440,6 +444,33 @@ public class ApiServlet extends HttpServlet {
             return '"' + s.replace("\"", "\"\"") + '"';
         }
         return s;
+    }
+
+    private static Map<String, Object> jobToPublicMap(Job j, UserRepository ur) throws IOException {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", j.id);
+        m.put("title", j.title);
+        m.put("module", j.module);
+        m.put("requirements", j.requirements);
+        m.put("requirementsTags", j.requirementsTags != null ? new ArrayList<>(j.requirementsTags) : new ArrayList<>());
+        m.put("requirementsNote", j.requirementsNote);
+        m.put("workingHours", j.workingHours);
+        m.put("deadline", j.deadline);
+        m.put("organizerId", j.organizerId);
+        String moName = "";
+        if (j.organizerId != null) {
+            Optional<User> ou = ur.findById(j.organizerId);
+            if (ou.isPresent()) {
+                User mo = ou.get();
+                if (mo.name != null && !mo.name.trim().isEmpty()) {
+                    moName = mo.name.trim();
+                } else if (mo.username != null && !mo.username.trim().isEmpty()) {
+                    moName = mo.username.trim();
+                }
+            }
+        }
+        m.put("organizerName", moName.isEmpty() ? "Unknown" : moName);
+        return m;
     }
 
     private static User requireUser(UserRepository ur, HttpServletRequest req) throws IOException {

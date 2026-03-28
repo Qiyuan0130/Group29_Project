@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job detail — TA</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="ta-job-view.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <div class="sys-header__actions">
+          <a class="btn btn-secondary" style="font-size: 0.85rem" href="dashboard.html#jobs">Back to Jobs</a>
+          <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard" style="display: block; max-width: 880px; margin: 0 auto">
+      <div class="dashboard__main">
+        <h2 class="dashboard__title">Job detail</h2>
+
+        <div id="detail-error" class="panel hidden" style="border-color: var(--danger)">
+          <p id="detail-error-text" style="margin: 0; color: var(--danger)"></p>
+          <p style="margin: 0.75rem 0 0"><a href="dashboard.html#jobs">Back to Jobs</a></p>
+        </div>
+
+        <div id="detail-content" class="panel hidden">
+          <h3 class="panel__head" id="detail-title-head"></h3>
+          <dl class="kv-list">
+            <dt>Title</dt>
+            <dd id="detail-name"></dd>
+            <dt>Module</dt>
+            <dd id="detail-module"></dd>
+            <dt>Posted by</dt>
+            <dd id="detail-organizer"></dd>
+            <dt>Application deadline</dt>
+            <dd id="detail-deadline"></dd>
+            <dt>Weekly workload</dt>
+            <dd id="detail-hours"></dd>
+            <dt>Tags</dt>
+            <dd id="detail-tags"></dd>
+            <dt>Requirements</dt>
+            <dd id="detail-req"></dd>
+            <dt>Organizer note</dt>
+            <dd id="detail-note"></dd>
+          </dl>
+          <div class="form-actions" style="margin-top: 1rem">
+            <button type="button" id="detail-apply-btn" class="btn btn-primary">Apply for this job</button>
+            <a class="btn btn-secondary" href="dashboard.html#jobs">Back to Jobs</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="ta-job-view-api.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        function escapeHtml(s) {
+          if (s == null) return "";
+          var d = document.createElement("div");
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function normTags(job) {
+          var t = job.requirementsTags;
+          if (!t || !t.length) return [];
+          return t.map(function (x) {
+            return (x == null ? "" : String(x)).trim();
+          }).filter(Boolean);
+        }
+
+        function showError(msg) {
+          var box = document.getElementById("detail-error");
+          var text = document.getElementById("detail-error-text");
+          var content = document.getElementById("detail-content");
+          if (text) text.textContent = msg;
+          if (box) box.classList.remove("hidden");
+          if (content) content.classList.add("hidden");
+        }
+
+        function renderJob(job) {
+          var err = document.getElementById("detail-error");
+          var content = document.getElementById("detail-content");
+          if (err) err.classList.add("hidden");
+          if (content) content.classList.remove("hidden");
+
+          var tags = normTags(job);
+          var tagsHtml = tags.length
+            ? tags.map(function (t) {
+                return '<span class="tag-pill">' + escapeHtml(t) + "</span>";
+              }).join(" ")
+            : '<span class="muted-inline">None</span>';
+
+          document.getElementById("detail-title-head").textContent = job.title || "(Untitled job)";
+          document.getElementById("detail-name").textContent = job.title || "—";
+          document.getElementById("detail-module").textContent = (job.module || "").trim() || "—";
+          document.getElementById("detail-organizer").textContent =
+            (job.organizerName || "").trim() || "—";
+          document.getElementById("detail-deadline").textContent = (job.deadline || "").trim() || "—";
+          document.getElementById("detail-hours").textContent = (job.workingHours || "").trim() || "—";
+          document.getElementById("detail-tags").innerHTML = tagsHtml;
+          document.getElementById("detail-req").textContent = (job.requirements || "").trim() || "—";
+          document.getElementById("detail-note").textContent = (job.requirementsNote || "").trim() || "—";
+
+          var applyBtn = document.getElementById("detail-apply-btn");
+          if (applyBtn && job.id != null) {
+            applyBtn.onclick = function () {
+              applyBtn.disabled = true;
+              window.taJobViewApi
+                .applicationsApply(job.id)
+                .then(function () {
+                  window.taRecruitment.showToast("Application submitted — opening Status…");
+                  setTimeout(function () {
+                    location.href = "dashboard.html#status";
+                  }, 500);
+                })
+                .catch(function (e) {
+                  window.taRecruitment.showToast(e.message || "Application failed");
+                })
+                .finally(function () {
+                  applyBtn.disabled = false;
+                });
+            };
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          var params = new URLSearchParams(location.search);
+          var rawId = params.get("id");
+          var jobId = rawId ? parseInt(rawId, 10) : NaN;
+
+          document.getElementById("logout-btn").addEventListener("click", function (e) {
+            e.preventDefault();
+            window.taJobViewApi.logout().finally(function () {
+              location.href = "../index.html";
+            });
+          });
+
+          if (Number.isNaN(jobId)) {
+            showError("Invalid link: missing job id.");
+            return;
+          }
+
+          window.taJobViewApi
+            .jobsList()
+            .then(function (data) {
+              var list = Array.isArray(data) ? data : [];
+              var job = null;
+              for (var i = 0; i < list.length; i++) {
+                if (Number(list[i].id) === jobId) {
+                  job = list[i];
+                  break;
+                }
+              }
+              if (!job) {
+                showError("This job could not be found.");
+                return;
+              }
+              renderJob(job);
+            })
+            .catch(function (e) {
+              var msg = e.message || "";
+              if (msg.indexOf("Not logged in") !== -1 || msg.indexOf("401") !== -1) {
+                window.taRecruitment.showToast("Please sign in again");
+                location.href = "../index.html";
+                return;
+              }
+              showError("Failed to load: " + msg);
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>
