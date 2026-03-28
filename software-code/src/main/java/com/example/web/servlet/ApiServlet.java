@@ -145,6 +145,18 @@ public class ApiServlet extends HttpServlet {
             HttpJson.write(resp, 200, UserPublic.from(ur.findById(u.id).orElse(u)));
             return;
         }
+        if ("/api/ta-profiles".equals(path) && "GET".equals(method)) {
+            User u = requireUser(ur, req);
+            if (!Roles.ADMIN.equals(u.role) && !Roles.MO.equals(u.role)) {
+                throw new SecurityException("Admin or MO only");
+            }
+            List<UserPublic> profiles = new ArrayList<>();
+            for (User ta : ur.listTaUsers()) {
+                profiles.add(UserPublic.from(ta));
+            }
+            HttpJson.write(resp, 200, Map.of("profiles", profiles));
+            return;
+        }
         if ("/api/jobs".equals(path) && "GET".equals(method)) {
             requireUser(ur, req);
             List<Map<String, Object>> jobRows = new ArrayList<>();
