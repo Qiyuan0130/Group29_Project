@@ -54,6 +54,11 @@
             <label for="reg-mo-key">MO Key</label>
             <input class="form-control" id="reg-mo-key" name="moKey" type="text" placeholder="Only required for MO registration" />
           </div>
+          <div class="form-group hidden" id="reg-admin-key-group">
+            <label for="reg-admin-key">Admin Registration Key</label>
+            <small style="display: block; color: #666">Required to register as Admin. Contact system administrator if you don't have the key.</small>
+            <input class="form-control" id="reg-admin-key" name="adminKey" type="password" placeholder="Enter admin registration key" />
+          </div>
           <div class="form-actions">
             <a class="btn btn-secondary" href="index.html">Return</a>
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -75,12 +80,23 @@
       }
       function syncMoKeyVisibility() {
         var role = document.getElementById("reg-role").value;
-        var group = document.getElementById("reg-mo-key-group");
-        var input = document.getElementById("reg-mo-key");
+        var moGroup = document.getElementById("reg-mo-key-group");
+        var moInput = document.getElementById("reg-mo-key");
+        var adminGroup = document.getElementById("reg-admin-key-group");
+        var adminInput = document.getElementById("reg-admin-key");
+        
         var isMo = role === "MO";
-        group.classList.toggle("hidden", !isMo);
-        input.required = isMo;
-        if (!isMo) input.value = "";
+        var isAdmin = role === "ADMIN";
+        
+        // 处理MO密钥框
+        moGroup.classList.toggle("hidden", !isMo);
+        moInput.required = isMo;
+        if (!isMo) moInput.value = "";
+        
+        // 处理Admin密钥框
+        adminGroup.classList.toggle("hidden", !isAdmin);
+        adminInput.required = isAdmin;
+        if (!isAdmin) adminInput.value = "";
       }
 
       document.getElementById("reg-role").addEventListener("change", syncMoKeyVisibility);
@@ -188,12 +204,17 @@
         var p = document.getElementById("reg-password").value;
         var p2 = document.getElementById("reg-password2").value;
         var moKey = document.getElementById("reg-mo-key").value.trim();
+        var adminKey = document.getElementById("reg-admin-key").value.trim();
         if (["TA", "MO", "ADMIN"].indexOf(role) === -1) {
           alert("Invalid role.");
           return;
         }
         if (role === "MO" && moKey !== "qwert1234") {
           alert("Invalid key. Registration not allowed.");
+          return;
+        }
+        if (role === "ADMIN" && (!adminKey || adminKey === "")) {
+          alert("Admin registration key is required. Registration not allowed.");
           return;
         }
         if (!isValidName(name)) {
@@ -217,7 +238,7 @@
           return;
         }
         window.taApi
-          .register(name, email, p, role, moKey)
+          .register(name, email, p, role, moKey, adminKey)
           .then(function () {
             // 注册成功 - 弹出提示而不是跳转页面
             showRegistrationSuccessModal(role);
