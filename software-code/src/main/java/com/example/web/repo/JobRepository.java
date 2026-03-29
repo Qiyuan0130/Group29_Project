@@ -52,11 +52,11 @@ public final class JobRepository {
         save(db);
     }
 
-    private static Job job(long id, String title, String module, String req, String reqNote, String hours, String deadline, long org) {
+    private static Job job(long id, String title, String courseName, String req, String reqNote, String hours, String deadline, long org) {
         Job j = new Job();
         j.id = id;
         j.title = title;
-        j.module = module;
+        j.courseName = courseName;
         j.requirements = req;
         j.requirementsTags = new ArrayList<>();
         j.requirementsNote = reqNote;
@@ -99,8 +99,8 @@ public final class JobRepository {
             if (patch.title != null) {
                 j.title = patch.title;
             }
-            if (patch.module != null) {
-                j.module = patch.module;
+            if (patch.courseName != null) {
+                j.courseName = patch.courseName;
             }
             if (patch.requirements != null) {
                 j.requirements = patch.requirements;

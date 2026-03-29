@@ -53,6 +53,9 @@
     applicationsApply: function (jobId) {
       return request("POST", "applications", { jobId: jobId });
     },
+    applicationsMe: function () {
+      return request("GET", "applications/me", null);
+    },
     logout: function () {
       return request("POST", "auth/logout", {});
     },

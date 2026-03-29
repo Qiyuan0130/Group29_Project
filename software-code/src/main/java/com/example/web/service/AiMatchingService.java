@@ -24,7 +24,7 @@ public final class AiMatchingService {
         List<MatchResultRow> rows = new ArrayList<>();
         String profile = safe(ta.technicalAbility) + " " + safe(ta.major);
         for (Job j : jobs) {
-            rows.add(matchOneRow("job-" + j.id, j.title, safe(j.module), profile, safe(j.requirements)));
+            rows.add(matchOneRow("job-" + j.id, j.title, safe(j.courseName), profile, safe(j.requirements)));
         }
         return rows;
     }

@@ -1,5 +1,5 @@
 {
-  "nextUserId": 5,
+  "nextUserId": 6,
   "users": [
     {
       "id": 1,
@@ -72,6 +72,18 @@
       "major": "",
       "technicalAbility": "",
       "contact": "admin1@163.com"
+    },
+    {
+      "id": 5,
+      "username": "ZhangCongming",
+      "password": "congming1",
+      "passwordHash": "$2a$10$bvqLZaR48dJnB4kZbqWP1epd9gRjRvsXQollCZzjEwM7b5eWwwfqK",
+      "role": "MO",
+      "qmNumber": "",
+      "name": "ZhangCongming",
+      "major": "",
+      "technicalAbility": "",
+      "contact": "congming@qq.com"
     }
   ]
 }
