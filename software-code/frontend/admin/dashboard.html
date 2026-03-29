@@ -15,29 +15,8 @@
     </header>
 
     <!-- ====================== -->
-    <!-- ✅ 管理员注册页面（你要的：带密钥） -->
+    <!-- ✅ Admin只能通过register.html注册，使用密钥 Group29admin -->
     <!-- ====================== -->
-    <div style="max-width: 500px; margin: 3rem auto; padding: 2rem;">
-      <h2>Admin Registration</h2>
-      <form id="adminRegisterForm" style="margin-top:1.5rem;">
-        <div class="form-group">
-          <label>Username</label>
-          <input class="form-control" type="text" required>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input class="form-control" type="password" required>
-        </div>
-
-        <!-- 管理员密钥 -->
-        <div class="form-group">
-          <label>Admin Secret Key</label>
-          <input id="adminSecret" class="form-control" type="password" placeholder="Enter admin key" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Register</button>
-      </form>
-    </div>
 
     <div class="dashboard__main" style="max-width: 1000px; margin: 0 auto; padding: 1.5rem">
       <div class="mo-tabs" style="margin-bottom: 1.25rem">
@@ -133,24 +112,6 @@
           location.href = "../index.html";
         });
       });
-
-      // ======================
-      // ✅ 管理员密钥验证（固定 12356）
-      // ======================
-      const CORRECT_KEY = "12356";
-      const form = document.getElementById("adminRegisterForm");
-      if(form){
-        form.addEventListener("submit", function(e){
-          e.preventDefault();
-          const key = document.getElementById("adminSecret").value.trim();
-          if(key !== CORRECT_KEY){
-            alert("Admin key error! Only admin can register.");
-            return;
-          }
-          alert("Registration success!");
-          window.location.href = "login.html";
-        });
-      }
     </script>
   </body>
 </html>
