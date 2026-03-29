@@ -22,6 +22,7 @@ import com.example.web.repo.UserRepository;
 import com.example.web.service.AiMatchingService;
 import com.example.web.util.HttpJson;
 import com.example.web.util.JsonPaths;
+import com.example.web.util.AuthTokenUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -102,23 +103,39 @@ public class ApiServlet extends HttpServlet {
                 throw new IllegalArgumentException("name, email, password, role required");
             }
             String role = body.role.trim().toUpperCase();
+            
+            // MO角色验证
             if (Roles.MO.equals(role)) {
                 String moKey = body.moKey == null ? "" : body.moKey.trim();
                 if (!MO_REGISTER_KEY.equals(moKey)) {
                     throw new IllegalArgumentException("Invalid key. Registration not allowed.");
                 }
             }
+            
+            // ADMIN角色验证
             if (Roles.ADMIN.equals(role)) {
                 String adminKey = body.adminKey == null ? "" : body.adminKey.trim();
                 if (!ADMIN_REGISTER_KEY.equals(adminKey)) {
-                    throw new IllegalArgumentException("Invalid admin key. Registration not allowed.");
+                    throw new IllegalArgumentException("Admin registration key is incorrect. Registration not allowed.");
                 }
             }
+            
+>>>>>>> e6ba700e5e7beede7ad58a532c55f59f98aa7a77
             User created = ur.register(body.name, body.email, body.password, body.role);
+            
+            // 生成注册成功密钥并自动建立会话（保密用户信息）
+            String authToken = AuthTokenUtil.generateAuthToken();
+            HttpSession session = req.getSession(true);
+            session.setAttribute("USER_ID", created.id);
+            session.setAttribute("AUTH_TOKEN", authToken);
+            
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("ok", true);
-            out.put("message", "注册成功，请登录");
+            out.put("message", "注册成功，自动登录中");
             out.put("role", created.role);
+            out.put("authToken", authToken);
+            out.put("userId", created.id);
+            out.put("user", UserPublic.from(created));
             HttpJson.write(resp, 200, out);
             return;
         }
