@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TA Dashboard — TA Recruitment</title>
     <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="ta-job-view.css" />
   </head>
   <body>
     <header class="sys-header">
@@ -106,66 +107,35 @@
               </div>
             </section>
 
-            <!-- Jobs -->
+            <!-- Jobs: live MO postings (GET /api/jobs); apply only on job detail page -->
             <section id="ta-panel-jobs" class="panel hidden">
-              <h3 class="panel__head">Jobs</h3>
+              <h3 class="panel__head">MO posted jobs</h3>
               <div class="toolbar">
-                <div class="form-group">
-                  <label>Search</label>
-                  <input class="form-control" type="search" placeholder="Job title or module..." />
+                <div class="form-group" style="min-width: 180px">
+                  <label for="jobs-search-input">Search</label>
+                  <input
+                    id="jobs-search-input"
+                    class="form-control"
+                    type="search"
+                    placeholder="Job title or module..."
+                    autocomplete="off"
+                  />
                 </div>
-                <div class="form-group">
-                  <label>Job Type</label>
-                  <select class="form-control">
-                    <option>Module</option>
-                    <option>Module Invigilation</option>
-                    <option>Lab</option>
-                  </select>
+                <div class="form-group" style="flex: 1; min-width: 200px">
+                  <label for="jobs-tag-filter">Filter by tags</label>
+                  <input
+                    id="jobs-tag-filter"
+                    class="form-control"
+                    type="search"
+                    placeholder="e.g. java github"
+                    autocomplete="off"
+                  />
                 </div>
-                <div class="form-group">
-                  <label>Deadline</label>
-                  <select class="form-control">
-                    <option>All</option>
-                    <option>This week</option>
-                    <option>This month</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Sort by</label>
-                  <select class="form-control">
-                    <option>Latest</option>
-                    <option>Most relevant</option>
-                  </select>
-                </div>
-                <button type="button" class="btn btn-accent">search</button>
+                <button type="button" id="jobs-reload-btn" class="btn btn-secondary">Reload</button>
               </div>
-              <div class="filter-chips">
-                <span class="chip is-active">All</span>
-                <span class="chip">This week</span>
-                <span class="chip">This month</span>
-                <span class="chip">Latest</span>
-                <span class="chip">Most relevant</span>
-              </div>
-              <div class="job-list">
-                <article class="job-card">
-                  <h4 class="job-card__title">Job Title：TA for EBU6304</h4>
-                  <p class="job-card__module">Software Engineering</p>
-                  <p class="job-card__req"><strong>requirement：</strong>Basic Java, teamwork, communication skills</p>
-                  <p class="job-card__meta">Module Organiser: Dr. XXX · Deadline: 2026-04-10</p>
-                  <div class="job-card__actions">
-                    <a class="btn btn-primary" href="#">Apply Now</a>
-                  </div>
-                </article>
-                <article class="job-card">
-                  <h4 class="job-card__title">Exam Invigilation Assistant</h4>
-                  <p class="job-card__module">School-wide</p>
-                  <p class="job-card__req"><strong>requirement：</strong>Punctuality, responsibility</p>
-                  <p class="job-card__meta">Deadline: 2026-04-15</p>
-                  <div class="job-card__actions">
-                    <a class="btn btn-primary" href="#">Apply Now</a>
-                  </div>
-                </article>
-              </div>
+              <p id="jobs-list-summary" class="subtitle" style="margin: 0 0 1rem"></p>
+              <div id="jobs-list-root" class="job-list"></div>
+              <p id="jobs-list-empty" class="subtitle hidden">No jobs match your filters.</p>
             </section>
 
             <!-- Status -->
@@ -180,23 +150,7 @@
                       <th>Application State</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>TA for EBU6304<br /><small>Software Engineering</small></td>
-                      <td>2026-04-03</td>
-                      <td><span class="status-pill status-pending">Pending</span></td>
-                    </tr>
-                    <tr>
-                      <td>Exam Invigilation Assistant</td>
-                      <td>2026-04-01</td>
-                      <td><span class="status-pill status-approved">Approved</span></td>
-                    </tr>
-                    <tr>
-                      <td>TA for EBU5002<br /><small>Computer Networks</small></td>
-                      <td>2026-03-29</td>
-                      <td><span class="status-pill status-rejected">Rejected</span></td>
-                    </tr>
-                  </tbody>
+                  <tbody id="ta-status-body"></tbody>
                 </table>
               </div>
             </section>
@@ -407,6 +361,289 @@
           })();
 
           loadCvList();
+        });
+      })();
+
+      (function () {
+        "use strict";
+
+        var allJobs = [];
+
+        function escapeHtml(s) {
+          if (s == null) return "";
+          var d = document.createElement("div");
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function normTags(job) {
+          var t = job.requirementsTags;
+          if (!t || !t.length) return [];
+          return t.map(function (x) {
+            return (x == null ? "" : String(x)).trim();
+          }).filter(Boolean);
+        }
+
+        function parseFilterTokens(raw) {
+          if (!raw || !String(raw).trim()) return [];
+          return String(raw)
+            .split(/[\s,，]+/)
+            .map(function (x) {
+              return x.trim().toLowerCase();
+            })
+            .filter(Boolean);
+        }
+
+        function jobMatchesTags(job, tokens) {
+          if (!tokens.length) return true;
+          var tags = normTags(job).map(function (t) {
+            return t.toLowerCase();
+          });
+          if (!tags.length) return false;
+          return tokens.every(function (tok) {
+            return tags.some(function (tag) {
+              return tag.indexOf(tok) !== -1;
+            });
+          });
+        }
+
+        function jobMatchesTitleModule(job, q) {
+          if (!q || !String(q).trim()) return true;
+          var hay = ((job.title || "") + " " + (job.module || "")).toLowerCase();
+          return hay.indexOf(String(q).trim().toLowerCase()) !== -1;
+        }
+
+        function sortByDeadline(a, b) {
+          var da = (a.deadline || "").trim();
+          var db = (b.deadline || "").trim();
+          if (!da && !db) return 0;
+          if (!da) return 1;
+          if (!db) return -1;
+          return da.localeCompare(db);
+        }
+
+        function detailHref(jobId) {
+          return "job-detail.html?id=" + encodeURIComponent(String(jobId));
+        }
+
+        function renderCard(job) {
+          var tags = normTags(job);
+          var tagsHtml = tags.length
+            ? tags
+                .map(function (t) {
+                  return '<span class="tag-pill">' + escapeHtml(t) + "</span>";
+                })
+                .join(" ")
+            : '<span class="muted-inline">No tags</span>';
+
+          var req = (job.requirements || "").trim();
+          var note = (job.requirementsNote || "").trim();
+          var hours = (job.workingHours || "").trim();
+          var deadline = (job.deadline || "").trim();
+          var jobIdAttr = job.id != null ? String(job.id) : "";
+          var detailUrl = detailHref(job.id);
+          var moName = (job.organizerName || "").trim() || "—";
+
+          var metaParts = [];
+          metaParts.push("Posted by: " + escapeHtml(moName));
+          if (hours) metaParts.push("Weekly workload: " + escapeHtml(hours));
+          metaParts.push(deadline ? "Deadline: " + escapeHtml(deadline) : "Deadline: —");
+
+          var preview = req || note || "Open details for the full description.";
+          if (preview.length > 120) preview = preview.slice(0, 120) + "…";
+
+          return (
+            '<article class="job-card job-card--clickable" data-job-id="' +
+            escapeHtml(jobIdAttr) +
+            '">' +
+            '<h4 class="job-card__title">' +
+            '<a class="job-card__title-link" href="' +
+            detailUrl +
+            '">' +
+            escapeHtml(job.title || "(Untitled)") +
+            "</a></h4>" +
+            '<p class="job-card__module">Module: ' +
+            escapeHtml(job.module || "—") +
+            "</p>" +
+            '<div class="job-card__tags-row"><span class="job-card__tags-label">Tags</span> ' +
+            tagsHtml +
+            "</div>" +
+            '<p class="job-card__req"><strong>Summary:</strong> ' +
+            escapeHtml(preview) +
+            "</p>" +
+            '<p class="job-card__meta">' +
+            metaParts.join(" · ") +
+            "</p>" +
+            '<div class="job-card__actions">' +
+            '<a class="btn btn-primary" href="' +
+            detailUrl +
+            '">View details</a>' +
+            "</div>" +
+            "</article>"
+          );
+        }
+
+        function renderTaJobs() {
+          var searchEl = document.getElementById("jobs-search-input");
+          var filterEl = document.getElementById("jobs-tag-filter");
+          var root = document.getElementById("jobs-list-root");
+          var empty = document.getElementById("jobs-list-empty");
+          var summary = document.getElementById("jobs-list-summary");
+          if (!root || !empty) return;
+
+          var titleQ = searchEl ? searchEl.value : "";
+          var tokens = parseFilterTokens(filterEl ? filterEl.value : "");
+
+          var list = allJobs.slice().sort(sortByDeadline);
+          var filtered = list.filter(function (j) {
+            return jobMatchesTitleModule(j, titleQ) && jobMatchesTags(j, tokens);
+          });
+
+          if (summary) {
+            var active = tokens.length > 0 || !!(titleQ && String(titleQ).trim());
+            summary.textContent =
+              "Showing " + filtered.length + " of " + list.length + " jobs" + (active ? " (filters active)" : "");
+          }
+
+          root.innerHTML = filtered.map(renderCard).join("");
+          empty.classList.toggle("hidden", filtered.length !== 0);
+
+          root.querySelectorAll(".job-card--clickable").forEach(function (card) {
+            card.addEventListener("click", function (ev) {
+              if (ev.target.closest("a")) return;
+              var id = card.getAttribute("data-job-id");
+              if (id) location.href = detailHref(id);
+            });
+          });
+        }
+
+        function loadTaJobs() {
+          return window.taApi
+            .jobsList()
+            .then(function (data) {
+              allJobs = Array.isArray(data) ? data : [];
+              renderTaJobs();
+            })
+            .catch(function (err) {
+              var msg = err.message || "";
+              if (msg.indexOf("Not logged in") !== -1 || msg.indexOf("401") !== -1) {
+                window.taRecruitment.showToast("Please sign in again");
+                location.href = "../index.html";
+                return;
+              }
+              window.taRecruitment.showToast("Failed to load jobs: " + msg);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          var searchEl = document.getElementById("jobs-search-input");
+          var filterEl = document.getElementById("jobs-tag-filter");
+          var reload = document.getElementById("jobs-reload-btn");
+          var navJobs = document.querySelector('.ta-nav-link[data-tab="jobs"]');
+
+          if (searchEl) searchEl.addEventListener("input", renderTaJobs);
+          if (filterEl) filterEl.addEventListener("input", renderTaJobs);
+          if (reload) reload.addEventListener("click", loadTaJobs);
+          if (navJobs) {
+            navJobs.addEventListener("click", function () {
+              loadTaJobs();
+            });
+          }
+
+          if (location.hash === "#jobs") {
+            var jobsTab = document.querySelector('.ta-nav-link[data-tab="jobs"]');
+            if (jobsTab) jobsTab.click();
+          }
+        });
+      })();
+
+      (function () {
+        "use strict";
+
+        function escapeHtml(s) {
+          if (s == null) return "";
+          var d = document.createElement("div");
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function statusPillClass(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "status-approved";
+          if (up === "REJECTED") return "status-rejected";
+          return "status-pending";
+        }
+
+        function statusLabel(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "Accepted";
+          if (up === "REJECTED") return "Rejected";
+          if (up === "PENDING") return "Pending";
+          return status || "—";
+        }
+
+        function formatAppliedAt(iso) {
+          if (!iso) return "—";
+          var d = new Date(iso);
+          return Number.isNaN(d.getTime()) ? String(iso) : d.toLocaleString();
+        }
+
+        function loadTaStatus() {
+          var body = document.getElementById("ta-status-body");
+          if (!body) return;
+          window.taApi
+            .applicationsMe()
+            .then(function (res) {
+              var apps = res && res.applications ? res.applications : [];
+              if (!apps.length) {
+                body.innerHTML = '<tr><td colspan="3">No applications yet.</td></tr>';
+                return;
+              }
+              body.innerHTML = apps
+                .map(function (a) {
+                  var title = escapeHtml(a.jobTitle || "—");
+                  var mod = (a.module || "").trim();
+                  var modHtml = mod ? "<br /><small>" + escapeHtml(mod) + "</small>" : "";
+                  var pill = statusPillClass(a.status);
+                  var lab = escapeHtml(statusLabel(a.status));
+                  return (
+                    "<tr><td>" +
+                    title +
+                    modHtml +
+                    "</td><td>" +
+                    escapeHtml(formatAppliedAt(a.appliedAt)) +
+                    '</td><td><span class="status-pill ' +
+                    pill +
+                    '">' +
+                    lab +
+                    "</span></td></tr>"
+                  );
+                })
+                .join("");
+            })
+            .catch(function (err) {
+              var msg = err.message || "";
+              if (msg.indexOf("Not logged in") !== -1 || msg.indexOf("401") !== -1) {
+                window.taRecruitment.showToast("Please sign in again");
+                location.href = "../index.html";
+                return;
+              }
+              if (body) body.innerHTML = '<tr><td colspan="3">Failed to load status.</td></tr>';
+              window.taRecruitment.showToast("Failed to load applications: " + msg);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          var navStatus = document.querySelector('.ta-nav-link[data-tab="status"]');
+          if (navStatus) {
+            navStatus.addEventListener("click", function () {
+              loadTaStatus();
+            });
+          }
+          if (location.hash === "#status") {
+            var st = document.querySelector('.ta-nav-link[data-tab="status"]');
+            if (st) st.click();
+          }
         });
       })();
 

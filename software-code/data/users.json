@@ -1,5 +1,5 @@
 {
-  "nextUserId": 4,
+  "nextUserId": 5,
   "users": [
     {
       "id": 1,
@@ -36,6 +36,18 @@
       "major": "",
       "technicalAbility": "",
       "contact": "1234@qq.com"
+    },
+    {
+      "id": 4,
+      "username": "12",
+      "password": "123456a",
+      "passwordHash": "$2a$10$MKDvnxAIhHQ5AGMzcPgns.KyqUAzhl8dQErHn/8vd0w4M16XhYEK.",
+      "role": "ADMIN",
+      "qmNumber": "",
+      "name": "12",
+      "major": "",
+      "technicalAbility": "",
+      "contact": "12@123.com"
     }
   ]
 }
