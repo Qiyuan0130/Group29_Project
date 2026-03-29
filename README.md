@@ -4,13 +4,13 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 # Group Name-List
 
 - GitHub Account:QMID(Lead/Member)
-- qrsikno2:190898878(Support TA) 
-- ACCOUNT for Mengdi Yang:231222006(L/M)
-- ACCOUNT for Zixin Xiong:231220149(L/M)
-- ACCOUNT for Songqi Zhang:231220541(L/M)
-- ACCOUNT for Xinyi li:231221630(L/M)
-- ACCOUNT for Jingyi Wang:231220644(L/M)
-- ACCOUNT for Yangxinyue Zhou:231222800(L/M)
+- qrsikno2:190898878(Support TA)
+- ACCOUNT for Zixin Xiong:231220149(L)
+- ACCOUNT for Mengdi Yang:231222006(M)
+- ACCOUNT for C3H604:231220541(M)
+- ACCOUNT for twila-suyuluo:231221630(M)
+- ACCOUNT for lindbs1:231220644(M)
+- ACCOUNT for zyxy7:231222800(M)
 
 # Meeting Record
 | Meeting | Focus | Output |
@@ -48,6 +48,5 @@ Here is the Markdown version of your table with the original English text preser
 | **Yangxinyue Zhou** | |
 | **(Support TA) qrsikno2** | |
 
-Would you like me to add any specific task descriptions for the other members?
 
 <!-- Copy the Week block above for Week 2, Week 3, … -->
