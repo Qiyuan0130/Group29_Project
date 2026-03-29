@@ -7,4 +7,5 @@ public class RegisterRequest {
     public String password;
     public String role;
     public String moKey;
+    public String adminKey;
 }
