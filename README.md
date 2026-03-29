@@ -18,6 +18,7 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 | Meeting 1 | Discussed overall project requirements, analyzed core tasks, and clarified module ownership. | Initial task breakdown and role assignment draft. |
 | Meeting 2 | Reviewed completed work in the previous phase and identified items needing adjustment. | Progress check with improvement items. |
 | Meeting 3 | Analyzed second-phase priorities and reconfirmed responsibilities based on project progress. | Finalized task allocation for the next stage. |
+| Meeting 4 | Checked this week’s completed tasks and discussed the work to be improved and finished next week. | Confirmed current progress and assigned next week’s follow-up tasks. |
 
 #### Current task allocation
 
@@ -34,8 +35,6 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 
 Use this section to log **weekly completed work per member**. Update after each week or team sync (replace dates, add new `### Week N` blocks as needed).
 
-Here is the Markdown version of your table with the original English text preserved:
-
 ### Week 1 
 
 | Member | Completed tasks |
@@ -44,7 +43,7 @@ Here is the Markdown version of your table with the original English text preser
 | **Zixin Xiong** | Created `task.json` to streamline build/run workflows; defined validation rules for registration and login formats; designed the user data storage files under `data`; fixed core TA registration/login functionality; completed the TA CV upload feature; and improved the front-end experience. |
 | **Xinyi Li** | Defined validation rules for registration and login formats in MO; created job dataset; modified the release job interface of MO; added tag function; fixed MO registration and login function; modified MO job list; unified the style of navigation bar; set job title, Required Technical Ability, Weekly Working Hours and Deadline to mandatory. |
 | **Mengdi Yang** | |
-| **Songqi Zhang** | |
+| **Songqi Zhang** | Built the TA-side job list for viewing MO-published jobs; fetched and displayed job details; added multi-keyword tag filtering; created the job detail page; linked Status with application records and redirected users there after successful application. |
 | **Yangxinyue Zhou** | |
 | **(Support TA) qrsikno2** | |
 
