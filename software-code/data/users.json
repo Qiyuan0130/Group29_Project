@@ -48,6 +48,30 @@
       "major": "",
       "technicalAbility": "",
       "contact": "12@123.com"
+    },
+    {
+      "id": 5,
+      "username": "Ella",
+      "password": "ella1234",
+      "passwordHash": "$2a$10$USrX03FuOf6.3CjbXKSu9u./UTB29SXrKNFDE712F.fRPxwvmSM3S",
+      "role": "TA",
+      "qmNumber": "123456",
+      "name": "Ella",
+      "major": "Telecommunications",
+      "technicalAbility": "java",
+      "contact": "ella@163.com"
+    },
+    {
+      "id": 6,
+      "username": "admin1",
+      "password": "admin1234",
+      "passwordHash": "$2a$10$C0FP3rhW7arBltSCaCZrBuxSHA7k5MPvpE.RRnj9PJ27IfmeEZlFq",
+      "role": "ADMIN",
+      "qmNumber": "",
+      "name": "admin1",
+      "major": "",
+      "technicalAbility": "",
+      "contact": "admin1@163.com"
     }
   ]
 }

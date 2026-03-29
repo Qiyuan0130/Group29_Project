@@ -29,6 +29,9 @@ public final class HttpJson {
         resp.setStatus(status);
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
         resp.setContentType("application/json;charset=UTF-8");
+        resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setDateHeader("Expires", 0);
         if (body != null) {
             resp.getWriter().write(GSON.toJson(body));
         }
