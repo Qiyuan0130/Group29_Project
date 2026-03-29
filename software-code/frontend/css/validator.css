@@ -1,0 +1,232 @@
+/**
+ * 表单验证样式
+ * 用于错误提示的样式定义
+ */
+
+/* 无效输入框样式 */
+input.is-invalid,
+textarea.is-invalid,
+select.is-invalid {
+  border-color: #dc3545;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath fill='%23dc3545' d='M8 4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0 0 1h3A.5.5 0 0 0 8 4z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  padding-right: calc(1.5em + 0.75rem);
+  box-shadow: inset 0 1px 1px rgba(220, 53, 69, 0.075);
+}
+
+input.is-invalid:focus,
+textarea.is-invalid:focus,
+select.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* 有效输入框样式 */
+input.is-valid,
+textarea.is-valid,
+select.is-valid {
+  border-color: #28a745;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  padding-right: calc(1.5em + 0.75rem);
+  box-shadow: inset 0 1px 1px rgba(40, 167, 69, 0.075);
+}
+
+input.is-valid:focus,
+textarea.is-valid:focus,
+select.is-valid:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* 错误消息容器 */
+.form-errors {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #f5c6cb;
+  border-radius: 0.25rem;
+  background-color: #f8d7da;
+  color: #721c24;
+  animation: slideDown 0.3s ease-out;
+}
+
+.form-errors .error-item {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.form-errors .error-item:first-child {
+  margin-top: 0;
+}
+
+.form-errors .error-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 成功消息容器 */
+.form-success {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #d4edda;
+  border-radius: 0.25rem;
+  background-color: #d4edda;
+  color: #155724;
+  animation: slideDown 0.3s ease-out;
+}
+
+/* 表单字段包装器 */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group label .required {
+  color: #dc3545;
+  margin-left: 0.25rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-group textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+/* 提交按钮 */
+.form-submit-btn {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.form-submit-btn:hover {
+  background-color: #0056b3;
+}
+
+.form-submit-btn:active {
+  background-color: #004085;
+}
+
+.form-submit-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* 加载状态 */
+.form-submit-btn.loading {
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.form-submit-btn.loading::after {
+  content: " ...";
+  animation: dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%,
+  20% {
+    content: " ";
+  }
+  40% {
+    content: " .";
+  }
+  60% {
+    content: " ..";
+  }
+  80%,
+  100% {
+    content: " ...";
+  }
+}
+
+/* 动画效果 */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 帮助文本 */
+.form-text {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* 单选框和复选框 */
+.form-check {
+  padding-left: 1.5rem;
+}
+
+.form-check input[type="checkbox"],
+.form-check input[type="radio"] {
+  margin-top: 0.3rem;
+  margin-left: -1.5rem;
+  cursor: pointer;
+}
+
+.form-check label {
+  padding: 0;
+  margin-bottom: 0;
+  display: inline;
+  cursor: pointer;
+}
+
+/* 响应式 */
+@media (max-width: 576px) {
+  .form-submit-btn {
+    width: 100%;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-size: 16px; /* 防止iOS中自动缩放 */
+  }
+}
