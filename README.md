@@ -33,7 +33,7 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 
 # 任务进度
 
-Use this section to log **weekly completed work per member**. Update after each week or team sync (replace dates, add new `### Week N` blocks as needed).
+Use this section to log **weekly completed work per member**. Update after each week or team sync.
 
 ### Week 1 
 
