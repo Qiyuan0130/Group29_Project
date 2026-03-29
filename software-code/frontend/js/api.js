@@ -110,5 +110,8 @@
     jobsUpdate: function (id, job) {
       return request("PUT", "jobs/" + id, job || {});
     },
+    applicationsMe: function () {
+      return request("GET", "applications/me", null);
+    },
   };
 })(typeof window !== "undefined" ? window : this);
