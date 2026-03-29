@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
     <title>TA Dashboard — TA Recruitment</title>
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="ta-job-view.css" />
@@ -117,7 +119,7 @@
                     id="jobs-search-input"
                     class="form-control"
                     type="search"
-                    placeholder="Job title or module..."
+                    placeholder="Job title or course name..."
                     autocomplete="off"
                   />
                 </div>
@@ -130,6 +132,13 @@
                     placeholder="e.g. java github"
                     autocomplete="off"
                   />
+                </div>
+                <div class="form-group" style="min-width: 220px">
+                  <label for="jobs-sort-select">Sort by deadline</label>
+                  <select id="jobs-sort-select" class="form-control">
+                    <option value="asc">Soonest deadline (not applied → applied → expired)</option>
+                    <option value="desc">Latest deadline (not applied → applied → expired)</option>
+                  </select>
                 </div>
                 <button type="button" id="jobs-reload-btn" class="btn btn-secondary">Reload</button>
               </div>
@@ -369,6 +378,8 @@
         "use strict";
 
         var allJobs = [];
+        /** jobId string -> { status, appliedAt } */
+        var myAppsByJobId = {};
 
         function escapeHtml(s) {
           if (s == null) return "";
@@ -408,19 +419,93 @@
           });
         }
 
-        function jobMatchesTitleModule(job, q) {
+        function jobMatchesTitleOrCourse(job, q) {
           if (!q || !String(q).trim()) return true;
-          var hay = ((job.title || "") + " " + (job.module || "")).toLowerCase();
+          var hay = ((job.title || "") + " " + (job.courseName || "")).toLowerCase();
           return hay.indexOf(String(q).trim().toLowerCase()) !== -1;
         }
 
-        function sortByDeadline(a, b) {
+        function sortByDeadlineAsc(a, b) {
           var da = (a.deadline || "").trim();
           var db = (b.deadline || "").trim();
           if (!da && !db) return 0;
           if (!da) return 1;
           if (!db) return -1;
           return da.localeCompare(db);
+        }
+
+        /**
+         * Order: not applied & open → applied & open → not applied & expired → applied & expired.
+         * Within each group, sort by deadline (asc/desc from UI).
+         */
+        function jobListSortTier(job) {
+          var jid = job.id != null ? String(job.id) : "";
+          var applied = !!(jid && myAppsByJobId[jid]);
+          var exp = isJobExpired(job.deadline);
+          if (!exp && !applied) return 0;
+          if (!exp && applied) return 1;
+          if (exp && !applied) return 2;
+          return 3;
+        }
+
+        function sortJobsForDisplay(list, deadlineOrder) {
+          var arr = list.slice();
+          arr.sort(function (a, b) {
+            var ta = jobListSortTier(a);
+            var tb = jobListSortTier(b);
+            if (ta !== tb) return ta - tb;
+            var cmp = sortByDeadlineAsc(a, b);
+            return deadlineOrder === "desc" ? -cmp : cmp;
+          });
+          return arr;
+        }
+
+        function todayYmd() {
+          var d = new Date();
+          var y = d.getFullYear();
+          var m = String(d.getMonth() + 1).padStart(2, "0");
+          var day = String(d.getDate()).padStart(2, "0");
+          return y + "-" + m + "-" + day;
+        }
+
+        function deadlineYmd(raw) {
+          if (!raw) return "";
+          var s = String(raw).trim();
+          var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+          return m ? m[1] : "";
+        }
+
+        function isJobExpired(deadlineRaw) {
+          var d = deadlineYmd(deadlineRaw);
+          if (!d) return false;
+          return todayYmd() > d;
+        }
+
+        function appStatusPillClass(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "status-approved";
+          if (up === "REJECTED") return "status-rejected";
+          return "status-pending";
+        }
+
+        function appStatusLabel(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "Accepted";
+          if (up === "REJECTED") return "Rejected";
+          if (up === "PENDING") return "Pending";
+          return status || "—";
+        }
+
+        function buildMyAppsMap(res) {
+          myAppsByJobId = {};
+          var apps = res && res.applications ? res.applications : [];
+          apps.forEach(function (a) {
+            if (a == null || a.jobId == null) return;
+            myAppsByJobId[String(a.jobId)] = {
+              status: a.status,
+              appliedAt: a.appliedAt,
+            };
+          });
         }
 
         function detailHref(jobId) {
@@ -444,6 +529,38 @@
           var jobIdAttr = job.id != null ? String(job.id) : "";
           var detailUrl = detailHref(job.id);
           var moName = (job.organizerName || "").trim() || "—";
+          var jidKey = jobIdAttr ? String(jobIdAttr) : "";
+          var myApp = jidKey ? myAppsByJobId[jidKey] : null;
+          var expired = isJobExpired(job.deadline);
+
+          var postingBlock = expired
+            ? ""
+            : '<span class="job-card__status-label">Posting</span>' +
+              '<span class="status-pill job-posting-open">Open</span>';
+
+          var appHtml;
+          if (myApp) {
+            appHtml =
+              '<span class="status-pill ' +
+              appStatusPillClass(myApp.status) +
+              '">' +
+              escapeHtml(appStatusLabel(myApp.status)) +
+              "</span>";
+          } else {
+            appHtml = '<span class="status-pill app-none">Not applied</span>';
+          }
+
+          var statusRow =
+            '<div class="job-card__status-row">' +
+            postingBlock +
+            '<span class="job-card__status-label">Your application</span>' +
+            appHtml +
+            "</div>";
+
+          var titlePlain = job.title || "(Untitled)";
+          var expiredSuffix = expired
+            ? '<span class="job-card__expired-suffix"> (Expired)</span>'
+            : "";
 
           var metaParts = [];
           metaParts.push("Posted by: " + escapeHtml(moName));
@@ -453,18 +570,27 @@
           var preview = req || note || "Open details for the full description.";
           if (preview.length > 120) preview = preview.slice(0, 120) + "…";
 
+          var titleLinkClass = expired
+            ? "job-card__title-link job-card__title-link--muted"
+            : "job-card__title-link";
+
           return (
             '<article class="job-card job-card--clickable" data-job-id="' +
             escapeHtml(jobIdAttr) +
             '">' +
-            '<h4 class="job-card__title">' +
-            '<a class="job-card__title-link" href="' +
+            '<h4 class="job-card__title job-card__title--list">' +
+            '<a class="' +
+            titleLinkClass +
+            '" href="' +
             detailUrl +
             '">' +
-            escapeHtml(job.title || "(Untitled)") +
-            "</a></h4>" +
-            '<p class="job-card__module">Module: ' +
-            escapeHtml(job.module || "—") +
+            escapeHtml(titlePlain) +
+            "</a>" +
+            expiredSuffix +
+            "</h4>" +
+            statusRow +
+            '<p class="job-card__course-name">Course name: ' +
+            escapeHtml(job.courseName || "—") +
             "</p>" +
             '<div class="job-card__tags-row"><span class="job-card__tags-label">Tags</span> ' +
             tagsHtml +
@@ -487,6 +613,7 @@
         function renderTaJobs() {
           var searchEl = document.getElementById("jobs-search-input");
           var filterEl = document.getElementById("jobs-tag-filter");
+          var sortEl = document.getElementById("jobs-sort-select");
           var root = document.getElementById("jobs-list-root");
           var empty = document.getElementById("jobs-list-empty");
           var summary = document.getElementById("jobs-list-summary");
@@ -494,10 +621,11 @@
 
           var titleQ = searchEl ? searchEl.value : "";
           var tokens = parseFilterTokens(filterEl ? filterEl.value : "");
+          var sortOrder = sortEl && sortEl.value === "desc" ? "desc" : "asc";
 
-          var list = allJobs.slice().sort(sortByDeadline);
+          var list = sortJobsForDisplay(allJobs, sortOrder);
           var filtered = list.filter(function (j) {
-            return jobMatchesTitleModule(j, titleQ) && jobMatchesTags(j, tokens);
+            return jobMatchesTitleOrCourse(j, titleQ) && jobMatchesTags(j, tokens);
           });
 
           if (summary) {
@@ -523,6 +651,12 @@
             .jobsList()
             .then(function (data) {
               allJobs = Array.isArray(data) ? data : [];
+              return window.taApi.applicationsMe().catch(function () {
+                return { applications: [] };
+              });
+            })
+            .then(function (res) {
+              buildMyAppsMap(res || { applications: [] });
               renderTaJobs();
             })
             .catch(function (err) {
@@ -539,11 +673,13 @@
         document.addEventListener("DOMContentLoaded", function () {
           var searchEl = document.getElementById("jobs-search-input");
           var filterEl = document.getElementById("jobs-tag-filter");
+          var sortEl = document.getElementById("jobs-sort-select");
           var reload = document.getElementById("jobs-reload-btn");
           var navJobs = document.querySelector('.ta-nav-link[data-tab="jobs"]');
 
           if (searchEl) searchEl.addEventListener("input", renderTaJobs);
           if (filterEl) filterEl.addEventListener("input", renderTaJobs);
+          if (sortEl) sortEl.addEventListener("change", renderTaJobs);
           if (reload) reload.addEventListener("click", loadTaJobs);
           if (navJobs) {
             navJobs.addEventListener("click", function () {
@@ -589,6 +725,27 @@
           return Number.isNaN(d.getTime()) ? String(iso) : d.toLocaleString();
         }
 
+        function statusTodayYmd() {
+          var d = new Date();
+          var y = d.getFullYear();
+          var m = String(d.getMonth() + 1).padStart(2, "0");
+          var day = String(d.getDate()).padStart(2, "0");
+          return y + "-" + m + "-" + day;
+        }
+
+        function statusDeadlineYmd(raw) {
+          if (!raw) return "";
+          var s = String(raw).trim();
+          var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+          return m ? m[1] : "";
+        }
+
+        function statusIsJobExpired(deadlineRaw) {
+          var d = statusDeadlineYmd(deadlineRaw);
+          if (!d) return false;
+          return statusTodayYmd() > d;
+        }
+
         function loadTaStatus() {
           var body = document.getElementById("ta-status-body");
           if (!body) return;
@@ -602,14 +759,21 @@
               }
               body.innerHTML = apps
                 .map(function (a) {
-                  var title = escapeHtml(a.jobTitle || "—");
-                  var mod = (a.module || "").trim();
+                  var rowExp = statusIsJobExpired(a.jobDeadline);
+                  var titleInner = escapeHtml(a.jobTitle || "—");
+                  if (rowExp) {
+                    titleInner =
+                      '<span class="status-job-title status-job-title--expired">' +
+                      titleInner +
+                      ' <span class="status-job-expired-suffix">(Expired)</span></span>';
+                  }
+                  var mod = (a.courseName || "").trim();
                   var modHtml = mod ? "<br /><small>" + escapeHtml(mod) + "</small>" : "";
                   var pill = statusPillClass(a.status);
                   var lab = escapeHtml(statusLabel(a.status));
                   return (
                     "<tr><td>" +
-                    title +
+                    titleInner +
                     modHtml +
                     "</td><td>" +
                     escapeHtml(formatAppliedAt(a.appliedAt)) +
