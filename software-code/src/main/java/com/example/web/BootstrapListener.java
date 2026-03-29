@@ -1,5 +1,7 @@
 package com.example.web;
 
+import com.example.web.util.JsonPaths;
+
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -18,5 +20,10 @@ public class BootstrapListener implements ServletContextListener {
         } catch (IOException e) {
             throw new IllegalStateException("初始化 JSON 数据失败", e);
         }
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        JsonPaths.clearSettingsCache();
     }
 }
