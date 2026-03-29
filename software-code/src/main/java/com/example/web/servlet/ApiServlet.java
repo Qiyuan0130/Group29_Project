@@ -120,7 +120,6 @@ public class ApiServlet extends HttpServlet {
                 }
             }
             
->>>>>>> e6ba700e5e7beede7ad58a532c55f59f98aa7a77
             User created = ur.register(body.name, body.email, body.password, body.role);
             
             // 生成注册成功密钥并自动建立会话（保密用户信息）

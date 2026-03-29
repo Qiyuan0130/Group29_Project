@@ -213,13 +213,8 @@
           alert("Invalid key. Registration not allowed.");
           return;
         }
-<<<<<<< HEAD
         if (role === "ADMIN" && adminKey !== "Group29admin") {
           alert("Invalid admin key. Registration not allowed.");
-=======
-        if (role === "ADMIN" && (!adminKey || adminKey === "")) {
-          alert("Admin registration key is required. Registration not allowed.");
->>>>>>> e6ba700e5e7beede7ad58a532c55f59f98aa7a77
           return;
         }
         if (!isValidName(name)) {
