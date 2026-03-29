@@ -43,6 +43,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
     private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
     private static final String MO_REGISTER_KEY = "qwert1234";
+    private static final String ADMIN_REGISTER_KEY = "Group29admin";
     private static final int MAX_REQUIREMENT_TAGS = 6;
     private static final int MAX_REQUIREMENT_TAG_LENGTH = 10;
 
@@ -105,6 +106,12 @@ public class ApiServlet extends HttpServlet {
                 String moKey = body.moKey == null ? "" : body.moKey.trim();
                 if (!MO_REGISTER_KEY.equals(moKey)) {
                     throw new IllegalArgumentException("Invalid key. Registration not allowed.");
+                }
+            }
+            if (Roles.ADMIN.equals(role)) {
+                String adminKey = body.adminKey == null ? "" : body.adminKey.trim();
+                if (!ADMIN_REGISTER_KEY.equals(adminKey)) {
+                    throw new IllegalArgumentException("Invalid admin key. Registration not allowed.");
                 }
             }
             User created = ur.register(body.name, body.email, body.password, body.role);

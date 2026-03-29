@@ -54,6 +54,10 @@
             <label for="reg-mo-key">MO Key</label>
             <input class="form-control" id="reg-mo-key" name="moKey" type="text" placeholder="Only required for MO registration" />
           </div>
+          <div class="form-group hidden" id="reg-admin-key-group">
+            <label for="reg-admin-key">Admin Key</label>
+            <input class="form-control" id="reg-admin-key" name="adminKey" type="text" placeholder="Only required for ADMIN registration" />
+          </div>
           <div class="form-actions">
             <a class="btn btn-secondary" href="index.html">Return</a>
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -75,12 +79,18 @@
       }
       function syncMoKeyVisibility() {
         var role = document.getElementById("reg-role").value;
-        var group = document.getElementById("reg-mo-key-group");
-        var input = document.getElementById("reg-mo-key");
+        var moGroup = document.getElementById("reg-mo-key-group");
+        var adminGroup = document.getElementById("reg-admin-key-group");
+        var moInput = document.getElementById("reg-mo-key");
+        var adminInput = document.getElementById("reg-admin-key");
         var isMo = role === "MO";
-        group.classList.toggle("hidden", !isMo);
-        input.required = isMo;
-        if (!isMo) input.value = "";
+        var isAdmin = role === "ADMIN";
+        moGroup.classList.toggle("hidden", !isMo);
+        adminGroup.classList.toggle("hidden", !isAdmin);
+        moInput.required = isMo;
+        adminInput.required = isAdmin;
+        if (!isMo) moInput.value = "";
+        if (!isAdmin) adminInput.value = "";
       }
 
       document.getElementById("reg-role").addEventListener("change", syncMoKeyVisibility);
@@ -95,12 +105,17 @@
         var p = document.getElementById("reg-password").value;
         var p2 = document.getElementById("reg-password2").value;
         var moKey = document.getElementById("reg-mo-key").value.trim();
+        var adminKey = document.getElementById("reg-admin-key").value.trim();
         if (["TA", "MO", "ADMIN"].indexOf(role) === -1) {
           alert("Invalid role.");
           return;
         }
         if (role === "MO" && moKey !== "qwert1234") {
           alert("Invalid key. Registration not allowed.");
+          return;
+        }
+        if (role === "ADMIN" && adminKey !== "Group29admin") {
+          alert("Invalid admin key. Registration not allowed.");
           return;
         }
         if (!isValidName(name)) {
@@ -124,7 +139,7 @@
           return;
         }
         window.taApi
-          .register(name, email, p, role, moKey)
+          .register(name, email, p, role, moKey, adminKey)
           .then(function () {
             alert("Registration successful. Please sign in.");
             location.href = "login.html";
