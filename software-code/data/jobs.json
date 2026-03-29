@@ -4,7 +4,7 @@
     {
       "id": 1,
       "title": "TA for EBU6304",
-      "module": "Software Engineering",
+      "courseName": "Software Engineering",
       "requirements": "Basic Java, teamwork, communication skills",
       "workingHours": "4 hrs/week",
       "deadline": "2026-04-10",
@@ -13,7 +13,7 @@
     {
       "id": 2,
       "title": "Exam Invigilation Assistant",
-      "module": "School-wide",
+      "courseName": "School-wide",
       "requirements": "Punctuality, responsibility",
       "workingHours": "As scheduled",
       "deadline": "2026-04-15",
@@ -22,7 +22,7 @@
     {
       "id": 3,
       "title": "TA for EBU5002",
-      "module": "Computer Networks",
+      "courseName": "Computer Networks",
       "requirements": "Network stack, troubleshooting, communication",
       "workingHours": "3 hrs/week",
       "deadline": "2026-04-20",
@@ -31,7 +31,7 @@
     {
       "id": 4,
       "title": "567",
-      "module": "General",
+      "courseName": "General",
       "requirements": "python, java",
       "requirementsTags": [
         "python",
@@ -45,7 +45,7 @@
     {
       "id": 5,
       "title": "333",
-      "module": "General",
+      "courseName": "General",
       "requirements": "java, github, 111, 1111, 11111",
       "requirementsTags": [
         "java",
@@ -62,7 +62,7 @@
     {
       "id": 6,
       "title": "123456",
-      "module": "General",
+      "courseName": "General",
       "requirements": "github",
       "requirementsTags": [
         "github"
@@ -75,7 +75,7 @@
     {
       "id": 7,
       "title": "123",
-      "module": "General",
+      "courseName": "General",
       "requirements": "",
       "requirementsTags": [],
       "requirementsNote": "66666",
@@ -86,7 +86,7 @@
     {
       "id": 8,
       "title": "333",
-      "module": "General",
+      "courseName": "General",
       "requirements": "",
       "requirementsTags": [],
       "requirementsNote": "",

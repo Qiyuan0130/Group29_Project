@@ -230,7 +230,8 @@ public class ApiServlet extends HttpServlet {
                 row.put("applicationId", a.id);
                 row.put("jobId", a.jobId);
                 row.put("jobTitle", j.map(x -> x.title).orElse(""));
-                row.put("module", j.map(x -> x.module).orElse(""));
+                row.put("courseName", j.map(x -> x.courseName).orElse(""));
+                row.put("jobDeadline", j.map(x -> x.deadline == null ? "" : x.deadline).orElse(""));
                 row.put("appliedAt", a.appliedAt);
                 row.put("status", a.status);
                 rows.add(row);
@@ -485,7 +486,7 @@ public class ApiServlet extends HttpServlet {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("id", j.id);
         m.put("title", j.title);
-        m.put("module", j.module);
+        m.put("courseName", j.courseName);
         m.put("requirements", j.requirements);
         m.put("requirementsTags", j.requirementsTags != null ? new ArrayList<>(j.requirementsTags) : new ArrayList<>());
         m.put("requirementsNote", j.requirementsNote);

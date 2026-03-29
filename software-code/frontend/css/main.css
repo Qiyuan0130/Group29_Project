@@ -481,7 +481,7 @@ textarea.form-control {
   margin: 0 0 0.25rem;
   color: var(--primary);
 }
-.job-card__module {
+.job-card__course-name {
   font-size: 0.9rem;
   color: var(--muted);
   margin: 0 0 0.75rem;

@@ -4,7 +4,7 @@ public class Job {
 
     public Long id;
     public String title;
-    public String module;
+    public String courseName;
     public String requirements;
     public java.util.List<String> requirementsTags;
     public String requirementsNote;
