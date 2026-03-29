@@ -22,6 +22,7 @@
       <div class="mo-tabs" style="margin-bottom: 1.25rem">
         <button type="button" class="btn btn-secondary is-active" data-admin-tab="workload">TA Workload Statistics</button>
         <button type="button" class="btn btn-secondary" data-admin-tab="balance">AI Workload Balance</button>
+        <button type="button" class="btn btn-secondary" data-admin-tab="ta-profiles">TA Profiles</button>
       </div>
 
       <!-- Workload -->
@@ -54,6 +55,31 @@
           </div>
           <div class="form-actions" style="margin-top: 1rem">
             <button type="button" class="btn btn-accent" onclick="window.taRecruitment.showToast('Export CSV (demo)')">Export to CSV</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TA profiles (read-only directory) -->
+      <div data-admin-panel="ta-profiles" class="hidden">
+        <h2 class="admin-page-title">TA Profiles</h2>
+        <div class="panel">
+          <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
+            Information entered by TAs on their Profile tab (same as <code>/api/profile</code>).
+          </p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Login</th>
+                  <th>Name</th>
+                  <th>QM Number</th>
+                  <th>Major</th>
+                  <th>Technical Ability</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody id="admin-ta-profiles-body"></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -105,6 +131,7 @@
     <p class="page-footer-hint">Admin prototype — CSV export will call Servlet later</p>
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
+    <script src="../js/ta-profiles-list.js"></script>
     <script>
       document.getElementById("logout-btn").addEventListener("click", function (e) {
         e.preventDefault();
