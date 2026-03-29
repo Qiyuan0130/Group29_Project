@@ -87,4 +87,11 @@ public final class JsonPaths {
     public static Path jsonFile(ServletContext ctx, String fileName) {
         return dataDirectory(ctx).resolve(fileName);
     }
+
+    /** Call from {@code contextDestroyed} so redeploy reloads {@code app-settings.properties}. */
+    public static void clearSettingsCache() {
+        synchronized (JsonPaths.class) {
+            cachedProps = null;
+        }
+    }
 }

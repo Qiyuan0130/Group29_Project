@@ -113,5 +113,14 @@
     applicationsMe: function () {
       return request("GET", "applications/me", null);
     },
+    profileGet: function () {
+      return request("GET", "profile", null);
+    },
+    profileUpdate: function (body) {
+      return request("PUT", "profile", body);
+    },
+    taProfiles: function () {
+      return request("GET", "ta-profiles?_=" + Date.now(), null);
+    },
   };
 })(typeof window !== "undefined" ? window : this);
