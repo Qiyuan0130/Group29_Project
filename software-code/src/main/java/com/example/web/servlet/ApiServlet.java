@@ -22,6 +22,7 @@ import com.example.web.repo.UserRepository;
 import com.example.web.service.AiMatchingService;
 import com.example.web.util.HttpJson;
 import com.example.web.util.JsonPaths;
+import com.example.web.util.AuthTokenUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -108,10 +109,20 @@ public class ApiServlet extends HttpServlet {
                 }
             }
             User created = ur.register(body.name, body.email, body.password, body.role);
+            
+            // 生成注册成功密钥并自动建立会话（保密用户信息）
+            String authToken = AuthTokenUtil.generateAuthToken();
+            HttpSession session = req.getSession(true);
+            session.setAttribute("USER_ID", created.id);
+            session.setAttribute("AUTH_TOKEN", authToken);
+            
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("ok", true);
-            out.put("message", "注册成功，请登录");
+            out.put("message", "注册成功，自动登录中");
             out.put("role", created.role);
+            out.put("authToken", authToken);
+            out.put("userId", created.id);
+            out.put("user", UserPublic.from(created));
             HttpJson.write(resp, 200, out);
             return;
         }

@@ -86,6 +86,99 @@
       document.getElementById("reg-role").addEventListener("change", syncMoKeyVisibility);
       syncMoKeyVisibility();
 
+      /**
+       * 显示注册成功的模态框（不跳转页面）
+       * @param role 注册的角色
+       */
+      function showRegistrationSuccessModal(role) {
+        var roleDisplay = {
+          'TA': '教学助理 (TA)',
+          'MO': '模块管理员 (MO)',
+          'ADMIN': '系统管理员 (Admin)'
+        };
+        
+        // 创建模态框HTML
+        var modalHTML = `
+          <div id="success-modal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+          ">
+            <div style="
+              background: white;
+              padding: 40px;
+              border-radius: 8px;
+              box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+              max-width: 500px;
+              text-align: center;
+              animation: slideUp 0.3s ease-out;
+            ">
+              <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
+              <h2 style="margin: 20px 0; color: #28a745;">注册成功！</h2>
+              <p style="color: #666; margin: 15px 0;">
+                欢迎注册成为 <strong>${roleDisplay[role] || role}</strong>
+              </p>
+              <p style="color: #999; font-size: 14px; margin: 15px 0;">
+                你的账户已经创建，信息已加密保存。现在可以访问系统的相关功能。
+              </p>
+              <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="goToLogin()" style="
+                  padding: 10px 30px;
+                  background: #007bff;
+                  color: white;
+                  border: none;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  font-size: 14px;
+                ">进入系统</button>
+                <button onclick="closeModal()" style="
+                  padding: 10px 30px;
+                  background: #6c757d;
+                  color: white;
+                  border: none;
+                  border-radius: 4px;
+                  cursor: pointer;
+                  font-size: 14px;
+                ">返回主页</button>
+              </div>
+            </div>
+          </div>
+          <style>
+            @keyframes slideUp {
+              from { opacity: 0; transform: translateY(20px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          </style>
+        `;
+        
+        // 向页面添加模态框
+        var body = document.body;
+        var modalDiv = document.createElement('div');
+        modalDiv.innerHTML = modalHTML;
+        body.appendChild(modalDiv);
+        
+        // 清空表单
+        document.getElementById('form-register').reset();
+        syncMoKeyVisibility();
+      }
+      
+      function goToLogin() {
+        location.href = 'login.html';
+      }
+      
+      function closeModal() {
+        var modal = document.getElementById('success-modal');
+        if (modal) modal.parentNode.removeChild(modal);
+        location.href = 'index.html';
+      }
+
       document.getElementById("form-register").addEventListener("submit", function (e) {
         e.preventDefault();
         var role = document.getElementById("reg-role").value;
@@ -126,8 +219,8 @@
         window.taApi
           .register(name, email, p, role, moKey)
           .then(function () {
-            alert("Registration successful. Please sign in.");
-            location.href = "login.html";
+            // 注册成功 - 弹出提示而不是跳转页面
+            showRegistrationSuccessModal(role);
           })
           .catch(function (err) {
             alert(err.message || "Register failed");
