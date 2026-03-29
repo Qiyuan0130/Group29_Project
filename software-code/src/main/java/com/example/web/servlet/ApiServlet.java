@@ -44,6 +44,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
     private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
     private static final String MO_REGISTER_KEY = "qwert1234";
+    private static final String ADMIN_REGISTER_KEY = "Group29admin";
     private static final int MAX_REQUIREMENT_TAGS = 6;
     private static final int MAX_REQUIREMENT_TAG_LENGTH = 10;
 
@@ -102,12 +103,23 @@ public class ApiServlet extends HttpServlet {
                 throw new IllegalArgumentException("name, email, password, role required");
             }
             String role = body.role.trim().toUpperCase();
+            
+            // MO角色验证
             if (Roles.MO.equals(role)) {
                 String moKey = body.moKey == null ? "" : body.moKey.trim();
                 if (!MO_REGISTER_KEY.equals(moKey)) {
                     throw new IllegalArgumentException("Invalid key. Registration not allowed.");
                 }
             }
+            
+            // ADMIN角色验证（新增）
+            if (Roles.ADMIN.equals(role)) {
+                String adminKey = body.adminKey == null ? "" : body.adminKey.trim();
+                if (!ADMIN_REGISTER_KEY.equals(adminKey)) {
+                    throw new IllegalArgumentException("Admin registration key is incorrect. Registration not allowed.");
+                }
+            }
+            
             User created = ur.register(body.name, body.email, body.password, body.role);
             
             // 生成注册成功密钥并自动建立会话（保密用户信息）
