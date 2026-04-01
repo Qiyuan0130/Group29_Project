@@ -273,8 +273,12 @@ public class ApiServlet extends HttpServlet {
                 Optional<CvRecord> cv = cr.findByUser(applicant.id).stream().findFirst();
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("applicationId", a.id);
+                row.put("applicantId", applicant.id);
                 row.put("applicantName", applicant.name);
                 row.put("qmNumber", applicant.qmNumber);
+                row.put("major", applicant.major);
+                row.put("technicalAbility", applicant.technicalAbility);
+                row.put("contact", applicant.contact);
                 row.put("status", a.status);
                 row.put("cvFileName", cv.map(c -> c.originalName).orElse(""));
                 rows.add(row);

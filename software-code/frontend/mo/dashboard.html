@@ -119,6 +119,19 @@
     </div>
 
     <p class="page-footer-hint">MO prototype — backend APIs to be wired</p>
+    <div id="mo-ta-profile-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mo-ta-profile-modal-title" aria-hidden="true">
+      <div class="modal__card" style="max-width: 720px">
+        <h2 id="mo-ta-profile-modal-title" class="modal__title">TA Profile</h2>
+        <div class="table-wrap" style="margin-top: .5rem">
+          <table class="data-table">
+            <tbody id="mo-ta-profile-modal-body"></tbody>
+          </table>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn-secondary" id="mo-ta-profile-modal-close">Close</button>
+        </div>
+      </div>
+    </div>
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/ta-profiles-list.js"></script>
@@ -218,13 +231,42 @@
           }
           return (
             "<tr>" +
-            "<td>" + escHtml(r && r.applicantName ? r.applicantName : "-") + "</td>" +
+            '<td><a href="#" data-view-ta-profile="' + escHtml(appId) + '">' + escHtml(r && r.applicantName ? r.applicantName : "-") + "</a></td>" +
             "<td>" + escHtml(cvName) + "</td>" +
             '<td><span class="' + getStatusPillClass(status) + '">' + escHtml(status) + "</span></td>" +
             "<td>" + actions + "</td>" +
             "</tr>"
           );
         }).join("");
+      }
+
+      function openMoTaProfileModal(row) {
+        var modal = document.getElementById("mo-ta-profile-modal");
+        var body = document.getElementById("mo-ta-profile-modal-body");
+        if (!modal || !body || !row) return;
+        var fields = [
+          ["Name", row.applicantName || "—"],
+          ["QM Number", row.qmNumber || "—"],
+          ["Major", row.major || "—"],
+          ["Technical Ability", row.technicalAbility || "—"],
+          ["Contact Information", row.contact || "—"],
+        ];
+        body.innerHTML = fields
+          .map(function (kv) {
+            return "<tr><th style=\"width:220px\">" + escHtml(kv[0]) + "</th><td>" + escHtml(kv[1]) + "</td></tr>";
+          })
+          .join("");
+        modal.removeAttribute("hidden");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeMoTaProfileModal() {
+        var modal = document.getElementById("mo-ta-profile-modal");
+        if (!modal) return;
+        modal.setAttribute("hidden", "");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
       }
 
       function loadMoApplicationsForJob(jobId) {
@@ -361,6 +403,18 @@
       });
 
       document.getElementById("mo-applications-body").addEventListener("click", function (e) {
+        var profileLink = e.target.closest("[data-view-ta-profile]");
+        if (profileLink) {
+          e.preventDefault();
+          var appIdForProfile = profileLink.getAttribute("data-view-ta-profile");
+          var rowForProfile = moCurrentApplications.find(function (x) {
+            return String(x && x.applicationId != null ? x.applicationId : "") === String(appIdForProfile || "");
+          });
+          if (rowForProfile) {
+            openMoTaProfileModal(rowForProfile);
+          }
+          return;
+        }
         var btn = e.target.closest("[data-app-action]");
         if (!btn) return;
         var appId = btn.getAttribute("data-app-id");
@@ -381,6 +435,13 @@
       });
 
       loadMoSelectApplicationsData();
+
+      document.getElementById("mo-ta-profile-modal-close").addEventListener("click", closeMoTaProfileModal);
+      document.getElementById("mo-ta-profile-modal").addEventListener("click", function (e) {
+        if (e.target.id === "mo-ta-profile-modal") {
+          closeMoTaProfileModal();
+        }
+      });
     </script>
   </body>
 </html>
