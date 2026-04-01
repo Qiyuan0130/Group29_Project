@@ -71,13 +71,13 @@
             </div>
           </div>
           <div class="table-wrap">
-            <table class="data-table">
+            <table class="data-table" style="text-align:center">
               <thead>
                 <tr>
-                  <th>Applicant Name</th>
-                  <th>CV File</th>
-                  <th>Application Status</th>
-                  <th>Action</th>
+                  <th style="text-align:center">Name</th>
+                  <th style="text-align:center">Major</th>
+                  <th style="text-align:center">Technical Ability</th>
+                  <th style="text-align:center">Application Status</th>
                 </tr>
               </thead>
               <tbody id="mo-applications-body"></tbody>
@@ -106,19 +106,6 @@
         </div>
         <div class="modal__actions">
           <button type="button" class="btn btn-secondary" id="mo-ta-profile-modal-close">Close</button>
-        </div>
-      </div>
-    </div>
-    <div id="mo-application-detail-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mo-application-detail-title" aria-hidden="true">
-      <div class="modal__card" style="max-width: 760px">
-        <h2 id="mo-application-detail-title" class="modal__title">Application Detail</h2>
-        <div class="table-wrap" style="margin-top: .5rem">
-          <table class="data-table">
-            <tbody id="mo-application-detail-body"></tbody>
-          </table>
-        </div>
-        <div class="modal__actions">
-          <button type="button" class="btn btn-secondary" id="mo-application-detail-close">Close</button>
         </div>
       </div>
     </div>
@@ -208,25 +195,12 @@
         }
         body.innerHTML = rows.map(function (r) {
           var appId = r && r.applicationId != null ? String(r.applicationId) : "";
-          var status = String((r && r.status) || "UPLOADED");
-          var cvName = (r && r.cvFileName) ? String(r.cvFileName) : "-";
-          var cvCell = cvName === "-"
-            ? "-"
-            : '<a href="' + escHtml(window.taApi.moApplicationCvViewUrl(appId)) + '" target="_blank" rel="noopener">' + escHtml(cvName) + "</a>";
-          var actions = "";
-          if (status === "UPLOADED") {
-            actions =
-              '<button type="button" class="btn btn-sm btn-success" data-app-action="accept" data-app-id="' + escHtml(appId) + '">Accept</button> ' +
-              '<button type="button" class="btn btn-sm btn-danger" data-app-action="reject" data-app-id="' + escHtml(appId) + '">Reject</button>';
-          } else {
-            actions = '<span class="status-pill status-approved">Operated</span>';
-          }
           return (
             '<tr data-open-application="' + escHtml(appId) + '" style="cursor:pointer">' +
-            '<td><a href="#" data-view-ta-profile="' + escHtml(appId) + '">' + escHtml(r && r.applicantName ? r.applicantName : "-") + "</a></td>" +
-            "<td>" + cvCell + "</td>" +
-            '<td><span class="' + getStatusPillClass(status) + '">' + escHtml(status) + "</span></td>" +
-            "<td>" + actions + "</td>" +
+            '<td style="text-align:center;vertical-align:middle">' + escHtml(r && r.applicantName ? r.applicantName : "-") + "</td>" +
+            '<td style="text-align:center;vertical-align:middle">' + escHtml(r && r.major ? r.major : "-") + "</td>" +
+            '<td style="text-align:center;vertical-align:middle">' + escHtml(r && r.technicalAbility ? r.technicalAbility : "-") + "</td>" +
+            '<td style="text-align:center;vertical-align:middle"><span class="' + getStatusPillClass(r && r.status ? r.status : "UPLOADED") + '">' + escHtml(r && r.status ? r.status : "UPLOADED") + "</span></td>" +
             "</tr>"
           );
         }).join("");
@@ -262,40 +236,9 @@
         document.body.style.overflow = "";
       }
 
-      function openMoApplicationDetailModal(row) {
-        var modal = document.getElementById("mo-application-detail-modal");
-        var body = document.getElementById("mo-application-detail-body");
-        if (!modal || !body || !row) return;
-        var appId = row.applicationId != null ? String(row.applicationId) : "";
-        var cvName = row.cvFileName ? String(row.cvFileName) : "-";
-        var cvValue = cvName === "-"
-          ? "-"
-          : '<a href="' + escHtml(window.taApi.moApplicationCvViewUrl(appId)) + '" target="_blank" rel="noopener">' + escHtml(cvName) + "</a>";
-        var fields = [
-          ["Applicant Name", row.applicantName || "—"],
-          ["Education Background", row.educationBackground || row.major || "—"],
-          ["Technical Ability", row.technicalAbility || "—"],
-          ["Contact Information", row.contact || "—"],
-          ["Application Status", String(row.status || "UPLOADED")],
-        ];
-        var rows = fields
-          .map(function (kv) {
-            return "<tr><th style=\"width:220px\">" + escHtml(kv[0]) + "</th><td>" + escHtml(kv[1]) + "</td></tr>";
-          })
-          .join("");
-        rows += "<tr><th style=\"width:220px\">CV File</th><td>" + cvValue + "</td></tr>";
-        body.innerHTML = rows;
-        modal.removeAttribute("hidden");
-        modal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-      }
-
-      function closeMoApplicationDetailModal() {
-        var modal = document.getElementById("mo-application-detail-modal");
-        if (!modal) return;
-        modal.setAttribute("hidden", "");
-        modal.setAttribute("aria-hidden", "true");
-        document.body.style.overflow = "";
+      function applicationDetailHref(jobId, appId) {
+        return "application-detail.html?jobId=" + encodeURIComponent(String(jobId || "")) +
+          "&appId=" + encodeURIComponent(String(appId || ""));
       }
 
       function loadMoApplicationsForJob(jobId) {
@@ -335,6 +278,16 @@
               select.innerHTML = moOwnJobs.map(function (j) {
                 return '<option value="' + escHtml(j.id) + '">' + escHtml(j.title || ("Job #" + j.id)) + "</option>";
               }).join("");
+              var params = new URLSearchParams(location.search);
+              var wantedJobId = params.get("jobId");
+              if (wantedJobId) {
+                var matched = moOwnJobs.some(function (j) {
+                  return String(j && j.id != null ? j.id : "") === String(wantedJobId);
+                });
+                if (matched) {
+                  select.value = wantedJobId;
+                }
+              }
               loadMoApplicationsForJob(select.value);
             });
           })
@@ -435,43 +388,10 @@
         var appRow = e.target.closest("[data-open-application]");
         if (appRow && !e.target.closest("[data-app-action]") && !e.target.closest("a")) {
           var appIdForRow = appRow.getAttribute("data-open-application");
-          var rowForDetail = moCurrentApplications.find(function (x) {
-            return String(x && x.applicationId != null ? x.applicationId : "") === String(appIdForRow || "");
-          });
-          if (rowForDetail) {
-            openMoApplicationDetailModal(rowForDetail);
-          }
+          var currentJobId = document.getElementById("mo-app-job-select").value;
+          location.href = applicationDetailHref(currentJobId, appIdForRow);
           return;
         }
-        var profileLink = e.target.closest("[data-view-ta-profile]");
-        if (profileLink) {
-          e.preventDefault();
-          var appIdForProfile = profileLink.getAttribute("data-view-ta-profile");
-          var rowForProfile = moCurrentApplications.find(function (x) {
-            return String(x && x.applicationId != null ? x.applicationId : "") === String(appIdForProfile || "");
-          });
-          if (rowForProfile) {
-            openMoTaProfileModal(rowForProfile);
-          }
-          return;
-        }
-        var btn = e.target.closest("[data-app-action]");
-        if (!btn) return;
-        var appId = btn.getAttribute("data-app-id");
-        var action = btn.getAttribute("data-app-action");
-        if (!appId || (action !== "accept" && action !== "reject")) return;
-        btn.disabled = true;
-        window.taApi
-          .moApplicationDecision(appId, action === "accept")
-          .then(function () {
-            loadMoApplicationsForJob(document.getElementById("mo-app-job-select").value);
-          })
-          .catch(function (err) {
-            alert(err.message || "Failed to update application status.");
-          })
-          .finally(function () {
-            btn.disabled = false;
-          });
       });
 
       loadMoSelectApplicationsData();
@@ -480,12 +400,6 @@
       document.getElementById("mo-ta-profile-modal").addEventListener("click", function (e) {
         if (e.target.id === "mo-ta-profile-modal") {
           closeMoTaProfileModal();
-        }
-      });
-      document.getElementById("mo-application-detail-close").addEventListener("click", closeMoApplicationDetailModal);
-      document.getElementById("mo-application-detail-modal").addEventListener("click", function (e) {
-        if (e.target.id === "mo-application-detail-modal") {
-          closeMoApplicationDetailModal();
         }
       });
     </script>
