@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job detail — TA</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="ta-job-view.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <div class="sys-header__actions">
+          <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard" style="display: block; max-width: 880px; margin: 0 auto">
+      <div class="dashboard__main">
+        <h2 class="dashboard__title">Job detail</h2>
+
+        <div id="detail-error" class="panel hidden" style="border-color: var(--danger)">
+          <p id="detail-error-text" style="margin: 0; color: var(--danger)"></p>
+          <p style="margin: 0.75rem 0 0"><a href="dashboard.html#jobs">Back to Jobs</a></p>
+        </div>
+
+        <div id="detail-content" class="panel hidden">
+          <h3 class="panel__head" id="detail-title-head"></h3>
+          <div id="detail-status-row" class="job-card__status-row" style="margin-bottom: 0.75rem"></div>
+          <dl class="kv-list">
+            <dt>Title</dt>
+            <dd id="detail-name"></dd>
+            <dt>Course name</dt>
+            <dd id="detail-course-name"></dd>
+            <dt>Posted by</dt>
+            <dd id="detail-organizer"></dd>
+            <dt>Application deadline</dt>
+            <dd id="detail-deadline"></dd>
+            <dt>Weekly workload</dt>
+            <dd id="detail-hours"></dd>
+            <dt>Tags</dt>
+            <dd id="detail-tags"></dd>
+            <dt>Requirements</dt>
+            <dd id="detail-req"></dd>
+            <dt>Organizer note</dt>
+            <dd id="detail-note"></dd>
+          </dl>
+          <div id="detail-form-actions" class="form-actions" style="margin-top: 1rem">
+            <a id="detail-footer-back" class="btn btn-secondary" href="dashboard.html#jobs">Back to Jobs</a>
+            <button type="button" id="detail-apply-btn" class="btn btn-primary">Apply for this job</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="ta-job-view-api.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        function escapeHtml(s) {
+          if (s == null) return "";
+          var d = document.createElement("div");
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function normTags(job) {
+          var t = job.requirementsTags;
+          if (!t || !t.length) return [];
+          return t.map(function (x) {
+            return (x == null ? "" : String(x)).trim();
+          }).filter(Boolean);
+        }
+
+        function showError(msg) {
+          var box = document.getElementById("detail-error");
+          var text = document.getElementById("detail-error-text");
+          var content = document.getElementById("detail-content");
+          if (text) text.textContent = msg;
+          if (box) box.classList.remove("hidden");
+          if (content) content.classList.add("hidden");
+        }
+
+        function todayYmd() {
+          var d = new Date();
+          var y = d.getFullYear();
+          var m = String(d.getMonth() + 1).padStart(2, "0");
+          var day = String(d.getDate()).padStart(2, "0");
+          return y + "-" + m + "-" + day;
+        }
+
+        function deadlineYmd(raw) {
+          if (!raw) return "";
+          var s = String(raw).trim();
+          var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+          return m ? m[1] : "";
+        }
+
+        function isJobExpired(deadlineRaw) {
+          var d = deadlineYmd(deadlineRaw);
+          if (!d) return false;
+          return todayYmd() > d;
+        }
+
+        function appStatusPillClass(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "status-approved";
+          if (up === "REJECTED") return "status-rejected";
+          return "status-pending";
+        }
+
+        function appStatusLabel(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "Accepted";
+          if (up === "REJECTED") return "Rejected";
+          if (up === "PENDING") return "Pending";
+          return status || "—";
+        }
+
+        function renderJob(job, myApp) {
+          var err = document.getElementById("detail-error");
+          var content = document.getElementById("detail-content");
+          if (err) err.classList.add("hidden");
+          if (content) content.classList.remove("hidden");
+
+          var tags = normTags(job);
+          var tagsHtml = tags.length
+            ? tags.map(function (t) {
+                return '<span class="tag-pill">' + escapeHtml(t) + "</span>";
+              }).join(" ")
+            : '<span class="muted-inline">None</span>';
+
+          document.getElementById("detail-title-head").textContent = job.title || "(Untitled job)";
+          document.getElementById("detail-name").textContent = job.title || "—";
+          document.getElementById("detail-course-name").textContent = (job.courseName || "").trim() || "—";
+          document.getElementById("detail-organizer").textContent =
+            (job.organizerName || "").trim() || "—";
+          document.getElementById("detail-deadline").textContent = (job.deadline || "").trim() || "—";
+          document.getElementById("detail-hours").textContent = (job.workingHours || "").trim() || "—";
+          document.getElementById("detail-tags").innerHTML = tagsHtml;
+          document.getElementById("detail-req").textContent = (job.requirements || "").trim() || "—";
+          document.getElementById("detail-note").textContent = (job.requirementsNote || "").trim() || "—";
+
+          var expired = isJobExpired(job.deadline);
+          var postingPill = expired
+            ? '<span class="status-pill job-posting-expired">Expired</span>'
+            : '<span class="status-pill job-posting-open">Open</span>';
+          var appHtml = myApp
+            ? '<span class="status-pill ' +
+              appStatusPillClass(myApp.status) +
+              '">' +
+              escapeHtml(appStatusLabel(myApp.status)) +
+              "</span>"
+            : '<span class="status-pill app-none">Not applied</span>';
+          var statusRow = document.getElementById("detail-status-row");
+          if (statusRow) {
+            statusRow.innerHTML =
+              '<span class="job-card__status-label">Posting</span>' +
+              postingPill +
+              '<span class="job-card__status-label">Your application</span>' +
+              appHtml;
+          }
+
+          var applyBtn = document.getElementById("detail-apply-btn");
+          var footerBack = document.getElementById("detail-footer-back");
+          if (footerBack) footerBack.classList.remove("hidden");
+          if (applyBtn) {
+            applyBtn.classList.remove("detail-apply-btn--final");
+          }
+          if (expired) {
+            if (applyBtn) {
+              applyBtn.classList.add("hidden");
+              applyBtn.onclick = null;
+            }
+          } else {
+            if (applyBtn) applyBtn.classList.remove("hidden");
+            if (applyBtn && job.id != null) {
+              applyBtn.onclick = null;
+              if (myApp) {
+                var st = String(myApp.status || "").toUpperCase();
+                if (st === "ACCEPTED" || st === "REJECTED") {
+                  applyBtn.disabled = true;
+                  applyBtn.className =
+                    "btn btn-secondary detail-apply-btn--final";
+                  applyBtn.textContent =
+                    "Already applied (" + appStatusLabel(myApp.status) + ")";
+                } else {
+                  applyBtn.className = "btn btn-primary";
+                  applyBtn.disabled = true;
+                  applyBtn.textContent = "Application pending review";
+                }
+              } else {
+                applyBtn.className = "btn btn-primary";
+                applyBtn.disabled = false;
+                applyBtn.textContent = "Apply for this job";
+                applyBtn.onclick = function () {
+                  applyBtn.disabled = true;
+                  window.taJobViewApi
+                    .applicationsApply(job.id)
+                    .then(function () {
+                      window.taRecruitment.showToast("Application submitted — opening Status…");
+                      setTimeout(function () {
+                        location.href = "dashboard.html#status";
+                      }, 500);
+                    })
+                    .catch(function (e) {
+                      window.taRecruitment.showToast(e.message || "Application failed");
+                    })
+                    .finally(function () {
+                      applyBtn.disabled = false;
+                    });
+                };
+              }
+            }
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          var params = new URLSearchParams(location.search);
+          var rawId = params.get("id");
+          var jobId = rawId ? parseInt(rawId, 10) : NaN;
+
+          document.getElementById("logout-btn").addEventListener("click", function (e) {
+            e.preventDefault();
+            window.taJobViewApi.logout().finally(function () {
+              location.href = "../index.html";
+            });
+          });
+
+          if (Number.isNaN(jobId)) {
+            showError("Invalid link: missing job id.");
+            return;
+          }
+
+          Promise.all([
+            window.taJobViewApi.jobsList(),
+            window.taJobViewApi.applicationsMe().catch(function () {
+              return { applications: [] };
+            }),
+          ])
+            .then(function (results) {
+              var list = Array.isArray(results[0]) ? results[0] : [];
+              var apps = results[1] && results[1].applications ? results[1].applications : [];
+              var myApp = null;
+              for (var j = 0; j < apps.length; j++) {
+                if (Number(apps[j].jobId) === jobId) {
+                  myApp = apps[j];
+                  break;
+                }
+              }
+              var job = null;
+              for (var i = 0; i < list.length; i++) {
+                if (Number(list[i].id) === jobId) {
+                  job = list[i];
+                  break;
+                }
+              }
+              if (!job) {
+                showError("This job could not be found.");
+                return;
+              }
+              renderJob(job, myApp);
+            })
+            .catch(function (e) {
+              var msg = e.message || "";
+              if (msg.indexOf("Not logged in") !== -1 || msg.indexOf("401") !== -1) {
+                window.taRecruitment.showToast("Please sign in again");
+                location.href = "../index.html";
+                return;
+              }
+              showError("Failed to load: " + msg);
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>

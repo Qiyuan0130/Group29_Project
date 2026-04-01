@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -86,8 +88,12 @@ public class ApiServlet extends HttpServlet {
         if ("/api/auth/login".equals(path) && "POST".equals(method)) {
             LoginRequest body = HttpJson.readBody(req, LoginRequest.class);
             Optional<User> u = ur.findByLogin(body.login);
-            if (u.isEmpty() || !ur.verifyPassword(u.get(), body.password)) {
-                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "姓名/邮箱或密码错误");
+            if (u.isEmpty()) {
+                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "User is not registered.");
+                return;
+            }
+            if (!ur.verifyPassword(u.get(), body.password)) {
+                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "Incorrect password.");
                 return;
             }
             HttpSession session = req.getSession(true);
@@ -162,6 +168,7 @@ public class ApiServlet extends HttpServlet {
             u.name = body.name != null ? body.name : u.name;
             u.qmNumber = body.qmNumber != null ? body.qmNumber : u.qmNumber;
             u.major = body.major != null ? body.major : u.major;
+            u.educationBackground = body.educationBackground != null ? body.educationBackground : u.educationBackground;
             u.technicalAbility = body.technicalAbility != null ? body.technicalAbility : u.technicalAbility;
             u.contact = body.contact != null ? body.contact : u.contact;
             ur.updateProfile(u);
@@ -269,8 +276,16 @@ public class ApiServlet extends HttpServlet {
                 Optional<CvRecord> cv = cr.findByUser(applicant.id).stream().findFirst();
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("applicationId", a.id);
+                row.put("applicantId", applicant.id);
                 row.put("applicantName", applicant.name);
                 row.put("qmNumber", applicant.qmNumber);
+                row.put("major", applicant.major);
+                row.put("educationBackground",
+                        applicant.educationBackground == null || applicant.educationBackground.trim().isEmpty()
+                                ? applicant.major
+                                : applicant.educationBackground);
+                row.put("technicalAbility", applicant.technicalAbility);
+                row.put("contact", applicant.contact);
                 row.put("status", a.status);
                 row.put("cvFileName", cv.map(c -> c.originalName).orElse(""));
                 rows.add(row);
@@ -294,6 +309,35 @@ public class ApiServlet extends HttpServlet {
             boolean accept = Boolean.TRUE.equals(body.accept);
             ar.updateStatus(appId, accept ? ApplicationStatuses.ACCEPTED : ApplicationStatuses.REJECTED);
             HttpJson.write(resp, 200, Map.of("ok", true, "status", accept ? ApplicationStatuses.ACCEPTED : ApplicationStatuses.REJECTED));
+            return;
+        }
+
+        if (path.matches("/api/mo/applications/\\d+/cv/view") && "GET".equals(method)) {
+            User u = requireUser(ur, req);
+            if (!Roles.MO.equals(u.role)) {
+                throw new SecurityException("MO only");
+            }
+            long appId = Long.parseLong(path.replaceFirst("/api/mo/applications/(\\d+)/cv/view", "$1"));
+            ApplicationRecord a = ar.findById(appId).orElseThrow(() -> new IllegalArgumentException("Application not found"));
+            Job job = jr.findById(a.jobId).orElseThrow(() -> new IllegalArgumentException("Job not found"));
+            if (!u.id.equals(job.organizerId)) {
+                throw new SecurityException("Not your job");
+            }
+            CvRecord c = cr.findByUser(a.applicantId).stream().findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("CV not found"));
+            Path file = JsonPaths.uploadsCvDirectory(getServletContext())
+                    .resolve(c.storedName == null ? "" : c.storedName);
+            if (!Files.exists(file)) {
+                throw new IllegalArgumentException("CV file missing on server");
+            }
+            resp.setStatus(200);
+            resp.setContentType("application/pdf");
+            resp.setHeader("Content-Disposition",
+                    "inline; filename=\"" + (c.originalName == null ? "cv.pdf" : c.originalName) + "\"");
+            resp.setContentLengthLong(Files.size(file));
+            try (InputStream in = Files.newInputStream(file)) {
+                in.transferTo(resp.getOutputStream());
+            }
             return;
         }
 
@@ -560,6 +604,14 @@ public class ApiServlet extends HttpServlet {
         String deadline = job.deadline == null ? "" : job.deadline.trim();
         if (deadline.isEmpty()) {
             throw new IllegalArgumentException("Deadline is required.");
+        }
+        try {
+            LocalDate deadlineDate = LocalDate.parse(deadline);
+            if (deadlineDate.isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("Deadline cannot be earlier than today.");
+            }
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("Deadline format is invalid. Use yyyy-MM-dd.");
         }
     }
 }

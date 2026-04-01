@@ -1,5 +1,5 @@
 {
-  "nextUserId": 6,
+  "nextUserId": 10,
   "users": [
     {
       "id": 1,
@@ -9,8 +9,9 @@
       "role": "TA",
       "qmNumber": "",
       "name": "Qiyao111",
-      "major": "",
-      "technicalAbility": "",
+      "major": "telecommunications",
+      "educationBackground": "undergraduate",
+      "technicalAbility": "java",
       "contact": "220019596@qq.com"
     },
     {
@@ -22,6 +23,7 @@
       "qmNumber": "",
       "name": "Qiyuan",
       "major": "",
+      "educationBackground": "",
       "technicalAbility": "",
       "contact": "xiongzixin@bupt.edu.cn"
     },
@@ -34,6 +36,7 @@
       "qmNumber": "",
       "name": "222",
       "major": "",
+      "educationBackground": "",
       "technicalAbility": "",
       "contact": "1234@qq.com"
     },
@@ -46,6 +49,7 @@
       "qmNumber": "",
       "name": "12",
       "major": "",
+      "educationBackground": "",
       "technicalAbility": "",
       "contact": "12@123.com"
     },
@@ -55,9 +59,10 @@
       "password": "ella1234",
       "passwordHash": "$2a$10$USrX03FuOf6.3CjbXKSu9u./UTB29SXrKNFDE712F.fRPxwvmSM3S",
       "role": "TA",
-      "qmNumber": "123456",
+      "qmNumber": "",
       "name": "Ella",
       "major": "Telecommunications",
+      "educationBackground": "undergraduate",
       "technicalAbility": "java",
       "contact": "ella@163.com"
     },
@@ -70,6 +75,7 @@
       "qmNumber": "",
       "name": "admin1",
       "major": "",
+      "educationBackground": "",
       "technicalAbility": "",
       "contact": "admin1@163.com"
     },
@@ -82,8 +88,61 @@
       "qmNumber": "",
       "name": "ZhangCongming",
       "major": "",
+      "educationBackground": "",
       "technicalAbility": "",
       "contact": "congming@qq.com"
+    },
+    {
+      "id": 6,
+      "username": "xiaoming",
+      "password": "12345q",
+      "passwordHash": "$2a$10$PPeuieAoUqkgr2l7CNGr/e3.km7yqhuNx6WVv0oJ98fKYf3pCFbGO",
+      "role": "MO",
+      "qmNumber": "",
+      "name": "xiaoming",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "123@qq.com"
+    },
+    {
+      "id": 7,
+      "username": "333",
+      "password": "123456qwe",
+      "passwordHash": "$2a$10$m.wLaX7TFXL8FBm5Bx80mOt5faN7ByS8wTfQRZY5RFO2sXKNVq/3G",
+      "role": "MO",
+      "qmNumber": "",
+      "name": "333",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "444@qq.com"
+    },
+    {
+      "id": 8,
+      "username": "xiaohong",
+      "password": "12345qwe",
+      "passwordHash": "$2a$10$VNsdO2a22.rXFmxE9PYEn.mLqEGSjktG7Y89Q7y7lxVjZSU.O..lu",
+      "role": "MO",
+      "qmNumber": "",
+      "name": "xiaohong",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "2345@qq.com"
+    },
+    {
+      "id": 9,
+      "username": "xiaoshang",
+      "password": "666qqq",
+      "passwordHash": "$2a$10$5OOliJdk3gvL.CW/p6BAiuv78SZZfL6N75tVF6o.VPB.hSJdC9g8y",
+      "role": "MO",
+      "qmNumber": "",
+      "name": "xiaoshang",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "666@qq.com"
     }
   ]
 }

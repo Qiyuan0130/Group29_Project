@@ -30,7 +30,7 @@
     },
     {
       "id": 4,
-      "title": "567",
+      "title": "Programming Fundamentals TA",
       "courseName": "General",
       "requirements": "python, java",
       "requirementsTags": [
@@ -44,7 +44,7 @@
     },
     {
       "id": 5,
-      "title": "333",
+      "title": "Software Tools Support TA",
       "courseName": "General",
       "requirements": "java, github, 111, 1111, 11111",
       "requirementsTags": [
@@ -61,7 +61,7 @@
     },
     {
       "id": 6,
-      "title": "123456",
+      "title": "Git Collaboration Assistant",
       "courseName": "General",
       "requirements": "github",
       "requirementsTags": [
@@ -74,7 +74,7 @@
     },
     {
       "id": 7,
-      "title": "123",
+      "title": "Python Lab Support TA",
       "courseName": "General",
       "requirements": "",
       "requirementsTags": [],
@@ -85,7 +85,7 @@
     },
     {
       "id": 8,
-      "title": "333",
+      "title": "Course Project Mentoring TA",
       "courseName": "General",
       "requirements": "",
       "requirementsTags": [],

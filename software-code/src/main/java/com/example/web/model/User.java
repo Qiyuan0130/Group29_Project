@@ -13,6 +13,7 @@ public class User {
     public String qmNumber;
     public String name;
     public String major;
+    public String educationBackground;
     public String technicalAbility;
     public String contact;
 

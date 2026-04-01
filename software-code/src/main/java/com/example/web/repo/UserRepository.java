@@ -80,6 +80,7 @@ public final class UserRepository {
         u.qmNumber = qm;
         u.name = name;
         u.major = major;
+        u.educationBackground = major;
         u.technicalAbility = tech;
         u.contact = contact;
         return u;
@@ -185,6 +186,7 @@ public final class UserRepository {
         u.qmNumber = "";
         u.name = cleanName;
         u.major = "";
+        u.educationBackground = "";
         u.technicalAbility = "";
         u.contact = cleanEmail;
         db.users.add(u);
@@ -202,6 +204,7 @@ public final class UserRepository {
         u.qmNumber = normalizeText(u.qmNumber);
         u.name = normalizeText(u.name);
         u.major = normalizeText(u.major);
+        u.educationBackground = normalizeText(u.educationBackground);
         u.technicalAbility = normalizeText(u.technicalAbility);
         u.contact = normalizeText(u.contact);
     }
@@ -259,6 +262,7 @@ public final class UserRepository {
                 u.name = updated.name;
                 u.qmNumber = updated.qmNumber;
                 u.major = updated.major;
+                u.educationBackground = updated.educationBackground;
                 u.technicalAbility = updated.technicalAbility;
                 u.contact = updated.contact;
                 save(db);
