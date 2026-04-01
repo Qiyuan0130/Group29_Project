@@ -86,8 +86,12 @@ public class ApiServlet extends HttpServlet {
         if ("/api/auth/login".equals(path) && "POST".equals(method)) {
             LoginRequest body = HttpJson.readBody(req, LoginRequest.class);
             Optional<User> u = ur.findByLogin(body.login);
-            if (u.isEmpty() || !ur.verifyPassword(u.get(), body.password)) {
-                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "姓名/邮箱或密码错误");
+            if (u.isEmpty()) {
+                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "User is not registered.");
+                return;
+            }
+            if (!ur.verifyPassword(u.get(), body.password)) {
+                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "Incorrect password.");
                 return;
             }
             HttpSession session = req.getSession(true);
