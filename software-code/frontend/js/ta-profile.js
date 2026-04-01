@@ -23,8 +23,8 @@
       if (!user) return;
       var vals = [
         user.name || "—",
-        user.qmNumber || "—",
         user.major || "—",
+        user.educationBackground || user.major || "—",
         user.technicalAbility || "—",
         user.contact || "—",
       ];
@@ -36,8 +36,8 @@
     function applyToForm(user) {
       if (!user || !ctrls.length) return;
       ctrls[0].value = user.name != null ? user.name : "";
-      if (ctrls[1]) ctrls[1].value = user.qmNumber != null ? user.qmNumber : "";
-      if (ctrls[2]) ctrls[2].value = user.major != null ? user.major : "";
+      if (ctrls[1]) ctrls[1].value = user.major != null ? user.major : "";
+      if (ctrls[2]) ctrls[2].value = user.educationBackground != null ? user.educationBackground : (user.major != null ? user.major : "");
       if (ctrls[3]) ctrls[3].value = user.technicalAbility != null ? user.technicalAbility : "";
       if (ctrls[4]) ctrls[4].value = user.contact != null ? user.contact : "";
     }
@@ -59,8 +59,8 @@
         e.preventDefault();
         var body = {
           name: ctrls[0] ? ctrls[0].value : "",
-          qmNumber: ctrls[1] ? ctrls[1].value : "",
-          major: ctrls[2] ? ctrls[2].value : "",
+          major: ctrls[1] ? ctrls[1].value : "",
+          educationBackground: ctrls[2] ? ctrls[2].value : "",
           technicalAbility: ctrls[3] ? ctrls[3].value : "",
           contact: ctrls[4] ? ctrls[4].value : "",
         };

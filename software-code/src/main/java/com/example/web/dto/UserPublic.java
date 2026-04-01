@@ -8,6 +8,7 @@ public class UserPublic {
     public String qmNumber;
     public String name;
     public String major;
+    public String educationBackground;
     public String technicalAbility;
     public String contact;
 
@@ -19,6 +20,7 @@ public class UserPublic {
         p.qmNumber = u.qmNumber;
         p.name = u.name;
         p.major = u.major;
+        p.educationBackground = u.educationBackground;
         p.technicalAbility = u.technicalAbility;
         p.contact = u.contact;
         return p;

@@ -144,6 +144,9 @@
         accept: !!accept,
       });
     },
+    moApplicationCvViewUrl: function (applicationId) {
+      return apiUrl("mo/applications/" + encodeURIComponent(applicationId) + "/cv/view");
+    },
     profileGet: function () {
       return request("GET", "profile", null);
     },

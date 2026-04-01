@@ -21,7 +21,6 @@
         <a class="nav-link" href="my-jobs.html">My Posted Jobs</a>
         <a class="nav-link" href="#" data-mo-section="applications">Select Applications</a>
         <a class="nav-link" href="#" data-mo-section="ai">Match Applications With AI</a>
-        <button type="button" class="nav-link" data-mo-section="ta-profiles" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer; font: inherit">TA Profiles</button>
       </aside>
 
       <div class="dashboard__main">
@@ -93,28 +92,6 @@
           <a class="btn btn-primary" href="ai-matching.html">Open AI Matching Dashboard (MO)</a>
         </div>
 
-        <!-- TA profiles -->
-        <div data-mo-panel="ta-profiles" class="panel hidden">
-          <h3 class="panel__head">TA Profiles</h3>
-          <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
-            Directory of TA accounts and the profile fields they saved.
-          </p>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Login</th>
-                  <th>Name</th>
-                  <th>QM Number</th>
-                  <th>Major</th>
-                  <th>Technical Ability</th>
-                  <th>Contact</th>
-                </tr>
-              </thead>
-              <tbody id="mo-ta-profiles-body"></tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -132,9 +109,21 @@
         </div>
       </div>
     </div>
+    <div id="mo-application-detail-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mo-application-detail-title" aria-hidden="true">
+      <div class="modal__card" style="max-width: 760px">
+        <h2 id="mo-application-detail-title" class="modal__title">Application Detail</h2>
+        <div class="table-wrap" style="margin-top: .5rem">
+          <table class="data-table">
+            <tbody id="mo-application-detail-body"></tbody>
+          </table>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn-secondary" id="mo-application-detail-close">Close</button>
+        </div>
+      </div>
+    </div>
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
-    <script src="../js/ta-profiles-list.js"></script>
     <script>
       function createMoJob(payload) {
         if (window.taApi && typeof window.taApi.jobsCreate === "function") {
@@ -221,6 +210,9 @@
           var appId = r && r.applicationId != null ? String(r.applicationId) : "";
           var status = String((r && r.status) || "UPLOADED");
           var cvName = (r && r.cvFileName) ? String(r.cvFileName) : "-";
+          var cvCell = cvName === "-"
+            ? "-"
+            : '<a href="' + escHtml(window.taApi.moApplicationCvViewUrl(appId)) + '" target="_blank" rel="noopener">' + escHtml(cvName) + "</a>";
           var actions = "";
           if (status === "UPLOADED") {
             actions =
@@ -230,9 +222,9 @@
             actions = '<span class="status-pill status-approved">Operated</span>';
           }
           return (
-            "<tr>" +
+            '<tr data-open-application="' + escHtml(appId) + '" style="cursor:pointer">' +
             '<td><a href="#" data-view-ta-profile="' + escHtml(appId) + '">' + escHtml(r && r.applicantName ? r.applicantName : "-") + "</a></td>" +
-            "<td>" + escHtml(cvName) + "</td>" +
+            "<td>" + cvCell + "</td>" +
             '<td><span class="' + getStatusPillClass(status) + '">' + escHtml(status) + "</span></td>" +
             "<td>" + actions + "</td>" +
             "</tr>"
@@ -248,6 +240,7 @@
           ["Name", row.applicantName || "—"],
           ["QM Number", row.qmNumber || "—"],
           ["Major", row.major || "—"],
+          ["Education Background", row.educationBackground || row.major || "—"],
           ["Technical Ability", row.technicalAbility || "—"],
           ["Contact Information", row.contact || "—"],
         ];
@@ -263,6 +256,42 @@
 
       function closeMoTaProfileModal() {
         var modal = document.getElementById("mo-ta-profile-modal");
+        if (!modal) return;
+        modal.setAttribute("hidden", "");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      function openMoApplicationDetailModal(row) {
+        var modal = document.getElementById("mo-application-detail-modal");
+        var body = document.getElementById("mo-application-detail-body");
+        if (!modal || !body || !row) return;
+        var appId = row.applicationId != null ? String(row.applicationId) : "";
+        var cvName = row.cvFileName ? String(row.cvFileName) : "-";
+        var cvValue = cvName === "-"
+          ? "-"
+          : '<a href="' + escHtml(window.taApi.moApplicationCvViewUrl(appId)) + '" target="_blank" rel="noopener">' + escHtml(cvName) + "</a>";
+        var fields = [
+          ["Applicant Name", row.applicantName || "—"],
+          ["Education Background", row.educationBackground || row.major || "—"],
+          ["Technical Ability", row.technicalAbility || "—"],
+          ["Contact Information", row.contact || "—"],
+          ["Application Status", String(row.status || "UPLOADED")],
+        ];
+        var rows = fields
+          .map(function (kv) {
+            return "<tr><th style=\"width:220px\">" + escHtml(kv[0]) + "</th><td>" + escHtml(kv[1]) + "</td></tr>";
+          })
+          .join("");
+        rows += "<tr><th style=\"width:220px\">CV File</th><td>" + cvValue + "</td></tr>";
+        body.innerHTML = rows;
+        modal.removeAttribute("hidden");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeMoApplicationDetailModal() {
+        var modal = document.getElementById("mo-application-detail-modal");
         if (!modal) return;
         modal.setAttribute("hidden", "");
         modal.setAttribute("aria-hidden", "true");
@@ -403,6 +432,17 @@
       });
 
       document.getElementById("mo-applications-body").addEventListener("click", function (e) {
+        var appRow = e.target.closest("[data-open-application]");
+        if (appRow && !e.target.closest("[data-app-action]") && !e.target.closest("a")) {
+          var appIdForRow = appRow.getAttribute("data-open-application");
+          var rowForDetail = moCurrentApplications.find(function (x) {
+            return String(x && x.applicationId != null ? x.applicationId : "") === String(appIdForRow || "");
+          });
+          if (rowForDetail) {
+            openMoApplicationDetailModal(rowForDetail);
+          }
+          return;
+        }
         var profileLink = e.target.closest("[data-view-ta-profile]");
         if (profileLink) {
           e.preventDefault();
@@ -440,6 +480,12 @@
       document.getElementById("mo-ta-profile-modal").addEventListener("click", function (e) {
         if (e.target.id === "mo-ta-profile-modal") {
           closeMoTaProfileModal();
+        }
+      });
+      document.getElementById("mo-application-detail-close").addEventListener("click", closeMoApplicationDetailModal);
+      document.getElementById("mo-application-detail-modal").addEventListener("click", function (e) {
+        if (e.target.id === "mo-application-detail-modal") {
+          closeMoApplicationDetailModal();
         }
       });
     </script>
