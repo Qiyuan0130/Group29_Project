@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -602,6 +604,14 @@ public class ApiServlet extends HttpServlet {
         String deadline = job.deadline == null ? "" : job.deadline.trim();
         if (deadline.isEmpty()) {
             throw new IllegalArgumentException("Deadline is required.");
+        }
+        try {
+            LocalDate deadlineDate = LocalDate.parse(deadline);
+            if (deadlineDate.isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("Deadline cannot be earlier than today.");
+            }
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("Deadline format is invalid. Use yyyy-MM-dd.");
         }
     }
 }
