@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <script src="ta-job-view-api.js"></script>
+    <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script>
       (function () {
@@ -238,7 +238,7 @@
                       return;
                     }
                     applyBtn.disabled = true;
-                    window.taJobViewApi
+                    window.taApi
                       .applicationsApply(job.id, cid)
                       .then(function () {
                         window.taRecruitment.showToast("Application submitted — opening Status…");
@@ -266,7 +266,7 @@
 
           document.getElementById("logout-btn").addEventListener("click", function (e) {
             e.preventDefault();
-            window.taJobViewApi.logout().finally(function () {
+            window.taApi.logout().finally(function () {
               location.href = "../index.html";
             });
           });
@@ -276,26 +276,25 @@
             return;
           }
 
-          if (!window.taJobViewApi || typeof window.taJobViewApi.jobsList !== "function") {
+          if (
+            !window.taApi ||
+            typeof window.taApi.jobsList !== "function" ||
+            typeof window.taApi.cvList !== "function" ||
+            typeof window.taApi.applicationsApply !== "function"
+          ) {
             showError("Page script failed to load. Hard-refresh (Ctrl+F5) or redeploy the app.");
             return;
           }
 
-          function safeCvList() {
-            if (typeof window.taJobViewApi.cvList === "function") {
-              return window.taJobViewApi.cvList().catch(function () {
-                return { files: [] };
-              });
-            }
-            return Promise.resolve({ files: [] });
-          }
-
           Promise.all([
-            window.taJobViewApi.jobsList(),
-            window.taJobViewApi.applicationsMe().catch(function () {
+            window.taApi.jobsList(),
+            window.taApi.applicationsMe().catch(function () {
               return { applications: [] };
             }),
-            safeCvList(),
+            window.taApi.cvList().catch(function (err) {
+              console.warn("cv/list:", err);
+              return { files: [] };
+            }),
           ])
             .then(function (results) {
               try {
