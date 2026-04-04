@@ -1,5 +1,5 @@
 {
-  "nextUserId": 13,
+  "nextUserId": 14,
   "users": [
     {
       "id": 1,
@@ -182,6 +182,19 @@
       "educationBackground": "",
       "technicalAbility": "",
       "contact": "yaoyao@bupt.edu.cn"
+    },
+    {
+      "id": 13,
+      "username": "Admin2",
+      "password": "admin2",
+      "passwordHash": "$2a$10$8aUD4vfCFFgmb86EmWGfSOX1k3w/jxHkjTLWPDq5kmyN3rypVrWEu",
+      "role": "ADMIN",
+      "qmNumber": "",
+      "name": "Admin2",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "admin2@qq.com"
     }
   ]
 }
