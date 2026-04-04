@@ -1,5 +1,5 @@
 {
-  "nextUserId": 16,
+  "nextUserId": 18,
   "users": [
     {
       "id": 1,
@@ -221,6 +221,32 @@
       "educationBackground": "",
       "technicalAbility": "",
       "contact": "apple@bupt.edu.cn"
+    },
+    {
+      "id": 16,
+      "username": "Grape",
+      "password": "grape1",
+      "passwordHash": "$2a$10$lWnCY1/..kQM/IXK/YYwM.limlftOFgvbi5mdtSqMC2Uz/OJi6SWu",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Grape",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "grape@bupt.edu.cn"
+    },
+    {
+      "id": 17,
+      "username": "Yanhua",
+      "password": "yanhua1",
+      "passwordHash": "$2a$10$l/RSs4AvR5MS7wj0JdWRKOiG.uW9WXj.1E/XOb2vFYDtFQ1eIu7JK",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Yanhua",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "yanhua@bupt.edu.cn"
     }
   ]
 }
