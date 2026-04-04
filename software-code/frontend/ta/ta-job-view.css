@@ -119,3 +119,9 @@
   font-size: 0.9rem;
   background: #fff;
 }
+
+/* TA dashboard: Jobs nav locked until profile fields are complete */
+.nav-link.ta-nav-link.ta-nav-link--locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

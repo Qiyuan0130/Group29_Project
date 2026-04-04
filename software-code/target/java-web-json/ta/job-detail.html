@@ -93,6 +93,45 @@
           if (content) content.classList.add("hidden");
         }
 
+        /** Old cached api.js may lack applicationsApply — add same behavior as js/api.js request(). */
+        function ensureTaApiApplicationsApply() {
+          if (!window.taApi || typeof window.taApi.applicationsApply === "function") {
+            return;
+          }
+          function postApplicationsUrl() {
+            if (typeof window.taApi.url === "function") {
+              return window.taApi.url("applications");
+            }
+            var path = location.pathname || "";
+            if (/^\/[^/]+\/software-code\//.test(path)) {
+              var seg = path.split("/");
+              return "/" + seg[1] + "/software-code/api/applications";
+            }
+            if (/^\/[^/]+\//.test(path)) {
+              return "/" + path.split("/")[1] + "/api/applications";
+            }
+            return "api/applications";
+          }
+          window.taApi.applicationsApply = function (jobId, cvId) {
+            return fetch(postApplicationsUrl(), {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json;charset=UTF-8" },
+              body: JSON.stringify({ jobId: jobId, cvId: cvId }),
+            }).then(function (res) {
+              var ct = res.headers.get("Content-Type") || "";
+              var isJson = ct.indexOf("application/json") !== -1;
+              return (isJson ? res.json() : res.text()).then(function (data) {
+                if (!res.ok) {
+                  var msg = data && data.error ? data.error : res.statusText;
+                  throw new Error(msg || "Request failed");
+                }
+                return data;
+              });
+            });
+          };
+        }
+
         function todayYmd() {
           var d = new Date();
           var y = d.getFullYear();
@@ -276,13 +315,19 @@
             return;
           }
 
-          if (
-            !window.taApi ||
-            typeof window.taApi.jobsList !== "function" ||
-            typeof window.taApi.cvList !== "function" ||
-            typeof window.taApi.applicationsApply !== "function"
-          ) {
-            showError("Page script failed to load. Hard-refresh (Ctrl+F5) or redeploy the app.");
+          if (!window.taApi) {
+            showError(
+              "Could not load ../js/api.js. Check deployment, then hard-refresh (Ctrl+F5)."
+            );
+            return;
+          }
+          if (typeof window.taApi.jobsList !== "function" || typeof window.taApi.cvList !== "function") {
+            showError("api.js is outdated or incomplete. Hard-refresh (Ctrl+F5) or redeploy.");
+            return;
+          }
+          ensureTaApiApplicationsApply();
+          if (typeof window.taApi.applicationsApply !== "function") {
+            showError("Could not initialize apply. Hard-refresh (Ctrl+F5) or redeploy.");
             return;
           }
 
