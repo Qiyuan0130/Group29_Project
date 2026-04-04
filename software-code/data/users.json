@@ -1,5 +1,5 @@
 {
-  "nextUserId": 10,
+  "nextUserId": 11,
   "users": [
     {
       "id": 1,
@@ -10,7 +10,6 @@
       "qmNumber": "",
       "name": "Qiyao111",
       "major": "telecommunications",
-      "educationBackground": "undergraduate",
       "technicalAbility": "java",
       "contact": "220019596@qq.com"
     },
@@ -23,7 +22,6 @@
       "qmNumber": "",
       "name": "Qiyuan",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "xiongzixin@bupt.edu.cn"
     },
@@ -36,7 +34,6 @@
       "qmNumber": "",
       "name": "222",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "1234@qq.com"
     },
@@ -49,7 +46,6 @@
       "qmNumber": "",
       "name": "12",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "12@123.com"
     },
@@ -62,7 +58,6 @@
       "qmNumber": "",
       "name": "Ella",
       "major": "Telecommunications",
-      "educationBackground": "undergraduate",
       "technicalAbility": "java",
       "contact": "ella@163.com"
     },
@@ -75,7 +70,6 @@
       "qmNumber": "",
       "name": "admin1",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "admin1@163.com"
     },
@@ -88,7 +82,6 @@
       "qmNumber": "",
       "name": "ZhangCongming",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "congming@qq.com"
     },
@@ -101,7 +94,6 @@
       "qmNumber": "",
       "name": "xiaoming",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "123@qq.com"
     },
@@ -114,7 +106,6 @@
       "qmNumber": "",
       "name": "333",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "444@qq.com"
     },
@@ -127,7 +118,6 @@
       "qmNumber": "",
       "name": "xiaohong",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "2345@qq.com"
     },
@@ -140,9 +130,20 @@
       "qmNumber": "",
       "name": "xiaoshang",
       "major": "",
-      "educationBackground": "",
       "technicalAbility": "",
       "contact": "666@qq.com"
+    },
+    {
+      "id": 10,
+      "username": "xinyi",
+      "password": "123456a",
+      "passwordHash": "$2a$10$c.toumbNyfyZxax6FPisc.y6ay9MvOpIOPRcDufk8O8JYalHIAuuK",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "xinyi",
+      "major": "",
+      "technicalAbility": "",
+      "contact": "qi9586@gmail.com"
     }
   ]
 }
