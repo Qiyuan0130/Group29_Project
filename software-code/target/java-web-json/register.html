@@ -66,6 +66,19 @@
         </form>
       </div>
     </div>
+
+    <div id="reg-success-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="reg-success-title" aria-describedby="reg-success-desc">
+      <div class="modal__card modal__card--reg-success">
+        <div id="reg-success-desc" class="modal__reg-success-lines">
+          <p id="reg-success-title" class="modal__reg-line">Registration successful.</p>
+          <p class="modal__reg-line">Welcome to use.</p>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn-primary" id="reg-success-continue">Continue to Login</button>
+        </div>
+      </div>
+    </div>
+
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
     <script>
@@ -149,15 +162,17 @@
           .then(function () {
             document.getElementById("form-register").reset();
             syncMoKeyVisibility();
-            var okMsg =
-              "You're all set — your account is ready. Taking you to sign in…";
-            if (window.taRecruitment && typeof window.taRecruitment.showToast === "function") {
-              window.taRecruitment.showToast(okMsg, { variant: "success", duration: 4200 });
-              setTimeout(function () {
+            var modal = document.getElementById("reg-success-modal");
+            var btn = document.getElementById("reg-success-continue");
+            if (modal && btn) {
+              modal.removeAttribute("hidden");
+              document.body.style.overflow = "hidden";
+              btn.focus();
+              btn.onclick = function () {
                 location.href = "login.html";
-              }, 2200);
+              };
             } else {
-              alert("Registration successful.");
+              alert("Registration successful.\nWelcome to use.");
               location.href = "login.html";
             }
           })
