@@ -12,10 +12,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * 数据与上传文件目录，由 {@code /WEB-INF/app-settings.properties} 配置。
- * <p>
- * 相对路径：相对于 Web 应用根目录（war 解压目录）。绝对路径：直接使用该目录（例如由 {@code build-no-maven.ps1}
- * 写入本机工程下的 {@code data/}、{@code uploads/cv/}，无需改 Tomcat）。
+ * Resolves data and upload directories from {@code /WEB-INF/app-settings.properties}.
  */
 public final class JsonPaths {
 
@@ -39,7 +36,7 @@ public final class JsonPaths {
                 }
             }
         } catch (IOException e) {
-            throw new IllegalStateException("读取 " + SETTINGS + " 失败", e);
+            throw new IllegalStateException("Failed to read " + SETTINGS, e);
         }
         return p;
     }
@@ -71,7 +68,7 @@ public final class JsonPaths {
         String base = ctx.getRealPath("/");
         if (base == null) {
             throw new IllegalStateException(
-                    "无法解析应用根目录(getRealPath)。请使用 Tomcat 对 war 的解压部署，或检查容器是否支持 getRealPath");
+                    "Cannot resolve application root (getRealPath is null). Deploy the WAR expanded in Tomcat, or check container support for getRealPath.");
         }
         return Paths.get(base).resolve(configured).normalize();
     }

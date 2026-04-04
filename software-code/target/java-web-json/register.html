@@ -88,12 +88,12 @@
         var isMo = role === "MO";
         var isAdmin = role === "ADMIN";
         
-        // 处理MO密钥框
+        // MO registration key field
         moGroup.classList.toggle("hidden", !isMo);
         moInput.required = isMo;
         if (!isMo) moInput.value = "";
         
-        // 处理Admin密钥框
+        // Admin registration key field
         adminGroup.classList.toggle("hidden", !isAdmin);
         adminInput.required = isAdmin;
         if (!isAdmin) adminInput.value = "";

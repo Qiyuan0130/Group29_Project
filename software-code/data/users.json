@@ -1,5 +1,5 @@
 {
-  "nextUserId": 14,
+  "nextUserId": 16,
   "users": [
     {
       "id": 1,
@@ -195,6 +195,32 @@
       "educationBackground": "",
       "technicalAbility": "",
       "contact": "admin2@qq.com"
+    },
+    {
+      "id": 14,
+      "username": "san",
+      "password": "san111",
+      "passwordHash": "$2a$10$9ZBEhcgxe6NeGo1YQsS3SuASVNpBiGJe0h9u8zg3XCk8agvPLoEyO",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "san",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "san@bupt.edu.cn"
+    },
+    {
+      "id": 15,
+      "username": "Apple",
+      "password": "apple1",
+      "passwordHash": "$2a$10$uCeFQdgk5tkkxVBN9/6a3OAuOz.cQuE.ai/.ErBNDDt.Dovpn1tCq",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Apple",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "apple@bupt.edu.cn"
     }
   ]
 }

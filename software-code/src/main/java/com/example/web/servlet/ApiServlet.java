@@ -110,7 +110,7 @@ public class ApiServlet extends HttpServlet {
             }
             String role = body.role.trim().toUpperCase();
             
-            // MO角色验证
+            // MO role: validate registration key
             if (Roles.MO.equals(role)) {
                 String moKey = body.moKey == null ? "" : body.moKey.trim();
                 if (!MO_REGISTER_KEY.equals(moKey)) {
@@ -118,7 +118,7 @@ public class ApiServlet extends HttpServlet {
                 }
             }
             
-            // ADMIN角色验证
+            // ADMIN role: validate registration key
             if (Roles.ADMIN.equals(role)) {
                 String adminKey = body.adminKey == null ? "" : body.adminKey.trim();
                 if (!ADMIN_REGISTER_KEY.equals(adminKey)) {
@@ -128,7 +128,7 @@ public class ApiServlet extends HttpServlet {
             
             User created = ur.register(body.name, body.email, body.password, body.role);
             
-            // 生成注册成功密钥并自动建立会话（保密用户信息）
+            // Issue auth token and session after registration
             String authToken = AuthTokenUtil.generateAuthToken();
             HttpSession session = req.getSession(true);
             session.setAttribute("USER_ID", created.id);
@@ -136,7 +136,7 @@ public class ApiServlet extends HttpServlet {
             
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("ok", true);
-            out.put("message", "注册成功，自动登录中");
+            out.put("message", "Registration successful. Signing you in…");
             out.put("role", created.role);
             out.put("authToken", authToken);
             out.put("userId", created.id);

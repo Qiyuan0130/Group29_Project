@@ -406,7 +406,7 @@
         function parseFilterTokens(raw) {
           if (!raw || !String(raw).trim()) return [];
           return String(raw)
-            .split(/[\s,，]+/)
+            .split(/[\s,\uFF0C]+/)
             .map(function (x) {
               return x.trim().toLowerCase();
             })
