@@ -27,7 +27,7 @@
           href="#"
           data-tab="jobs"
           aria-disabled="true"
-          title="Complete Major, Education Background, and Technical Ability in Profile, then save."
+          title="Please complete Name, Major, Education Background, Technical Ability, and Contact in Profile, then save."
           >Jobs</a
         >
         <a class="nav-link ta-nav-link" href="#" data-tab="status">Status</a>
@@ -671,6 +671,10 @@
               if (msg.indexOf("Not logged in") !== -1 || msg.indexOf("401") !== -1) {
                 window.taRecruitment.showToast("Please sign in again");
                 location.href = "../index.html";
+                return;
+              }
+              if (msg.indexOf("Complete your profile") !== -1 || msg.indexOf("403") !== -1) {
+                window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
                 return;
               }
               window.taRecruitment.showToast("Failed to load jobs: " + msg);

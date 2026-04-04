@@ -5,6 +5,25 @@
   "use strict";
 
   window.taRecruitment = {
+    /** Shown when Jobs is locked or API rejects job access until profile is complete. */
+    taProfileIncompleteToast:
+      "Please complete Name, Major, Education Background, Technical Ability, and Contact in Profile, then save.",
+
+    /** Same rule as server: all five fields non-empty (trimmed). */
+    isTaProfileCompleteForJobs: function (user) {
+      if (!user) return false;
+      function ne(s) {
+        return s != null && String(s).trim().length > 0;
+      }
+      return (
+        ne(user.name) &&
+        ne(user.major) &&
+        ne(user.educationBackground) &&
+        ne(user.technicalAbility) &&
+        ne(user.contact)
+      );
+    },
+
     /** TA / MO dashboard tab switching */
     bindTabs: function (navSelector, panelPrefix) {
       var links = document.querySelectorAll(navSelector);
@@ -13,9 +32,7 @@
           e.preventDefault();
           if (link.classList.contains("ta-nav-link--locked")) {
             if (window.taRecruitment && window.taRecruitment.showToast) {
-              window.taRecruitment.showToast(
-                "Please complete Major, Education Background, and Technical Ability in Profile, then save."
-              );
+              window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
             }
             return;
           }
