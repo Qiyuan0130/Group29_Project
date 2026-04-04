@@ -22,7 +22,14 @@
         <div class="dashboard__sidebar-title">Navigation bar</div>
         <a class="nav-link ta-nav-link is-active" href="#" data-tab="profile">Profile</a>
         <a class="nav-link ta-nav-link" href="#" data-tab="cv">CV Upload</a>
-        <a class="nav-link ta-nav-link" href="#" data-tab="jobs">Jobs</a>
+        <a
+          class="nav-link ta-nav-link ta-nav-link--locked"
+          href="#"
+          data-tab="jobs"
+          aria-disabled="true"
+          title="Please complete Name, Major, Education Background, Technical Ability, and Contact in Profile, then save."
+          >Jobs</a
+        >
         <a class="nav-link ta-nav-link" href="#" data-tab="status">Status</a>
       </aside>
 
@@ -399,7 +406,7 @@
         function parseFilterTokens(raw) {
           if (!raw || !String(raw).trim()) return [];
           return String(raw)
-            .split(/[\s,，]+/)
+            .split(/[\s,\uFF0C]+/)
             .map(function (x) {
               return x.trim().toLowerCase();
             })
@@ -666,6 +673,10 @@
                 location.href = "../index.html";
                 return;
               }
+              if (msg.indexOf("Complete your profile") !== -1 || msg.indexOf("403") !== -1) {
+                window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
+                return;
+              }
               window.taRecruitment.showToast("Failed to load jobs: " + msg);
             });
         }
@@ -683,14 +694,12 @@
           if (reload) reload.addEventListener("click", loadTaJobs);
           if (navJobs) {
             navJobs.addEventListener("click", function () {
+              if (navJobs.classList.contains("ta-nav-link--locked")) return;
               loadTaJobs();
             });
           }
 
-          if (location.hash === "#jobs") {
-            var jobsTab = document.querySelector('.ta-nav-link[data-tab="jobs"]');
-            if (jobsTab) jobsTab.click();
-          }
+          /* #jobs hash: opened after profile loads in ta-profile.js (unlock + sync) */
         });
       })();
 

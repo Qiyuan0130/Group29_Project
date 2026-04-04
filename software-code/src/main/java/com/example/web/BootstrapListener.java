@@ -18,7 +18,7 @@ public class BootstrapListener implements ServletContextListener {
             app.jobs.ensureSeed(app.users);
             app.applications.ensureSeed(app.users);
         } catch (IOException e) {
-            throw new IllegalStateException("初始化 JSON 数据失败", e);
+            throw new IllegalStateException("Failed to initialize JSON data store", e);
         }
     }
 

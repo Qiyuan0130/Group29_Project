@@ -3,6 +3,7 @@ package com.example.web.repo;
 import com.example.web.ApplicationStatuses;
 import com.example.web.model.ApplicationDatabase;
 import com.example.web.model.ApplicationRecord;
+import com.example.web.model.CvRecord;
 import com.example.web.util.JsonFileStore;
 
 import jakarta.servlet.ServletContext;
@@ -88,7 +89,12 @@ public final class ApplicationRepository {
         return Optional.empty();
     }
 
-    public synchronized ApplicationRecord apply(long jobId, long applicantId) throws IOException {
+    public synchronized ApplicationRecord apply(long jobId, long applicantId, long cvId, CvRepository cvs)
+            throws IOException {
+        CvRecord cv = cvs.findById(cvId).orElseThrow(() -> new IllegalArgumentException("CV not found"));
+        if (cv.userId == null || cv.userId != applicantId) {
+            throw new IllegalArgumentException("CV does not belong to you");
+        }
         ApplicationDatabase db = load();
         for (ApplicationRecord r : db.applications) {
             if (r.jobId == jobId && r.applicantId == applicantId) {
@@ -99,6 +105,7 @@ public final class ApplicationRepository {
         r.id = db.nextApplicationId++;
         r.jobId = jobId;
         r.applicantId = applicantId;
+        r.cvId = cvId;
         r.status = ApplicationStatuses.PENDING;
         r.appliedAt = Instant.now().toString();
         db.applications.add(r);

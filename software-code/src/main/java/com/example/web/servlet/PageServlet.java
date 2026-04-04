@@ -7,8 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 通用占位 Servlet：{@code /page/*} 映射到占位 JSP。
- * 原型确定后，建议为每个功能拆独立 Servlet 并删除或缩小本类职责。
+ * Placeholder servlet: maps {@code /page/*} to JSP views.
  */
 public class PageServlet extends HttpServlet {
 

@@ -1,5 +1,5 @@
 {
-  "nextUserId": 10,
+  "nextUserId": 18,
   "users": [
     {
       "id": 1,
@@ -10,7 +10,7 @@
       "qmNumber": "",
       "name": "Qiyao111",
       "major": "telecommunications",
-      "educationBackground": "undergraduate",
+      "educationBackground": "",
       "technicalAbility": "java",
       "contact": "220019596@qq.com"
     },
@@ -62,7 +62,7 @@
       "qmNumber": "",
       "name": "Ella",
       "major": "Telecommunications",
-      "educationBackground": "undergraduate",
+      "educationBackground": "",
       "technicalAbility": "java",
       "contact": "ella@163.com"
     },
@@ -143,6 +143,110 @@
       "educationBackground": "",
       "technicalAbility": "",
       "contact": "666@qq.com"
+    },
+    {
+      "id": 10,
+      "username": "xinyi",
+      "password": "123456a",
+      "passwordHash": "$2a$10$c.toumbNyfyZxax6FPisc.y6ay9MvOpIOPRcDufk8O8JYalHIAuuK",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "xinyi",
+      "major": "AI",
+      "educationBackground": "BUPT",
+      "technicalAbility": "Java, Python",
+      "contact": "qi9586@gmail.com"
+    },
+    {
+      "id": 11,
+      "username": "Guanlan",
+      "password": "guanlan1",
+      "passwordHash": "$2a$10$ybS1mgfcYN9IhbYeHcT6peABtnGEzVFnGBR47kmWqXXcyyEnYSlGe",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Guanlan",
+      "major": "AI",
+      "educationBackground": "Pku",
+      "technicalAbility": "Python, Matlab",
+      "contact": "guanlan@bupt.edu.cn"
+    },
+    {
+      "id": 12,
+      "username": "Yaoyao",
+      "password": "yaoyao1",
+      "passwordHash": "$2a$10$dSeScnEuZIYbdJ2WSw5MVeUG8HmHlvWK3ZXTQj7Ie.g9liz6iQHNm",
+      "role": "MO",
+      "qmNumber": "",
+      "name": "Yaoyao",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "yaoyao@bupt.edu.cn"
+    },
+    {
+      "id": 13,
+      "username": "Admin2",
+      "password": "admin2",
+      "passwordHash": "$2a$10$8aUD4vfCFFgmb86EmWGfSOX1k3w/jxHkjTLWPDq5kmyN3rypVrWEu",
+      "role": "ADMIN",
+      "qmNumber": "",
+      "name": "Admin2",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "admin2@qq.com"
+    },
+    {
+      "id": 14,
+      "username": "san",
+      "password": "san111",
+      "passwordHash": "$2a$10$9ZBEhcgxe6NeGo1YQsS3SuASVNpBiGJe0h9u8zg3XCk8agvPLoEyO",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "san",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "san@bupt.edu.cn"
+    },
+    {
+      "id": 15,
+      "username": "Apple",
+      "password": "apple1",
+      "passwordHash": "$2a$10$uCeFQdgk5tkkxVBN9/6a3OAuOz.cQuE.ai/.ErBNDDt.Dovpn1tCq",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Apple",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "apple@bupt.edu.cn"
+    },
+    {
+      "id": 16,
+      "username": "Grape",
+      "password": "grape1",
+      "passwordHash": "$2a$10$lWnCY1/..kQM/IXK/YYwM.limlftOFgvbi5mdtSqMC2Uz/OJi6SWu",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Grape",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "grape@bupt.edu.cn"
+    },
+    {
+      "id": 17,
+      "username": "Yanhua",
+      "password": "yanhua1",
+      "passwordHash": "$2a$10$l/RSs4AvR5MS7wj0JdWRKOiG.uW9WXj.1E/XOb2vFYDtFQ1eIu7JK",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Yanhua",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "yanhua@bupt.edu.cn"
     }
   ]
 }

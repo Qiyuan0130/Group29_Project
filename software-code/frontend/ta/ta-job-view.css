@@ -100,3 +100,28 @@
   font-weight: 600;
   font-size: 0.92em;
 }
+
+.detail-cv-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.detail-cv-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.detail-cv-select {
+  max-width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-size: 0.9rem;
+  background: #fff;
+}
+
+/* TA dashboard: Jobs nav locked until profile fields are complete */
+.nav-link.ta-nav-link.ta-nav-link--locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

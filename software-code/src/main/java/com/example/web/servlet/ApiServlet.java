@@ -110,7 +110,7 @@ public class ApiServlet extends HttpServlet {
             }
             String role = body.role.trim().toUpperCase();
             
-            // MO角色验证
+            // MO role: validate registration key
             if (Roles.MO.equals(role)) {
                 String moKey = body.moKey == null ? "" : body.moKey.trim();
                 if (!MO_REGISTER_KEY.equals(moKey)) {
@@ -118,7 +118,7 @@ public class ApiServlet extends HttpServlet {
                 }
             }
             
-            // ADMIN角色验证
+            // ADMIN role: validate registration key
             if (Roles.ADMIN.equals(role)) {
                 String adminKey = body.adminKey == null ? "" : body.adminKey.trim();
                 if (!ADMIN_REGISTER_KEY.equals(adminKey)) {
@@ -128,7 +128,7 @@ public class ApiServlet extends HttpServlet {
             
             User created = ur.register(body.name, body.email, body.password, body.role);
             
-            // 生成注册成功密钥并自动建立会话（保密用户信息）
+            // Issue auth token and session after registration
             String authToken = AuthTokenUtil.generateAuthToken();
             HttpSession session = req.getSession(true);
             session.setAttribute("USER_ID", created.id);
@@ -136,7 +136,7 @@ public class ApiServlet extends HttpServlet {
             
             Map<String, Object> out = new LinkedHashMap<>();
             out.put("ok", true);
-            out.put("message", "注册成功，自动登录中");
+            out.put("message", "Registration successful. Signing you in…");
             out.put("role", created.role);
             out.put("authToken", authToken);
             out.put("userId", created.id);
@@ -188,7 +188,12 @@ public class ApiServlet extends HttpServlet {
             return;
         }
         if ("/api/jobs".equals(path) && "GET".equals(method)) {
-            requireUser(ur, req);
+            User u = requireUser(ur, req);
+            if (Roles.TA.equals(u.role) && !isTaProfileCompleteForJobs(u)) {
+                HttpJson.error(resp, HttpServletResponse.SC_FORBIDDEN,
+                        "Complete your profile (Name, Major, Education Background, Technical Ability, Contact) before viewing jobs.");
+                return;
+            }
             List<Map<String, Object>> jobRows = new ArrayList<>();
             for (Job j : jr.findAll()) {
                 jobRows.add(jobToPublicMap(j, ur));
@@ -241,6 +246,7 @@ public class ApiServlet extends HttpServlet {
                 row.put("jobDeadline", j.map(x -> x.deadline == null ? "" : x.deadline).orElse(""));
                 row.put("appliedAt", a.appliedAt);
                 row.put("status", a.status);
+                row.put("cvId", a.cvId);
                 rows.add(row);
             }
             HttpJson.write(resp, 200, Map.of("applications", rows));
@@ -251,11 +257,18 @@ public class ApiServlet extends HttpServlet {
             if (!Roles.TA.equals(u.role)) {
                 throw new SecurityException("TA only");
             }
+            if (!isTaProfileCompleteForJobs(u)) {
+                throw new SecurityException(
+                        "Complete your profile (Name, Major, Education Background, Technical Ability, Contact) before applying.");
+            }
             ApplyRequest body = HttpJson.readBody(req, ApplyRequest.class);
             if (body.jobId == null) {
                 throw new IllegalArgumentException("jobId required");
             }
-            ApplicationRecord created = ar.apply(body.jobId, u.id);
+            if (body.cvId == null) {
+                throw new IllegalArgumentException("cvId required — upload a PDF resume first");
+            }
+            ApplicationRecord created = ar.apply(body.jobId, u.id, body.cvId, cr);
             HttpJson.write(resp, 200, created);
             return;
         }
@@ -273,7 +286,7 @@ public class ApiServlet extends HttpServlet {
             List<Map<String, Object>> rows = new ArrayList<>();
             for (ApplicationRecord a : ar.findByJob(jobId)) {
                 User applicant = ur.findById(a.applicantId).orElseThrow();
-                Optional<CvRecord> cv = cr.findByUser(applicant.id).stream().findFirst();
+                Optional<CvRecord> cv = resolveCvForApplication(a, cr, applicant.id);
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("applicationId", a.id);
                 row.put("applicantId", applicant.id);
@@ -323,7 +336,7 @@ public class ApiServlet extends HttpServlet {
             if (!u.id.equals(job.organizerId)) {
                 throw new SecurityException("Not your job");
             }
-            CvRecord c = cr.findByUser(a.applicantId).stream().findFirst()
+            CvRecord c = resolveCvForApplication(a, cr, a.applicantId)
                     .orElseThrow(() -> new IllegalArgumentException("CV not found"));
             Path file = JsonPaths.uploadsCvDirectory(getServletContext())
                     .resolve(c.storedName == null ? "" : c.storedName);
@@ -553,6 +566,22 @@ public class ApiServlet extends HttpServlet {
         return m;
     }
 
+    private static boolean isNonEmptyField(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
+
+    /** TA must fill all profile fields used in the dashboard before browsing jobs or applying. */
+    private static boolean isTaProfileCompleteForJobs(User u) {
+        if (u == null) {
+            return false;
+        }
+        return isNonEmptyField(u.name)
+                && isNonEmptyField(u.major)
+                && isNonEmptyField(u.educationBackground)
+                && isNonEmptyField(u.technicalAbility)
+                && isNonEmptyField(u.contact);
+    }
+
     private static User requireUser(UserRepository ur, HttpServletRequest req) throws IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
@@ -613,5 +642,22 @@ public class ApiServlet extends HttpServlet {
         } catch (DateTimeParseException ex) {
             throw new IllegalArgumentException("Deadline format is invalid. Use yyyy-MM-dd.");
         }
+    }
+
+    /** CV attached to the application, or the applicant's first upload for legacy applications. */
+    private static Optional<CvRecord> resolveCvForApplication(ApplicationRecord a, CvRepository cr, long applicantId)
+            throws IOException {
+        if (a.cvId != null) {
+            Optional<CvRecord> opt = cr.findById(a.cvId);
+            if (opt.isEmpty()) {
+                return Optional.empty();
+            }
+            CvRecord c = opt.get();
+            if (c.userId == null || c.userId != applicantId) {
+                return Optional.empty();
+            }
+            return opt;
+        }
+        return cr.findByUser(applicantId).stream().findFirst();
     }
 }

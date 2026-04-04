@@ -50,8 +50,11 @@
     jobsList: function () {
       return request("GET", "jobs", null);
     },
-    applicationsApply: function (jobId) {
-      return request("POST", "applications", { jobId: jobId });
+    cvList: function () {
+      return request("GET", "cv/list", null);
+    },
+    applicationsApply: function (jobId, cvId) {
+      return request("POST", "applications", { jobId: jobId, cvId: cvId });
     },
     applicationsMe: function () {
       return request("GET", "applications/me", null);

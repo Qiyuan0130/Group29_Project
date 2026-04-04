@@ -42,11 +42,50 @@
       if (ctrls[4]) ctrls[4].value = user.contact != null ? user.contact : "";
     }
 
+    function isProfileCompleteForJobs(user) {
+      return (
+        window.taRecruitment &&
+        typeof window.taRecruitment.isTaProfileCompleteForJobs === "function" &&
+        window.taRecruitment.isTaProfileCompleteForJobs(user)
+      );
+    }
+
+    function updateTaJobsTabLock(user) {
+      var nav = document.querySelector('.ta-nav-link[data-tab="jobs"]');
+      if (!nav) return;
+      var ok = isProfileCompleteForJobs(user);
+      nav.classList.toggle("ta-nav-link--locked", !ok);
+      nav.setAttribute("aria-disabled", ok ? "false" : "true");
+      nav.title = ok ? "" : window.taRecruitment.taProfileIncompleteToast;
+    }
+
+    function syncTaDashboardJobsHash(user) {
+      if (!document.getElementById("ta-panel-jobs")) return;
+      if (location.hash !== "#jobs") return;
+      if (isProfileCompleteForJobs(user)) {
+        var jobsTab = document.querySelector('.ta-nav-link[data-tab="jobs"]');
+        if (jobsTab) jobsTab.click();
+      } else {
+        if (history.replaceState) {
+          history.replaceState(null, "", "#profile");
+        } else {
+          location.hash = "#profile";
+        }
+        var profileTab = document.querySelector('.ta-nav-link[data-tab="profile"]');
+        if (profileTab) profileTab.click();
+        if (window.taRecruitment && window.taRecruitment.showToast) {
+          window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
+        }
+      }
+    }
+
     window.taApi
       .me()
       .then(function (user) {
         applyToView(user);
         applyToForm(user);
+        updateTaJobsTabLock(user);
+        syncTaDashboardJobsHash(user);
       })
       .catch(function (err) {
         if (window.taRecruitment && window.taRecruitment.showToast) {
@@ -69,6 +108,7 @@
           .then(function (user) {
             applyToView(user);
             applyToForm(user);
+            updateTaJobsTabLock(user);
             window.taRecruitment.showToast("Profile saved");
           })
           .catch(function (err) {
