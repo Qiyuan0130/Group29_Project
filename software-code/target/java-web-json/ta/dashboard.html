@@ -22,7 +22,14 @@
         <div class="dashboard__sidebar-title">Navigation bar</div>
         <a class="nav-link ta-nav-link is-active" href="#" data-tab="profile">Profile</a>
         <a class="nav-link ta-nav-link" href="#" data-tab="cv">CV Upload</a>
-        <a class="nav-link ta-nav-link" href="#" data-tab="jobs">Jobs</a>
+        <a
+          class="nav-link ta-nav-link ta-nav-link--locked"
+          href="#"
+          data-tab="jobs"
+          aria-disabled="true"
+          title="Complete Major, Education Background, and Technical Ability in Profile, then save."
+          >Jobs</a
+        >
         <a class="nav-link ta-nav-link" href="#" data-tab="status">Status</a>
       </aside>
 
@@ -683,14 +690,12 @@
           if (reload) reload.addEventListener("click", loadTaJobs);
           if (navJobs) {
             navJobs.addEventListener("click", function () {
+              if (navJobs.classList.contains("ta-nav-link--locked")) return;
               loadTaJobs();
             });
           }
 
-          if (location.hash === "#jobs") {
-            var jobsTab = document.querySelector('.ta-nav-link[data-tab="jobs"]');
-            if (jobsTab) jobsTab.click();
-          }
+          /* #jobs hash: opened after profile loads in ta-profile.js (unlock + sync) */
         });
       })();
 

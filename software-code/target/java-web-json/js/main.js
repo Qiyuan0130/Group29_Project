@@ -11,6 +11,14 @@
       links.forEach(function (link) {
         link.addEventListener("click", function (e) {
           e.preventDefault();
+          if (link.classList.contains("ta-nav-link--locked")) {
+            if (window.taRecruitment && window.taRecruitment.showToast) {
+              window.taRecruitment.showToast(
+                "Please complete Major, Education Background, and Technical Ability in Profile, then save."
+              );
+            }
+            return;
+          }
           var tab = link.getAttribute("data-tab");
           if (!tab) return;
 

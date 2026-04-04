@@ -188,7 +188,12 @@ public class ApiServlet extends HttpServlet {
             return;
         }
         if ("/api/jobs".equals(path) && "GET".equals(method)) {
-            requireUser(ur, req);
+            User u = requireUser(ur, req);
+            if (Roles.TA.equals(u.role) && !isTaProfileCompleteForJobs(u)) {
+                HttpJson.error(resp, HttpServletResponse.SC_FORBIDDEN,
+                        "Complete your profile (Name, Major, Education Background, Technical Ability, Contact) before viewing jobs.");
+                return;
+            }
             List<Map<String, Object>> jobRows = new ArrayList<>();
             for (Job j : jr.findAll()) {
                 jobRows.add(jobToPublicMap(j, ur));
@@ -251,6 +256,10 @@ public class ApiServlet extends HttpServlet {
             User u = requireUser(ur, req);
             if (!Roles.TA.equals(u.role)) {
                 throw new SecurityException("TA only");
+            }
+            if (!isTaProfileCompleteForJobs(u)) {
+                throw new SecurityException(
+                        "Complete your profile (Name, Major, Education Background, Technical Ability, Contact) before applying.");
             }
             ApplyRequest body = HttpJson.readBody(req, ApplyRequest.class);
             if (body.jobId == null) {
@@ -555,6 +564,22 @@ public class ApiServlet extends HttpServlet {
         }
         m.put("organizerName", moName.isEmpty() ? "Unknown" : moName);
         return m;
+    }
+
+    private static boolean isNonEmptyField(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
+
+    /** TA must fill all profile fields used in the dashboard before browsing jobs or applying. */
+    private static boolean isTaProfileCompleteForJobs(User u) {
+        if (u == null) {
+            return false;
+        }
+        return isNonEmptyField(u.name)
+                && isNonEmptyField(u.major)
+                && isNonEmptyField(u.educationBackground)
+                && isNonEmptyField(u.technicalAbility)
+                && isNonEmptyField(u.contact);
     }
 
     private static User requireUser(UserRepository ur, HttpServletRequest req) throws IOException {

@@ -42,17 +42,11 @@
       if (ctrls[4]) ctrls[4].value = user.contact != null ? user.contact : "";
     }
 
-    function nonEmptyField(s) {
-      return s != null && String(s).trim().length > 0;
-    }
-
-    /** Jobs tab is available only after these three fields are saved on the server. */
     function isProfileCompleteForJobs(user) {
-      if (!user) return false;
       return (
-        nonEmptyField(user.major) &&
-        nonEmptyField(user.educationBackground) &&
-        nonEmptyField(user.technicalAbility)
+        window.taRecruitment &&
+        typeof window.taRecruitment.isTaProfileCompleteForJobs === "function" &&
+        window.taRecruitment.isTaProfileCompleteForJobs(user)
       );
     }
 
@@ -62,9 +56,7 @@
       var ok = isProfileCompleteForJobs(user);
       nav.classList.toggle("ta-nav-link--locked", !ok);
       nav.setAttribute("aria-disabled", ok ? "false" : "true");
-      nav.title = ok
-        ? ""
-        : "Complete Major, Education Background, and Technical Ability in Profile, then save.";
+      nav.title = ok ? "" : window.taRecruitment.taProfileIncompleteToast;
     }
 
     function syncTaDashboardJobsHash(user) {
@@ -82,9 +74,7 @@
         var profileTab = document.querySelector('.ta-nav-link[data-tab="profile"]');
         if (profileTab) profileTab.click();
         if (window.taRecruitment && window.taRecruitment.showToast) {
-          window.taRecruitment.showToast(
-            "Complete Major, Education Background, and Technical Ability in Profile (Save) to unlock Jobs."
-          );
+          window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
         }
       }
     }

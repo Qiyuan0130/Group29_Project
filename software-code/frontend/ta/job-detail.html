@@ -23,7 +23,9 @@
 
         <div id="detail-error" class="panel hidden" style="border-color: var(--danger)">
           <p id="detail-error-text" style="margin: 0; color: var(--danger)"></p>
-          <p style="margin: 0.75rem 0 0"><a href="dashboard.html#jobs">Back to Jobs</a></p>
+          <p style="margin: 0.75rem 0 0">
+            <a id="detail-error-back" href="dashboard.html#jobs">Back to Jobs</a>
+          </p>
         </div>
 
         <div id="detail-content" class="panel hidden">
@@ -84,11 +86,17 @@
           }).filter(Boolean);
         }
 
-        function showError(msg) {
+        function showError(msg, opts) {
+          opts = opts || {};
           var box = document.getElementById("detail-error");
           var text = document.getElementById("detail-error-text");
           var content = document.getElementById("detail-content");
+          var back = document.getElementById("detail-error-back");
           if (text) text.textContent = msg;
+          if (back) {
+            back.setAttribute("href", opts.backHref || "dashboard.html#jobs");
+            back.textContent = opts.backLabel || "Back to Jobs";
+          }
           if (box) box.classList.remove("hidden");
           if (content) content.classList.add("hidden");
         }
@@ -331,17 +339,35 @@
             return;
           }
 
-          Promise.all([
-            window.taApi.jobsList(),
-            window.taApi.applicationsMe().catch(function () {
-              return { applications: [] };
-            }),
-            window.taApi.cvList().catch(function (err) {
-              console.warn("cv/list:", err);
-              return { files: [] };
-            }),
-          ])
+          window.taApi
+            .me()
+            .then(function (user) {
+              var role = String(user && user.role ? user.role : "").toUpperCase();
+              if (
+                role === "TA" &&
+                window.taRecruitment &&
+                typeof window.taRecruitment.isTaProfileCompleteForJobs === "function" &&
+                !window.taRecruitment.isTaProfileCompleteForJobs(user)
+              ) {
+                showError(
+                  "Complete Name, Major, Education Background, Technical Ability, and Contact in Profile (Save) before viewing or applying for jobs.",
+                  { backHref: "dashboard.html#profile", backLabel: "Go to Profile" }
+                );
+                return null;
+              }
+              return Promise.all([
+                window.taApi.jobsList(),
+                window.taApi.applicationsMe().catch(function () {
+                  return { applications: [] };
+                }),
+                window.taApi.cvList().catch(function (err) {
+                  console.warn("cv/list:", err);
+                  return { files: [] };
+                }),
+              ]);
+            })
             .then(function (results) {
+              if (results === null) return;
               try {
                 var list = Array.isArray(results[0]) ? results[0] : [];
                 var apps = results[1] && results[1].applications ? results[1].applications : [];
@@ -376,6 +402,13 @@
               if (msg.indexOf("Not logged in") !== -1 || msg.indexOf("401") !== -1) {
                 window.taRecruitment.showToast("Please sign in again");
                 location.href = "../index.html";
+                return;
+              }
+              if (msg.indexOf("Complete your profile") !== -1) {
+                showError(
+                  "Complete Name, Major, Education Background, Technical Ability, and Contact in Profile (Save) before viewing or applying for jobs.",
+                  { backHref: "dashboard.html#profile", backLabel: "Go to Profile" }
+                );
                 return;
               }
               showError("Failed to load: " + msg);

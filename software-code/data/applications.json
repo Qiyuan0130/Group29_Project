@@ -1,5 +1,5 @@
 {
-  "nextApplicationId": 13,
+  "nextApplicationId": 14,
   "applications": [
     {
       "id": 1,
@@ -85,6 +85,14 @@
       "cvId": 6,
       "status": "PENDING",
       "appliedAt": "2026-04-04T09:42:25.531617Z"
+    },
+    {
+      "id": 13,
+      "jobId": 1,
+      "applicantId": 10,
+      "cvId": 7,
+      "status": "PENDING",
+      "appliedAt": "2026-04-04T09:53:28.495002400Z"
     }
   ]
 }
