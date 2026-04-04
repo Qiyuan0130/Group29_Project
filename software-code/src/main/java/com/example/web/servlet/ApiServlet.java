@@ -241,6 +241,7 @@ public class ApiServlet extends HttpServlet {
                 row.put("jobDeadline", j.map(x -> x.deadline == null ? "" : x.deadline).orElse(""));
                 row.put("appliedAt", a.appliedAt);
                 row.put("status", a.status);
+                row.put("cvId", a.cvId);
                 rows.add(row);
             }
             HttpJson.write(resp, 200, Map.of("applications", rows));
@@ -255,7 +256,10 @@ public class ApiServlet extends HttpServlet {
             if (body.jobId == null) {
                 throw new IllegalArgumentException("jobId required");
             }
-            ApplicationRecord created = ar.apply(body.jobId, u.id);
+            if (body.cvId == null) {
+                throw new IllegalArgumentException("cvId required — upload a PDF resume first");
+            }
+            ApplicationRecord created = ar.apply(body.jobId, u.id, body.cvId, cr);
             HttpJson.write(resp, 200, created);
             return;
         }
@@ -273,7 +277,7 @@ public class ApiServlet extends HttpServlet {
             List<Map<String, Object>> rows = new ArrayList<>();
             for (ApplicationRecord a : ar.findByJob(jobId)) {
                 User applicant = ur.findById(a.applicantId).orElseThrow();
-                Optional<CvRecord> cv = cr.findByUser(applicant.id).stream().findFirst();
+                Optional<CvRecord> cv = resolveCvForApplication(a, cr, applicant.id);
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("applicationId", a.id);
                 row.put("applicantId", applicant.id);
@@ -323,7 +327,7 @@ public class ApiServlet extends HttpServlet {
             if (!u.id.equals(job.organizerId)) {
                 throw new SecurityException("Not your job");
             }
-            CvRecord c = cr.findByUser(a.applicantId).stream().findFirst()
+            CvRecord c = resolveCvForApplication(a, cr, a.applicantId)
                     .orElseThrow(() -> new IllegalArgumentException("CV not found"));
             Path file = JsonPaths.uploadsCvDirectory(getServletContext())
                     .resolve(c.storedName == null ? "" : c.storedName);
@@ -613,5 +617,22 @@ public class ApiServlet extends HttpServlet {
         } catch (DateTimeParseException ex) {
             throw new IllegalArgumentException("Deadline format is invalid. Use yyyy-MM-dd.");
         }
+    }
+
+    /** CV attached to the application, or the applicant's first upload for legacy applications. */
+    private static Optional<CvRecord> resolveCvForApplication(ApplicationRecord a, CvRepository cr, long applicantId)
+            throws IOException {
+        if (a.cvId != null) {
+            Optional<CvRecord> opt = cr.findById(a.cvId);
+            if (opt.isEmpty()) {
+                return Optional.empty();
+            }
+            CvRecord c = opt.get();
+            if (c.userId == null || c.userId != applicantId) {
+                return Optional.empty();
+            }
+            return opt;
+        }
+        return cr.findByUser(applicantId).stream().findFirst();
     }
 }
