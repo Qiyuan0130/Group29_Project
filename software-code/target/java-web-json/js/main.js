@@ -206,21 +206,82 @@
       });
     },
 
-    showToast: function (msg) {
+    /**
+     * Card-style toast (bottom-right). Optional second arg: { variant, duration }.
+     * variant: 'info' | 'success' | 'warning' | 'error'. If omitted, inferred from message.
+     */
+    showToast: function (msg, opts) {
+      opts = opts || {};
+      var icons = {
+        info:
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+        success:
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+        warning:
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+        error:
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+      };
+
+      function inferVariant(text) {
+        var s = String(text || "").toLowerCase();
+        if (
+          /submitted|saved|uploaded|deleted|profile saved|analysis complete|successfully|^\s*ok\b/.test(s) &&
+          !/failed|error/.test(s)
+        ) {
+          return "success";
+        }
+        if (
+          /failed|error|required|invalid|missing|not logged|sign in again|could not|403|401|forbidden|denied|unable|upload a pdf|please upload|cv upload|cvid/.test(
+            s
+          )
+        ) {
+          return "warning";
+        }
+        return "info";
+      }
+
+      var variant = opts.variant;
+      if (!variant || !icons[variant]) {
+        variant = inferVariant(msg);
+      }
+
+      var duration = opts.duration;
+      if (duration == null) {
+        var len = String(msg || "").length;
+        duration = Math.min(9500, Math.max(3000, 2400 + len * 38));
+      }
+
       var t = document.getElementById("toast");
       if (!t) {
         t = document.createElement("div");
         t.id = "toast";
-        t.style.cssText =
-          "position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a2332;color:#fff;padding:0.6rem 1rem;border-radius:8px;font-size:0.9rem;z-index:9999;opacity:0;transition:opacity .2s;";
+        t.setAttribute("role", "status");
+        t.setAttribute("aria-live", "polite");
         document.body.appendChild(t);
+      } else {
+        t.removeAttribute("style");
       }
-      t.textContent = msg;
-      t.style.opacity = "1";
-      clearTimeout(t._hide);
-      t._hide = setTimeout(function () {
-        t.style.opacity = "0";
-      }, 2500);
+
+      t.className = "toast toast--" + variant;
+      t.innerHTML =
+        '<span class="toast__icon" aria-hidden="true">' +
+        (icons[variant] || icons.info) +
+        '</span><span class="toast__msg"></span>';
+      var msgEl = t.querySelector(".toast__msg");
+      if (msgEl) msgEl.textContent = msg;
+
+      clearTimeout(t._hideOut);
+      t.classList.remove("toast--in");
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          t.classList.add("toast--in");
+        });
+      });
+
+      t._hideOut = setTimeout(function () {
+        t.classList.remove("toast--in");
+      }, duration);
     },
   };
 
