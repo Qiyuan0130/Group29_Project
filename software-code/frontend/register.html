@@ -147,10 +147,19 @@
         window.taApi
           .register(name, email, p, role, moKey, adminKey)
           .then(function () {
-            alert("Registration successful.");
             document.getElementById("form-register").reset();
             syncMoKeyVisibility();
-            location.href = "login.html";
+            var okMsg =
+              "You're all set — your account is ready. Taking you to sign in…";
+            if (window.taRecruitment && typeof window.taRecruitment.showToast === "function") {
+              window.taRecruitment.showToast(okMsg, { variant: "success", duration: 4200 });
+              setTimeout(function () {
+                location.href = "login.html";
+              }, 2200);
+            } else {
+              alert("Registration successful.");
+              location.href = "login.html";
+            }
           })
           .catch(function (err) {
             alert(err.message || "Register failed");
