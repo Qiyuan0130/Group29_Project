@@ -136,6 +136,9 @@
     applicationsMe: function () {
       return request("GET", "applications/me", null);
     },
+    applicationsApply: function (jobId, cvId) {
+      return request("POST", "applications", { jobId: jobId, cvId: cvId });
+    },
     moJobApplications: function (jobId) {
       return request("GET", "mo/jobs/" + encodeURIComponent(jobId) + "/applications", null);
     },
