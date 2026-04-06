@@ -828,5 +828,101 @@
         });
       });
     </script>
+        <!-- ===== ADDED: TA Application Status Real-time Update ===== -->
+    <script>
+    (function() {
+      "use strict";
+      
+      // ADDED: Real-time status polling for TA
+      var statusPollingInterval = null;
+      var lastKnownStatuses = {};
+      
+      function startStatusPolling() {
+        // Poll every 10 seconds for status updates
+        statusPollingInterval = setInterval(function() {
+          refreshApplicationStatuses();
+        }, 10000);
+      }
+      
+      function stopStatusPolling() {
+        if (statusPollingInterval) {
+          clearInterval(statusPollingInterval);
+          statusPollingInterval = null;
+        }
+      }
+      
+      function refreshApplicationStatuses() {
+        if (!window.taApi || typeof window.taApi.applicationsMe !== "function") return;
+        
+        window.taApi.applicationsMe()
+          .then(function(res) {
+            var apps = res && res.applications ? res.applications : [];
+            var hasChanges = false;
+            
+            apps.forEach(function(app) {
+              var appId = String(app.jobId);
+              var oldStatus = lastKnownStatuses[appId];
+              var newStatus = app.status;
+              
+              if (oldStatus && oldStatus !== newStatus) {
+                hasChanges = true;
+                // Show notification for status change
+                showStatusChangeNotification(app);
+              }
+              
+              lastKnownStatuses[appId] = newStatus;
+            });
+            
+            // If on status tab, refresh the table
+            var statusPanel = document.getElementById("ta-panel-status");
+            if (statusPanel && !statusPanel.classList.contains("hidden") && hasChanges) {
+              loadTaStatus && loadTaStatus();
+            }
+          })
+          .catch(function(err) {
+            console.log("Status polling error:", err);
+          });
+      }
+      
+      function showStatusChangeNotification(app) {
+        var statusText = app.status === "ACCEPTED" ? "approved" : 
+                        app.status === "REJECTED" ? "rejected" : "updated";
+        var message = "Your application for \"" + (app.jobTitle || "Job") + "\" has been " + statusText + "!";
+        
+        // Use existing toast if available
+        if (window.taRecruitment && window.taRecruitment.showToast) {
+          window.taRecruitment.showToast(message);
+        }
+        
+        // Browser notification if permitted
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("TA Application Update", {
+            body: message,
+            icon: "../favicon.ico"
+          });
+        }
+      }
+      
+      // Request notification permission
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+      
+      // Start polling when dashboard loads
+      document.addEventListener("DOMContentLoaded", function() {
+        startStatusPolling();
+      });
+      
+      // Stop polling when page hidden
+      document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+          stopStatusPolling();
+        } else {
+          startStatusPolling();
+          refreshApplicationStatuses();
+        }
+      });
+    })();
+    </script>
   </body>
 </html>

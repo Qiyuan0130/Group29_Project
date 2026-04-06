@@ -416,5 +416,151 @@
         });
       })();
     </script>
+        <!-- ===== ADDED: TA Job Detail Status Display Enhancement ===== -->
+    <script>
+    (function() {
+      "use strict";
+      
+      // ADDED: Enhanced status display with review details
+      function enhanceStatusDisplay() {
+        var statusRow = document.getElementById("detail-status-row");
+        if (!statusRow) return;
+        
+        // Add review details section if application has been reviewed
+        var reviewDetails = document.getElementById("detail-review-details");
+        if (!reviewDetails) {
+          reviewDetails = document.createElement("div");
+          reviewDetails.id = "detail-review-details";
+          reviewDetails.className = "detail-review-details";
+          reviewDetails.style.cssText = "margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--accent);";
+          
+          var content = document.getElementById("detail-content");
+          if (content) {
+            var cvBlock = document.getElementById("detail-cv-block");
+            if (cvBlock && !cvBlock.classList.contains("hidden")) {
+              content.insertBefore(reviewDetails, cvBlock);
+            } else {
+              var actions = document.getElementById("detail-form-actions");
+              if (actions) {
+                content.insertBefore(reviewDetails, actions);
+              }
+            }
+          }
+        }
+      }
+      
+      // ADDED: Update review details display
+      window.updateReviewDetails = function(appData) {
+        var reviewDetails = document.getElementById("detail-review-details");
+        if (!reviewDetails || !appData) return;
+        
+        var status = String(appData.status || "").toUpperCase();
+        var html = "";
+        
+        if (status === "ACCEPTED" || status === "ACCEPTED_BY_MO") {
+          html = '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">' +
+                 '<span style="font-size:1.5rem;">🎉</span>' +
+                 '<div>' +
+                 '<strong style="color:#2e7d32;font-size:1.1rem;">Congratulations! Your application has been approved.</strong>' +
+                 '<p style="margin:0.25rem 0 0 0;color:#666;font-size:0.9rem;">The MO has accepted your application.</p>' +
+                 '</div></div>';
+          if (appData.reviewNote) {
+            html += '<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(46,125,50,0.1);border-radius:6px;">' +
+                    '<strong style="color:#2e7d32;">MO Feedback:</strong>' +
+                    '<p style="margin:0.5rem 0 0 0;color:#333;">' + escHtml(appData.reviewNote) + '</p></div>';
+          }
+        } else if (status === "REJECTED" || status === "REJECTED_BY_MO") {
+          html = '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">' +
+                 '<span style="font-size:1.5rem;">😔</span>' +
+                 '<div>' +
+                 '<strong style="color:#c62828;font-size:1.1rem;">Your application was not approved.</strong>' +
+                 '<p style="margin:0.25rem 0 0 0;color:#666;font-size:0.9rem;">The MO has declined your application.</p>' +
+                 '</div></div>';
+          if (appData.reviewNote) {
+            html += '<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(198,40,40,0.1);border-radius:6px;">' +
+                    '<strong style="color:#c62828;">MO Feedback:</strong>' +
+                    '<p style="margin:0.5rem 0 0 0;color:#333;">' + escHtml(appData.reviewNote) + '</p></div>';
+          }
+        } else {
+          reviewDetails.style.display = "none";
+          return;
+        }
+        
+        if (appData.reviewedAt) {
+          var d = new Date(appData.reviewedAt);
+          html += '<p style="margin:0.75rem 0 0 0;font-size:0.8rem;color:#999;">' +
+                  'Reviewed on: ' + (Number.isNaN(d.getTime()) ? appData.reviewedAt : d.toLocaleString()) +
+                  '</p>';
+        }
+        
+        reviewDetails.innerHTML = html;
+        reviewDetails.style.display = "block";
+      };
+      
+      function escHtml(s) {
+        if (s == null) return "";
+        var d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+      }
+      
+      // Hook into existing renderJob function
+      var originalRenderJob = window.renderJob;
+      if (originalRenderJob) {
+        window.renderJob = function(job, myApp, cvFiles) {
+          originalRenderJob(job, myApp, cvFiles);
+          enhanceStatusDisplay();
+          if (myApp) {
+            window.updateReviewDetails(myApp);
+          }
+        };
+      }
+      
+      // ADDED: Auto-refresh status every 10 seconds
+      var statusRefreshInterval = setInterval(function() {
+        var params = new URLSearchParams(location.search);
+        var jobId = params.get("id");
+        if (!jobId || !window.taApi) return;
+        
+        window.taApi.applicationsMe()
+          .then(function(res) {
+            var apps = res && res.applications ? res.applications : [];
+            var currentApp = apps.find(function(a) { return String(a.jobId) === String(jobId); });
+            if (currentApp) {
+              window.updateReviewDetails(currentApp);
+              // Update button state if status changed
+              var applyBtn = document.getElementById("detail-apply-btn");
+              if (applyBtn) {
+                var st = String(currentApp.status || "").toUpperCase();
+                if (st === "ACCEPTED" || st === "REJECTED" || st === "ACCEPTED_BY_MO" || st === "REJECTED_BY_MO") {
+                  applyBtn.disabled = true;
+                  applyBtn.className = "btn btn-secondary detail-apply-btn--final";
+                  applyBtn.textContent = "Application " + (st.indexOf("ACCEPT") !== -1 ? "Approved" : "Rejected");
+                }
+              }
+            }
+          })
+          .catch(function(err) {
+            console.log("Status refresh error:", err);
+          });
+      }, 10000);
+      
+      // Clean up on page unload
+      window.addEventListener("beforeunload", function() {
+        clearInterval(statusRefreshInterval);
+      });
+    })();
+    </script>
+    
+    <!-- ADDED: Styles for review details -->
+    <style>
+      .detail-review-details {
+        animation: slideIn 0.3s ease;
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
   </body>
 </html>
