@@ -3,7 +3,7 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $tomcatRoot = if ($env:CATALINA_HOME) { $env:CATALINA_HOME.TrimEnd('\') } else {
-    "D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49"
+    "D:\Tomcat10\apache-tomcat-10.1.49"
 }
 if (-not (Test-Path (Join-Path $tomcatRoot "webapps"))) {
     Write-Error "Tomcat not found at: $tomcatRoot — set CATALINA_HOME or edit deploy-tomcat.ps1"
