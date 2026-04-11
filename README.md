@@ -1,9 +1,17 @@
-# Group29_Project
-BUPT International School Teaching Assistant Recruitment System. Developed using Agile methods for EBU6304 Software Engineering Group Project.
+<div align="center">
 
-# Group Name-List
+# 📘 Group29_Project
 
-- GitHub Account:QMID(Lead/Member)
+**📚 BUPT International School Teaching Assistant Recruitment System**  
+*🔄 Developed using Agile methods for EBU6304 Software Engineering Group Project.*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+</div>
+
+## 👥 Group Name-List
+
+- 🏷️ GitHub Account:QMID(Lead/Member)
 - qrsikno2:190898878(Support TA)
 - ACCOUNT for Qiyuan0130:231220149(L)
 - ACCOUNT for pinkpiggyVv:231222006(M)
@@ -12,7 +20,10 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 - ACCOUNT for lindbs1:231220644(M)
 - ACCOUNT for zyxy7:231222800(M)
 
-# Meeting Record
+---
+
+## 📅 Meeting Record
+
 | Meeting | Focus | Output |
 |---------|-------|--------|
 | Meeting 1 | Discussed overall project requirements, analyzed core tasks, and clarified module ownership. | Initial task breakdown and role assignment draft. |
@@ -20,9 +31,9 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 | Meeting 3 | Analyzed second-phase priorities and reconfirmed responsibilities based on project progress. | Finalized task allocation for the next stage. |
 | Meeting 4 | Checked this week’s completed tasks and discussed the work to be improved and finished next week. | Confirmed current progress and assigned next week’s follow-up tasks. |
 
-#### Current task allocation
+### ✅ Current task allocation
 
-| Member | Responsibility 1 | Responsibility 2 |
+| 👤 Member | 📌 Responsibility 1 | 📌 Responsibility 2 |
 |--------|-------------------|------------------|
 | Jingyi Wang | Front-end | Admin Homepage |
 | Zixin Xiong | TA Homepage | Resume Upload |
@@ -31,4 +42,4 @@ BUPT International School Teaching Assistant Recruitment System. Developed using
 | Songqi Zhang | Login and Registration Page | TA Job Viewing |
 | Yangxinyue Zhou | Registration and Login (for three types of users) | Info of others |
 
-
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
