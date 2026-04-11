@@ -1,7 +1,21 @@
 package com.example.web.servlet;
 
-import com.example.web.ApplicationStatuses;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
+
 import com.example.web.AppContext;
+import com.example.web.ApplicationStatuses;
 import com.example.web.Roles;
 import com.example.web.dto.ApplyRequest;
 import com.example.web.dto.DecisionRequest;
@@ -20,9 +34,9 @@ import com.example.web.repo.CvRepository;
 import com.example.web.repo.JobRepository;
 import com.example.web.repo.UserRepository;
 import com.example.web.service.AiMatchingService;
+import com.example.web.util.AuthTokenUtil;
 import com.example.web.util.HttpJson;
 import com.example.web.util.JsonPaths;
-import com.example.web.util.AuthTokenUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -30,19 +44,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 public class ApiServlet extends HttpServlet {
     private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
     private static final String MO_REGISTER_KEY = "qwert1234";
