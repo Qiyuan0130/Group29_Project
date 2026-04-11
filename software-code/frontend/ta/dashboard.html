@@ -22,7 +22,14 @@
         <div class="dashboard__sidebar-title">Navigation bar</div>
         <a class="nav-link ta-nav-link is-active" href="#" data-tab="profile">Profile</a>
         <a class="nav-link ta-nav-link" href="#" data-tab="cv">CV Upload</a>
-        <a class="nav-link ta-nav-link" href="#" data-tab="jobs">Jobs</a>
+        <a
+          class="nav-link ta-nav-link ta-nav-link--locked"
+          href="#"
+          data-tab="jobs"
+          aria-disabled="true"
+          title="Please complete Name, Major, Education Background, Technical Ability, and Contact in Profile, then save."
+          >Jobs</a
+        >
         <a class="nav-link ta-nav-link" href="#" data-tab="status">Status</a>
       </aside>
 
@@ -399,7 +406,7 @@
         function parseFilterTokens(raw) {
           if (!raw || !String(raw).trim()) return [];
           return String(raw)
-            .split(/[\s,，]+/)
+            .split(/[\s,\uFF0C]+/)
             .map(function (x) {
               return x.trim().toLowerCase();
             })
@@ -666,6 +673,10 @@
                 location.href = "../index.html";
                 return;
               }
+              if (msg.indexOf("Complete your profile") !== -1 || msg.indexOf("403") !== -1) {
+                window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
+                return;
+              }
               window.taRecruitment.showToast("Failed to load jobs: " + msg);
             });
         }
@@ -683,14 +694,12 @@
           if (reload) reload.addEventListener("click", loadTaJobs);
           if (navJobs) {
             navJobs.addEventListener("click", function () {
+              if (navJobs.classList.contains("ta-nav-link--locked")) return;
               loadTaJobs();
             });
           }
 
-          if (location.hash === "#jobs") {
-            var jobsTab = document.querySelector('.ta-nav-link[data-tab="jobs"]');
-            if (jobsTab) jobsTab.click();
-          }
+          /* #jobs hash: opened after profile loads in ta-profile.js (unlock + sync) */
         });
       })();
 
@@ -818,6 +827,102 @@
           location.href = "../index.html";
         });
       });
+    </script>
+        <!-- ===== ADDED: TA Application Status Real-time Update ===== -->
+    <script>
+    (function() {
+      "use strict";
+      
+      // ADDED: Real-time status polling for TA
+      var statusPollingInterval = null;
+      var lastKnownStatuses = {};
+      
+      function startStatusPolling() {
+        // Poll every 10 seconds for status updates
+        statusPollingInterval = setInterval(function() {
+          refreshApplicationStatuses();
+        }, 10000);
+      }
+      
+      function stopStatusPolling() {
+        if (statusPollingInterval) {
+          clearInterval(statusPollingInterval);
+          statusPollingInterval = null;
+        }
+      }
+      
+      function refreshApplicationStatuses() {
+        if (!window.taApi || typeof window.taApi.applicationsMe !== "function") return;
+        
+        window.taApi.applicationsMe()
+          .then(function(res) {
+            var apps = res && res.applications ? res.applications : [];
+            var hasChanges = false;
+            
+            apps.forEach(function(app) {
+              var appId = String(app.jobId);
+              var oldStatus = lastKnownStatuses[appId];
+              var newStatus = app.status;
+              
+              if (oldStatus && oldStatus !== newStatus) {
+                hasChanges = true;
+                // Show notification for status change
+                showStatusChangeNotification(app);
+              }
+              
+              lastKnownStatuses[appId] = newStatus;
+            });
+            
+            // If on status tab, refresh the table
+            var statusPanel = document.getElementById("ta-panel-status");
+            if (statusPanel && !statusPanel.classList.contains("hidden") && hasChanges) {
+              loadTaStatus && loadTaStatus();
+            }
+          })
+          .catch(function(err) {
+            console.log("Status polling error:", err);
+          });
+      }
+      
+      function showStatusChangeNotification(app) {
+        var statusText = app.status === "ACCEPTED" ? "approved" : 
+                        app.status === "REJECTED" ? "rejected" : "updated";
+        var message = "Your application for \"" + (app.jobTitle || "Job") + "\" has been " + statusText + "!";
+        
+        // Use existing toast if available
+        if (window.taRecruitment && window.taRecruitment.showToast) {
+          window.taRecruitment.showToast(message);
+        }
+        
+        // Browser notification if permitted
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification("TA Application Update", {
+            body: message,
+            icon: "../favicon.ico"
+          });
+        }
+      }
+      
+      // Request notification permission
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+      
+      // Start polling when dashboard loads
+      document.addEventListener("DOMContentLoaded", function() {
+        startStatusPolling();
+      });
+      
+      // Stop polling when page hidden
+      document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+          stopStatusPolling();
+        } else {
+          startStatusPolling();
+          refreshApplicationStatuses();
+        }
+      });
+    })();
     </script>
   </body>
 </html>

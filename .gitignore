@@ -2,3 +2,4 @@
 
 # Maven / Java build output — never commit (causes endless merge conflicts)
 software-code/target/
+software-code/build/

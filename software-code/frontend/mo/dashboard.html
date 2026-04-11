@@ -440,5 +440,109 @@
         }
       });
     </script>
+        <!-- ===== ADDED: MO Application Review Link Enhancement ===== -->
+    <script>
+    (function() {
+      "use strict";
+      
+      // ADDED: Modify application table rows to link to review page instead of detail
+      var originalRenderMoApplicationsTable = window.renderMoApplicationsTable;
+      
+      if (originalRenderMoApplicationsTable) {
+        window.renderMoApplicationsTable = function(rows) {
+          // Call original function first
+          originalRenderMoApplicationsTable(rows);
+          
+          // Then enhance the rows with review links
+          var body = document.getElementById("mo-applications-body");
+          if (!body) return;
+          
+          // Update click handler to go to review page instead of detail
+          body.querySelectorAll("tr[data-open-application]").forEach(function(row) {
+            var appId = row.getAttribute("data-open-application");
+            var currentJobId = document.getElementById("mo-app-job-select").value;
+            
+            // Change cursor to indicate clickable
+            row.style.cursor = "pointer";
+            
+            // Add review action button
+            var actionCell = row.querySelector("td:last-child");
+            if (actionCell && !actionCell.querySelector(".review-btn")) {
+              var reviewBtn = document.createElement("a");
+              reviewBtn.className = "btn btn-sm btn-accent review-btn";
+              reviewBtn.href = "mo-application-review.html?jobId=" + encodeURIComponent(currentJobId) + 
+                               "&appId=" + encodeURIComponent(appId);
+              reviewBtn.textContent = "Review";
+              reviewBtn.style.marginLeft = "0.5rem";
+              actionCell.appendChild(reviewBtn);
+            }
+          });
+        };
+      }
+      
+      // ADDED: Helper function to get status pill with review indicator
+      window.getStatusPillWithReview = function(status, reviewNote) {
+        var pillClass = "status-pill status-pending";
+        var label = status || "UPLOADED";
+        
+        if (status === "ACCEPTED" || status === "ACCEPTED_BY_MO") {
+          pillClass = "status-pill status-approved";
+        } else if (status === "REJECTED" || status === "REJECTED_BY_MO") {
+          pillClass = "status-pill status-rejected";
+        }
+        
+        var html = '<span class="' + pillClass + '">' + escHtml(label) + '</span>';
+        
+        if (reviewNote) {
+          html += '<span class="review-indicator" title="' + escHtml(reviewNote) + '">📝</span>';
+        }
+        
+        return html;
+      };
+      
+      function escHtml(s) {
+        if (s == null) return "";
+        var d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+      }
+    })();
+    </script>
+    
+    <!-- ADDED: Quick review modal for batch operations -->
+    <div id="mo-quick-review-modal" class="modal" hidden role="dialog" aria-modal="true">
+      <div class="modal__card" style="max-width: 600px">
+        <h2 class="modal__title">Quick Review</h2>
+        <p class="modal__text">Review multiple applications at once</p>
+        <div id="quick-review-list" style="max-height: 400px; overflow-y: auto; margin: 1rem 0;"></div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn-secondary" id="quick-review-cancel">Cancel</button>
+          <button type="button" class="btn btn-primary" id="quick-review-submit">Submit Reviews</button>
+        </div>
+      </div>
+    </div>
+    
+    <style>
+      /* ADDED: Review button styles */
+      .btn-accent {
+        background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+        color: white;
+        border: none;
+      }
+      .btn-accent:hover {
+        background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+      }
+      .review-indicator {
+        margin-left: 0.35rem;
+        cursor: help;
+      }
+      .review-btn {
+        animation: fadeIn 0.3s ease;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
   </body>
 </html>

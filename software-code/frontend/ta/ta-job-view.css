@@ -100,3 +100,240 @@
   font-weight: 600;
   font-size: 0.92em;
 }
+
+.detail-cv-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.detail-cv-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.detail-cv-select {
+  max-width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-size: 0.9rem;
+  background: #fff;
+}
+
+/* TA dashboard: Jobs nav locked until profile fields are complete */
+.nav-link.ta-nav-link.ta-nav-link--locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* ===== ADDED: TA Application Status Enhancement Styles ===== */
+
+/* Status badge animations */
+@keyframes statusPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.status-pill.status-approved {
+  animation: statusPulse 2s ease-in-out;
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(76, 175, 80, 0.2) 100%);
+  border: 2px solid rgba(46, 125, 50, 0.4);
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.status-pill.status-rejected {
+  background: linear-gradient(135deg, rgba(198, 40, 40, 0.15) 0%, rgba(239, 83, 80, 0.2) 100%);
+  border: 2px solid rgba(198, 40, 40, 0.4);
+  color: #c62828;
+  font-weight: 700;
+}
+
+/* Application status row with review info */
+.app-status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.app-status-row .review-indicator {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--muted);
+}
+
+/* Status update notification toast */
+.ta-status-toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  max-width: 400px;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 3000;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  border-left: 4px solid var(--accent);
+}
+
+.ta-status-toast.show {
+  transform: translateX(0);
+}
+
+.ta-status-toast.status-accepted {
+  border-left-color: #4caf50;
+  background: linear-gradient(135deg, #f1f8f4 0%, #ffffff 100%);
+}
+
+.ta-status-toast.status-rejected {
+  border-left-color: #ef5350;
+  background: linear-gradient(135deg, #fef1f1 0%, #ffffff 100%);
+}
+
+.ta-status-toast__title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+.ta-status-toast__message {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.ta-status-toast__close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #999;
+  line-height: 1;
+}
+
+/* Review details in job detail page */
+.detail-review-section {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+}
+
+.detail-review-section.approved {
+  background: linear-gradient(135deg, #f1f8f4 0%, #ffffff 100%);
+  border-color: rgba(46, 125, 50, 0.3);
+}
+
+.detail-review-section.rejected {
+  background: linear-gradient(135deg, #fef1f1 0%, #ffffff 100%);
+  border-color: rgba(198, 40, 40, 0.3);
+}
+
+.detail-review-section__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-review-section__icon {
+  font-size: 1.5rem;
+}
+
+.detail-review-section__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.detail-review-section.approved .detail-review-section__title {
+  color: #2e7d32;
+}
+
+.detail-review-section.rejected .detail-review-section__title {
+  color: #c62828;
+}
+
+.detail-review-section__feedback {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.detail-review-section__meta {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+/* Status table enhancement */
+#ta-status-body tr {
+  transition: background-color 0.2s ease;
+}
+
+#ta-status-body tr:hover {
+  background-color: rgba(13, 71, 161, 0.03);
+}
+
+#ta-status-body tr.status-updated {
+  animation: highlightUpdate 1s ease;
+}
+
+@keyframes highlightUpdate {
+  0% { background-color: rgba(255, 193, 7, 0.3); }
+  100% { background-color: transparent; }
+}
+
+/* MO feedback display in status table */
+.mo-feedback-inline {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mo-feedback-inline:hover {
+  white-space: normal;
+  overflow: visible;
+}
+
+/* Real-time status indicator */
+.status-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-left: 0.5rem;
+}
+
+.status-live-indicator::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: livePulse 2s infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

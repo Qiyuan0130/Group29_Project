@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 可解释的规则匹配（非大模型），用于 TA/MO 端 AI 分析演示。
+ * Rule-based, explainable matching (not an LLM) for TA/MO AI demo screens.
  */
 public final class AiMatchingService {
 

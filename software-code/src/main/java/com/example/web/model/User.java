@@ -1,7 +1,7 @@
 package com.example.web.model;
 
 /**
- * 用户实体（Gson 反序列化，使用可空包装类型便于与 JSON 对齐）。
+ * User entity (Gson-deserialized; fields align with JSON).
  */
 public class User {
 

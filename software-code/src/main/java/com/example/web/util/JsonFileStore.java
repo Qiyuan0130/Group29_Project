@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * 读写本地 JSON 文件（无数据库）。线程安全由调用方在业务层控制；此处仅做文件级读写。
+ * Reads and writes JSON files on disk (no database). Callers control concurrency; this layer is file I/O only.
  */
 public final class JsonFileStore {
 
@@ -31,7 +31,7 @@ public final class JsonFileStore {
         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             return GSON.fromJson(reader, type);
         } catch (JsonSyntaxException e) {
-            throw new IOException("JSON 解析失败: " + fileName, e);
+            throw new IOException("Invalid JSON in file: " + fileName, e);
         }
     }
 
@@ -43,7 +43,7 @@ public final class JsonFileStore {
         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             return GSON.fromJson(reader, type);
         } catch (JsonSyntaxException e) {
-            throw new IOException("JSON 解析失败: " + fileName, e);
+            throw new IOException("Invalid JSON in file: " + fileName, e);
         }
     }
 

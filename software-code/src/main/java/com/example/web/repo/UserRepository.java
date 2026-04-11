@@ -108,7 +108,7 @@ public final class UserRepository {
             if (x.name != null && n.equalsIgnoreCase(x.name.trim())) {
                 return Optional.of(x);
             }
-            // 兼容历史数据：部分账号把姓名存进了 username 字段
+            // Legacy: some accounts stored display name in username
             if (x.username != null && n.equalsIgnoreCase(x.username.trim())) {
                 return Optional.of(x);
             }
@@ -159,22 +159,22 @@ public final class UserRepository {
         String rawPassword = password == null ? "" : password;
         String cleanRole = role == null ? "" : role.trim().toUpperCase();
         if (!NAME_PATTERN.matcher(cleanName).matches()) {
-            throw new IllegalArgumentException("姓名只能包含字母和数字");
+            throw new IllegalArgumentException("Name may only contain letters and numbers.");
         }
         if (!isValidEmailAddress(cleanEmail)) {
-            throw new IllegalArgumentException("邮箱格式不正确");
+            throw new IllegalArgumentException("Invalid email format.");
         }
         if (!PASSWORD_PATTERN.matcher(rawPassword).matches()) {
-            throw new IllegalArgumentException("密码需为6-10位，且必须同时包含字母和数字");
+            throw new IllegalArgumentException("Password must be 6–10 characters and include both letters and numbers.");
         }
         if (!Roles.TA.equals(cleanRole) && !Roles.MO.equals(cleanRole) && !Roles.ADMIN.equals(cleanRole)) {
-            throw new IllegalArgumentException("角色不合法，可选值: TA/MO/ADMIN");
+            throw new IllegalArgumentException("Invalid role. Allowed values: TA, MO, ADMIN.");
         }
         if (findByName(cleanName).isPresent()) {
-            throw new IllegalArgumentException("姓名已被注册");
+            throw new IllegalArgumentException("This name is already registered.");
         }
         if (findByEmail(cleanEmail).isPresent()) {
-            throw new IllegalArgumentException("邮箱已被注册");
+            throw new IllegalArgumentException("This email is already registered.");
         }
         UserDatabase db = load();
         User u = new User();

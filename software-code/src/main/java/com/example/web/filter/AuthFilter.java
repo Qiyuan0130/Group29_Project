@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * 保护 /api/*（登录、注册、登出除外）。
+ * Protects {@code /api/*} except login, register, and logout.
  */
 public class AuthFilter implements Filter {
 
