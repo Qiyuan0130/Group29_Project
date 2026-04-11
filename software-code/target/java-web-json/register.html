@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register — TA Recruitment</title>
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <a href="index.html" class="sys-title" style="color: #fff; text-decoration: none">BUPT International School TA Recruitment System</a>
+      </div>
+    </header>
+
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <h1>Register</h1>
+        <p class="subtitle">Use name, email and password to create TA/MO/Admin account.</p>
+        <form id="form-register" action="#" method="post">
+          <div class="form-group">
+            <label for="reg-role">Role</label>
+            <select class="form-control" id="reg-role" name="role" required>
+              <option value="TA" selected>TA</option>
+              <option value="MO">MO</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reg-name">Name</label>
+            <input class="form-control" id="reg-name" name="name" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email</label>
+            <input
+              class="form-control"
+              id="reg-email"
+              name="email"
+              type="email"
+              pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password</label>
+            <small style="display: block; color: #666">6-10 characters, include letters and numbers.</small>
+            <input class="form-control" id="reg-password" name="password" type="password" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-password2">Again Password</label>
+            <input class="form-control" id="reg-password2" name="password2" type="password" required />
+          </div>
+          <div class="form-group hidden" id="reg-mo-key-group">
+            <label for="reg-mo-key">MO Key</label>
+            <input class="form-control" id="reg-mo-key" name="moKey" type="text" placeholder="Only required for MO registration" />
+          </div>
+          <div class="form-group hidden" id="reg-admin-key-group">
+            <label for="reg-admin-key">Admin Registration Key</label>
+            <small style="display: block; color: #666">Required to register as Admin. Contact system administrator if you don't have the key.</small>
+            <input class="form-control" id="reg-admin-key" name="adminKey" type="password" placeholder="Enter admin registration key" />
+          </div>
+          <div class="form-actions">
+            <a class="btn btn-secondary" href="index.html">Return</a>
+            <button type="submit" class="btn btn-primary">Register</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="reg-success-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="reg-success-title" aria-describedby="reg-success-desc">
+      <div class="modal__card modal__card--reg-success">
+        <div id="reg-success-desc" class="modal__reg-success-lines">
+          <p id="reg-success-title" class="modal__reg-line">Registration successful.</p>
+          <p class="modal__reg-line">Welcome to use.</p>
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn-primary" id="reg-success-continue">Continue to Login</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+      function isValidName(name) {
+        return /^[A-Za-z0-9]+$/.test(name);
+      }
+      function isValidEmail(email) {
+        return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
+      }
+      function isValidPassword(password) {
+        return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,10}$/.test(password);
+      }
+      function syncMoKeyVisibility() {
+        var role = document.getElementById("reg-role").value;
+        var moGroup = document.getElementById("reg-mo-key-group");
+        var moInput = document.getElementById("reg-mo-key");
+        var adminGroup = document.getElementById("reg-admin-key-group");
+        var adminInput = document.getElementById("reg-admin-key");
+        
+        var isMo = role === "MO";
+        var isAdmin = role === "ADMIN";
+        
+        // MO registration key field
+        moGroup.classList.toggle("hidden", !isMo);
+        moInput.required = isMo;
+        if (!isMo) moInput.value = "";
+        
+        // Admin registration key field
+        adminGroup.classList.toggle("hidden", !isAdmin);
+        adminInput.required = isAdmin;
+        if (!isAdmin) adminInput.value = "";
+      }
+
+      document.getElementById("reg-role").addEventListener("change", syncMoKeyVisibility);
+      syncMoKeyVisibility();
+
+      document.getElementById("form-register").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var role = document.getElementById("reg-role").value;
+        var name = document.getElementById("reg-name").value.trim();
+        var email = document.getElementById("reg-email").value.trim();
+        var emailInput = document.getElementById("reg-email");
+        var p = document.getElementById("reg-password").value;
+        var p2 = document.getElementById("reg-password2").value;
+        var moKey = document.getElementById("reg-mo-key").value.trim();
+        var adminKey = document.getElementById("reg-admin-key").value.trim();
+        if (["TA", "MO", "ADMIN"].indexOf(role) === -1) {
+          alert("Invalid role.");
+          return;
+        }
+        if (role === "MO" && moKey !== "qwert1234") {
+          alert("Invalid key. Registration not allowed.");
+          return;
+        }
+        if (role === "ADMIN" && adminKey !== "Group29admin") {
+          alert("Invalid admin key. Registration not allowed.");
+          return;
+        }
+        if (!isValidName(name)) {
+          alert("Name may only contain letters and numbers.");
+          return;
+        }
+        if (!isValidEmail(email)) {
+          alert("Invalid email format.");
+          emailInput.focus();
+          emailInput.setCustomValidity("Invalid email format.");
+          emailInput.reportValidity();
+          return;
+        }
+        emailInput.setCustomValidity("");
+        if (!isValidPassword(p)) {
+          alert("Password must be 6–10 characters and include both letters and numbers.");
+          return;
+        }
+        if (p !== p2) {
+          alert("Passwords do not match");
+          return;
+        }
+        window.taApi
+          .register(name, email, p, role, moKey, adminKey)
+          .then(function () {
+            document.getElementById("form-register").reset();
+            syncMoKeyVisibility();
+            var modal = document.getElementById("reg-success-modal");
+            var btn = document.getElementById("reg-success-continue");
+            if (modal && btn) {
+              modal.removeAttribute("hidden");
+              document.body.style.overflow = "hidden";
+              btn.focus();
+              btn.onclick = function () {
+                location.href = "login.html";
+              };
+            } else {
+              alert("Registration successful.\nWelcome to use.");
+              location.href = "login.html";
+            }
+          })
+          .catch(function (err) {
+            alert(err.message || "Register failed");
+          });
+      });
+    </script>
+  </body>
+</html>

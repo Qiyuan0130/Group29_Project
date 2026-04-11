@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {
+      "path": "software-code",
+      "name": "java-web-json (Maven)"
+    }
+  ],
+  "settings": {
+    "java.configuration.updateBuildConfiguration": "automatic"
+  }
+}

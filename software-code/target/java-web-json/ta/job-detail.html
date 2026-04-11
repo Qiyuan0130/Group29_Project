@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job detail — TA</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="ta-job-view.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <div class="sys-header__actions">
+          <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard" style="display: block; max-width: 880px; margin: 0 auto">
+      <div class="dashboard__main">
+        <h2 class="dashboard__title">Job detail</h2>
+
+        <div id="detail-error" class="panel hidden" style="border-color: var(--danger)">
+          <p id="detail-error-text" style="margin: 0; color: var(--danger)"></p>
+          <p style="margin: 0.75rem 0 0">
+            <a id="detail-error-back" href="dashboard.html#jobs">Back to Jobs</a>
+          </p>
+        </div>
+
+        <div id="detail-content" class="panel hidden">
+          <h3 class="panel__head" id="detail-title-head"></h3>
+          <div id="detail-status-row" class="job-card__status-row" style="margin-bottom: 0.75rem"></div>
+          <dl class="kv-list">
+            <dt>Title</dt>
+            <dd id="detail-name"></dd>
+            <dt>Course name</dt>
+            <dd id="detail-course-name"></dd>
+            <dt>Posted by</dt>
+            <dd id="detail-organizer"></dd>
+            <dt>Application deadline</dt>
+            <dd id="detail-deadline"></dd>
+            <dt>Weekly workload</dt>
+            <dd id="detail-hours"></dd>
+            <dt>Tags</dt>
+            <dd id="detail-tags"></dd>
+            <dt>Requirements</dt>
+            <dd id="detail-req"></dd>
+            <dt>Organizer note</dt>
+            <dd id="detail-note"></dd>
+          </dl>
+          <div id="detail-cv-block" class="detail-cv-block hidden" style="margin-top: 1rem">
+            <label for="detail-cv-select" class="detail-cv-label">Resume (PDF) for this application</label>
+            <select id="detail-cv-select" class="detail-cv-select"></select>
+          </div>
+          <p id="detail-cv-empty" class="hidden" style="margin-top: 1rem; color: var(--muted)">
+            You have no PDF resume uploaded. Please upload one in
+            <a href="dashboard.html#cv">CV Upload</a> before applying.
+          </p>
+          <div id="detail-form-actions" class="form-actions" style="margin-top: 1rem">
+            <a id="detail-footer-back" class="btn btn-secondary" href="dashboard.html#jobs">Back to Jobs</a>
+            <button type="button" id="detail-apply-btn" class="btn btn-primary">Apply for this job</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        function escapeHtml(s) {
+          if (s == null) return "";
+          var d = document.createElement("div");
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function normTags(job) {
+          var t = job.requirementsTags;
+          if (!t || !t.length) return [];
+          return t.map(function (x) {
+            return (x == null ? "" : String(x)).trim();
+          }).filter(Boolean);
+        }
+
+        function showError(msg, opts) {
+          opts = opts || {};
+          var box = document.getElementById("detail-error");
+          var text = document.getElementById("detail-error-text");
+          var content = document.getElementById("detail-content");
+          var back = document.getElementById("detail-error-back");
+          if (text) text.textContent = msg;
+          if (back) {
+            back.setAttribute("href", opts.backHref || "dashboard.html#jobs");
+            back.textContent = opts.backLabel || "Back to Jobs";
+          }
+          if (box) box.classList.remove("hidden");
+          if (content) content.classList.add("hidden");
+        }
+
+        /** Old cached api.js may lack applicationsApply — add same behavior as js/api.js request(). */
+        function ensureTaApiApplicationsApply() {
+          if (!window.taApi || typeof window.taApi.applicationsApply === "function") {
+            return;
+          }
+          function postApplicationsUrl() {
+            if (typeof window.taApi.url === "function") {
+              return window.taApi.url("applications");
+            }
+            var path = location.pathname || "";
+            if (/^\/[^/]+\/software-code\//.test(path)) {
+              var seg = path.split("/");
+              return "/" + seg[1] + "/software-code/api/applications";
+            }
+            if (/^\/[^/]+\//.test(path)) {
+              return "/" + path.split("/")[1] + "/api/applications";
+            }
+            return "api/applications";
+          }
+          window.taApi.applicationsApply = function (jobId, cvId) {
+            return fetch(postApplicationsUrl(), {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json;charset=UTF-8" },
+              body: JSON.stringify({ jobId: jobId, cvId: cvId }),
+            }).then(function (res) {
+              var ct = res.headers.get("Content-Type") || "";
+              var isJson = ct.indexOf("application/json") !== -1;
+              return (isJson ? res.json() : res.text()).then(function (data) {
+                if (!res.ok) {
+                  var msg = data && data.error ? data.error : res.statusText;
+                  throw new Error(msg || "Request failed");
+                }
+                return data;
+              });
+            });
+          };
+        }
+
+        function todayYmd() {
+          var d = new Date();
+          var y = d.getFullYear();
+          var m = String(d.getMonth() + 1).padStart(2, "0");
+          var day = String(d.getDate()).padStart(2, "0");
+          return y + "-" + m + "-" + day;
+        }
+
+        function deadlineYmd(raw) {
+          if (!raw) return "";
+          var s = String(raw).trim();
+          var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
+          return m ? m[1] : "";
+        }
+
+        function isJobExpired(deadlineRaw) {
+          var d = deadlineYmd(deadlineRaw);
+          if (!d) return false;
+          return todayYmd() > d;
+        }
+
+        function appStatusPillClass(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "status-approved";
+          if (up === "REJECTED") return "status-rejected";
+          return "status-pending";
+        }
+
+        function appStatusLabel(status) {
+          var up = String(status || "").toUpperCase();
+          if (up === "ACCEPTED") return "Accepted";
+          if (up === "REJECTED") return "Rejected";
+          if (up === "PENDING") return "Pending";
+          return status || "—";
+        }
+
+        function renderJob(job, myApp, cvFiles) {
+          var err = document.getElementById("detail-error");
+          var content = document.getElementById("detail-content");
+          if (err) err.classList.add("hidden");
+          if (content) content.classList.remove("hidden");
+
+          var tags = normTags(job);
+          var tagsHtml = tags.length
+            ? tags.map(function (t) {
+                return '<span class="tag-pill">' + escapeHtml(t) + "</span>";
+              }).join(" ")
+            : '<span class="muted-inline">None</span>';
+
+          document.getElementById("detail-title-head").textContent = job.title || "(Untitled job)";
+          document.getElementById("detail-name").textContent = job.title || "—";
+          document.getElementById("detail-course-name").textContent = (job.courseName || "").trim() || "—";
+          document.getElementById("detail-organizer").textContent =
+            (job.organizerName || "").trim() || "—";
+          document.getElementById("detail-deadline").textContent = (job.deadline || "").trim() || "—";
+          document.getElementById("detail-hours").textContent = (job.workingHours || "").trim() || "—";
+          document.getElementById("detail-tags").innerHTML = tagsHtml;
+          document.getElementById("detail-req").textContent = (job.requirements || "").trim() || "—";
+          document.getElementById("detail-note").textContent = (job.requirementsNote || "").trim() || "—";
+
+          var expired = isJobExpired(job.deadline);
+          var postingPill = expired
+            ? '<span class="status-pill job-posting-expired">Expired</span>'
+            : '<span class="status-pill job-posting-open">Open</span>';
+          var appHtml = myApp
+            ? '<span class="status-pill ' +
+              appStatusPillClass(myApp.status) +
+              '">' +
+              escapeHtml(appStatusLabel(myApp.status)) +
+              "</span>"
+            : '<span class="status-pill app-none">Not applied</span>';
+          var statusRow = document.getElementById("detail-status-row");
+          if (statusRow) {
+            statusRow.innerHTML =
+              '<span class="job-card__status-label">Posting</span>' +
+              postingPill +
+              '<span class="job-card__status-label">Your application</span>' +
+              appHtml;
+          }
+
+          var applyBtn = document.getElementById("detail-apply-btn");
+          var footerBack = document.getElementById("detail-footer-back");
+          var cvBlock = document.getElementById("detail-cv-block");
+          var cvSelect = document.getElementById("detail-cv-select");
+          var cvEmpty = document.getElementById("detail-cv-empty");
+          var files = Array.isArray(cvFiles) ? cvFiles : [];
+          if (footerBack) footerBack.classList.remove("hidden");
+          if (applyBtn) {
+            applyBtn.classList.remove("detail-apply-btn--final");
+          }
+          if (cvBlock) cvBlock.classList.add("hidden");
+          if (cvEmpty) cvEmpty.classList.add("hidden");
+          if (expired) {
+            if (applyBtn) {
+              applyBtn.classList.add("hidden");
+              applyBtn.onclick = null;
+            }
+          } else {
+            if (applyBtn) applyBtn.classList.remove("hidden");
+            if (applyBtn && job.id != null) {
+              applyBtn.onclick = null;
+              if (myApp) {
+                var st = String(myApp.status || "").toUpperCase();
+                if (st === "ACCEPTED" || st === "REJECTED") {
+                  applyBtn.disabled = true;
+                  applyBtn.className =
+                    "btn btn-secondary detail-apply-btn--final";
+                  applyBtn.textContent =
+                    "Already applied (" + appStatusLabel(myApp.status) + ")";
+                } else {
+                  applyBtn.className = "btn btn-primary";
+                  applyBtn.disabled = true;
+                  applyBtn.textContent = "Application pending review";
+                }
+              } else {
+                if (files.length === 0) {
+                  if (cvEmpty) cvEmpty.classList.remove("hidden");
+                  applyBtn.className = "btn btn-primary";
+                  applyBtn.disabled = true;
+                  applyBtn.textContent = "Apply for this job";
+                  applyBtn.onclick = null;
+                } else {
+                  if (cvBlock) cvBlock.classList.remove("hidden");
+                  if (cvSelect) {
+                    cvSelect.innerHTML = "";
+                    for (var fi = 0; fi < files.length; fi++) {
+                      var f = files[fi];
+                      var opt = document.createElement("option");
+                      opt.value = String(f.id);
+                      opt.textContent = (f.originalName || "resume.pdf") + " (#" + f.id + ")";
+                      cvSelect.appendChild(opt);
+                    }
+                  }
+                  applyBtn.className = "btn btn-primary";
+                  applyBtn.disabled = false;
+                  applyBtn.textContent = "Apply for this job";
+                  applyBtn.onclick = function () {
+                    var cid = cvSelect ? parseInt(cvSelect.value, 10) : NaN;
+                    if (!cvSelect || files.length === 0 || Number.isNaN(cid)) {
+                      window.taRecruitment.showToast(
+                        "Please upload a PDF resume in CV Upload before applying."
+                      );
+                      return;
+                    }
+                    applyBtn.disabled = true;
+                    window.taApi
+                      .applicationsApply(job.id, cid)
+                      .then(function () {
+                        window.taRecruitment.showToast("Application submitted — opening Status…");
+                        setTimeout(function () {
+                          location.href = "dashboard.html#status";
+                        }, 500);
+                      })
+                      .catch(function (e) {
+                        window.taRecruitment.showToast(e.message || "Application failed");
+                      })
+                      .finally(function () {
+                        applyBtn.disabled = false;
+                      });
+                  };
+                }
+              }
+            }
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          var params = new URLSearchParams(location.search);
+          var rawId = params.get("id");
+          var jobId = rawId ? parseInt(rawId, 10) : NaN;
+
+          document.getElementById("logout-btn").addEventListener("click", function (e) {
+            e.preventDefault();
+            window.taApi.logout().finally(function () {
+              location.href = "../index.html";
+            });
+          });
+
+          if (Number.isNaN(jobId)) {
+            showError("Invalid link: missing job id.");
+            return;
+          }
+
+          if (!window.taApi) {
+            showError(
+              "Could not load ../js/api.js. Check deployment, then hard-refresh (Ctrl+F5)."
+            );
+            return;
+          }
+          if (typeof window.taApi.jobsList !== "function" || typeof window.taApi.cvList !== "function") {
+            showError("api.js is outdated or incomplete. Hard-refresh (Ctrl+F5) or redeploy.");
+            return;
+          }
+          ensureTaApiApplicationsApply();
+          if (typeof window.taApi.applicationsApply !== "function") {
+            showError("Could not initialize apply. Hard-refresh (Ctrl+F5) or redeploy.");
+            return;
+          }
+
+          window.taApi
+            .me()
+            .then(function (user) {
+              var role = String(user && user.role ? user.role : "").toUpperCase();
+              if (
+                role === "TA" &&
+                window.taRecruitment &&
+                typeof window.taRecruitment.isTaProfileCompleteForJobs === "function" &&
+                !window.taRecruitment.isTaProfileCompleteForJobs(user)
+              ) {
+                showError(
+                  "Complete Name, Major, Education Background, Technical Ability, and Contact in Profile (Save) before viewing or applying for jobs.",
+                  { backHref: "dashboard.html#profile", backLabel: "Go to Profile" }
+                );
+                return null;
+              }
+              return Promise.all([
+                window.taApi.jobsList(),
+                window.taApi.applicationsMe().catch(function () {
+                  return { applications: [] };
+                }),
+                window.taApi.cvList().catch(function (err) {
+                  console.warn("cv/list:", err);
+                  return { files: [] };
+                }),
+              ]);
+            })
+            .then(function (results) {
+              if (results === null) return;
+              try {
+                var list = Array.isArray(results[0]) ? results[0] : [];
+                var apps = results[1] && results[1].applications ? results[1].applications : [];
+                var cvPayload = results[2] || {};
+                var cvFiles =
+                  cvPayload.files && Array.isArray(cvPayload.files) ? cvPayload.files : [];
+                var myApp = null;
+                for (var j = 0; j < apps.length; j++) {
+                  if (Number(apps[j].jobId) === jobId) {
+                    myApp = apps[j];
+                    break;
+                  }
+                }
+                var job = null;
+                for (var i = 0; i < list.length; i++) {
+                  if (Number(list[i].id) === jobId) {
+                    job = list[i];
+                    break;
+                  }
+                }
+                if (!job) {
+                  showError("This job could not be found.");
+                  return;
+                }
+                renderJob(job, myApp, cvFiles);
+              } catch (err) {
+                showError("Failed to render: " + (err && err.message ? err.message : String(err)));
+              }
+            })
+            .catch(function (e) {
+              var msg = e && e.message ? e.message : String(e);
+              if (msg.indexOf("Not logged in") !== -1 || msg.indexOf("401") !== -1) {
+                window.taRecruitment.showToast("Please sign in again");
+                location.href = "../index.html";
+                return;
+              }
+              if (msg.indexOf("Complete your profile") !== -1) {
+                showError(
+                  "Complete Name, Major, Education Background, Technical Ability, and Contact in Profile (Save) before viewing or applying for jobs.",
+                  { backHref: "dashboard.html#profile", backLabel: "Go to Profile" }
+                );
+                return;
+              }
+              showError("Failed to load: " + msg);
+            });
+        });
+      })();
+    </script>
+        <!-- ===== ADDED: TA Job Detail Status Display Enhancement ===== -->
+    <script>
+    (function() {
+      "use strict";
+      
+      // ADDED: Enhanced status display with review details
+      function enhanceStatusDisplay() {
+        var statusRow = document.getElementById("detail-status-row");
+        if (!statusRow) return;
+        
+        // Add review details section if application has been reviewed
+        var reviewDetails = document.getElementById("detail-review-details");
+        if (!reviewDetails) {
+          reviewDetails = document.createElement("div");
+          reviewDetails.id = "detail-review-details";
+          reviewDetails.className = "detail-review-details";
+          reviewDetails.style.cssText = "margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid var(--accent);";
+          
+          var content = document.getElementById("detail-content");
+          if (content) {
+            var cvBlock = document.getElementById("detail-cv-block");
+            if (cvBlock && !cvBlock.classList.contains("hidden")) {
+              content.insertBefore(reviewDetails, cvBlock);
+            } else {
+              var actions = document.getElementById("detail-form-actions");
+              if (actions) {
+                content.insertBefore(reviewDetails, actions);
+              }
+            }
+          }
+        }
+      }
+      
+      // ADDED: Update review details display
+      window.updateReviewDetails = function(appData) {
+        var reviewDetails = document.getElementById("detail-review-details");
+        if (!reviewDetails || !appData) return;
+        
+        var status = String(appData.status || "").toUpperCase();
+        var html = "";
+        
+        if (status === "ACCEPTED" || status === "ACCEPTED_BY_MO") {
+          html = '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">' +
+                 '<span style="font-size:1.5rem;">🎉</span>' +
+                 '<div>' +
+                 '<strong style="color:#2e7d32;font-size:1.1rem;">Congratulations! Your application has been approved.</strong>' +
+                 '<p style="margin:0.25rem 0 0 0;color:#666;font-size:0.9rem;">The MO has accepted your application.</p>' +
+                 '</div></div>';
+          if (appData.reviewNote) {
+            html += '<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(46,125,50,0.1);border-radius:6px;">' +
+                    '<strong style="color:#2e7d32;">MO Feedback:</strong>' +
+                    '<p style="margin:0.5rem 0 0 0;color:#333;">' + escHtml(appData.reviewNote) + '</p></div>';
+          }
+        } else if (status === "REJECTED" || status === "REJECTED_BY_MO") {
+          html = '<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">' +
+                 '<span style="font-size:1.5rem;">😔</span>' +
+                 '<div>' +
+                 '<strong style="color:#c62828;font-size:1.1rem;">Your application was not approved.</strong>' +
+                 '<p style="margin:0.25rem 0 0 0;color:#666;font-size:0.9rem;">The MO has declined your application.</p>' +
+                 '</div></div>';
+          if (appData.reviewNote) {
+            html += '<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(198,40,40,0.1);border-radius:6px;">' +
+                    '<strong style="color:#c62828;">MO Feedback:</strong>' +
+                    '<p style="margin:0.5rem 0 0 0;color:#333;">' + escHtml(appData.reviewNote) + '</p></div>';
+          }
+        } else {
+          reviewDetails.style.display = "none";
+          return;
+        }
+        
+        if (appData.reviewedAt) {
+          var d = new Date(appData.reviewedAt);
+          html += '<p style="margin:0.75rem 0 0 0;font-size:0.8rem;color:#999;">' +
+                  'Reviewed on: ' + (Number.isNaN(d.getTime()) ? appData.reviewedAt : d.toLocaleString()) +
+                  '</p>';
+        }
+        
+        reviewDetails.innerHTML = html;
+        reviewDetails.style.display = "block";
+      };
+      
+      function escHtml(s) {
+        if (s == null) return "";
+        var d = document.createElement("div");
+        d.textContent = s;
+        return d.innerHTML;
+      }
+      
+      // Hook into existing renderJob function
+      var originalRenderJob = window.renderJob;
+      if (originalRenderJob) {
+        window.renderJob = function(job, myApp, cvFiles) {
+          originalRenderJob(job, myApp, cvFiles);
+          enhanceStatusDisplay();
+          if (myApp) {
+            window.updateReviewDetails(myApp);
+          }
+        };
+      }
+      
+      // ADDED: Auto-refresh status every 10 seconds
+      var statusRefreshInterval = setInterval(function() {
+        var params = new URLSearchParams(location.search);
+        var jobId = params.get("id");
+        if (!jobId || !window.taApi) return;
+        
+        window.taApi.applicationsMe()
+          .then(function(res) {
+            var apps = res && res.applications ? res.applications : [];
+            var currentApp = apps.find(function(a) { return String(a.jobId) === String(jobId); });
+            if (currentApp) {
+              window.updateReviewDetails(currentApp);
+              // Update button state if status changed
+              var applyBtn = document.getElementById("detail-apply-btn");
+              if (applyBtn) {
+                var st = String(currentApp.status || "").toUpperCase();
+                if (st === "ACCEPTED" || st === "REJECTED" || st === "ACCEPTED_BY_MO" || st === "REJECTED_BY_MO") {
+                  applyBtn.disabled = true;
+                  applyBtn.className = "btn btn-secondary detail-apply-btn--final";
+                  applyBtn.textContent = "Application " + (st.indexOf("ACCEPT") !== -1 ? "Approved" : "Rejected");
+                }
+              }
+            }
+          })
+          .catch(function(err) {
+            console.log("Status refresh error:", err);
+          });
+      }, 10000);
+      
+      // Clean up on page unload
+      window.addEventListener("beforeunload", function() {
+        clearInterval(statusRefreshInterval);
+      });
+    })();
+    </script>
+    
+    <!-- ADDED: Styles for review details -->
+    <style>
+      .detail-review-details {
+        animation: slideIn 0.3s ease;
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </body>
+</html>
