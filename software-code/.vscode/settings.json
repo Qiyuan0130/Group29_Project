@@ -1,0 +1,12 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.compile.nullAnalysis.mode": "disabled",
+  "java.debug.settings.console": "integratedTerminal",
+  "java.import.gradle.enabled": false,
+  "java.maven.downloadSources": false,
+  "java.eclipse.downloadSources": false,
+  "files.watcherExclude": {
+    "**/target/**": true,
+    "**/build/**": true
+  }
+}

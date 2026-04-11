@@ -32,14 +32,6 @@ public final class AuthTokenUtil {
     }
     
     /**
-     * Generates a 6-digit numeric code (email verification demo).
-     */
-    public static String generateEmailVerificationCode() {
-        int code = (int) (Math.random() * 1000000);
-        return String.format("%06d", code);
-    }
-    
-    /**
      * Generates a session key (same format as auth token).
      */
     public static String generateSessionKey() {
