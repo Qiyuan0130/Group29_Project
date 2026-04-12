@@ -38,11 +38,11 @@
 
 | 👤 Member | Iteration 1 | Iteration 2 |
 |--------|--------|--------|
-| Jingyi Wang | Take part in a discussion. | Completed the implementation of the key/secret system for registration; MOs can filter published recruitments, view TA applications for corresponding activities, as well as approve and reject them. |
+| Jingyi Wang | Through JUnit testing, a test file was written to verify the validity of registration inputs. | Completed the implementation of the key/secret system for registration; MOs can filter published recruitments, view TA applications for corresponding activities, as well as approve and reject them. |
 | Zixin Xiong | Determine the verification criteria for the three key pieces of information for registration and write them into the code. | Responsible for the resume upload section, users can upload multiple versions of PDF resumes; the "Jobs" function can only be unlocked after the user has completed filling in the profile; implement the verification that at least one resume must be uploaded for the user to apply for a job. |
 | Xinyi Li | Refined the registration and login information. Users can register using their name, email, password, and a unique MO key. | Create a job posting page for MOs to set the job title, technical ability, weekly working hours, and deadline. Develop a job list where MOs can view and edit their posted information. |
 | Mengdi Yang | JUnit tests are run to ensure that the data are correctly sent to the JSON files used to store user data. | Completed the TA profile part, which now can add TA's information for the MOs and TA themselves to read. After registration, TA's name and email will be automatically shown in the profile that's ready for completion.  |
-| Songqi Zhang | Take part in a discussion. | Built the TA-side job list for viewing MO-published jobs; fetched and displayed job details; added multi-keyword tag filtering; added JsonPathsTest. |
+| Songqi Zhang | JUnit tests are run to ensure that the paths used for JSON data files are set up correctly. | Built the TA-side job list for viewing MO-published jobs; fetched and displayed job details; added multi-keyword tag filtering; added JsonPathsTest. |
 | Yangxinyue Zhou | Responsible for designing the full project prototype, defining page layouts, user flows and interaction logic, and guiding the front-end implementation based on this prototype. | Subsequent front-end maintenance |
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
