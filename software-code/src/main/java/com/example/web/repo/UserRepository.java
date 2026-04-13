@@ -153,7 +153,7 @@ public final class UserRepository {
         if (byEmail.isPresent()) {
             return byEmail;
         }
-        return findByName(key);
+        return findByBuptNumber(key);
     }
 
     public Optional<User> findById(long id) throws IOException {
