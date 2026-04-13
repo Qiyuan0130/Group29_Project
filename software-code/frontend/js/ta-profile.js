@@ -21,9 +21,10 @@
 
     function applyToView(user) {
       if (!user) return;
+      var buptNumber = user.buptNumber || user.qmNumber || "—";
       var vals = [
         user.name || "—",
-        user.qmNumber || "—",
+        buptNumber,
         user.major || "—",
         user.educationBackground || user.major || "—",
         user.technicalAbility || "—",
@@ -36,8 +37,9 @@
 
     function applyToForm(user) {
       if (!user || !ctrls.length) return;
+      var buptNumber = user.buptNumber != null ? user.buptNumber : user.qmNumber;
       ctrls[0].value = user.name != null ? user.name : "";
-      if (ctrls[1]) ctrls[1].value = user.qmNumber != null ? user.qmNumber : "";
+      if (ctrls[1]) ctrls[1].value = buptNumber != null ? buptNumber : "";
       if (ctrls[2]) ctrls[2].value = user.major != null ? user.major : "";
       if (ctrls[3]) ctrls[3].value = user.educationBackground != null ? user.educationBackground : (user.major != null ? user.major : "");
       if (ctrls[4]) ctrls[4].value = user.technicalAbility != null ? user.technicalAbility : "";

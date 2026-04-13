@@ -5,6 +5,7 @@ public class UserPublic {
     public Long id;
     public String username;
     public String role;
+    public String buptNumber;
     public String qmNumber;
     public String name;
     public String major;
@@ -17,6 +18,7 @@ public class UserPublic {
         p.id = u.id;
         p.username = u.username;
         p.role = u.role;
+        p.buptNumber = u.qmNumber;
         p.qmNumber = u.qmNumber;
         p.name = u.name;
         p.major = u.major;
