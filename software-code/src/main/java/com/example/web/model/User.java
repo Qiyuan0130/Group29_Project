@@ -10,6 +10,8 @@ public class User {
     public String password;
     private String passwordHash;
     public String role;
+    // Legacy compatibility: some records may store BUPT number under buptNumber.
+    public String buptNumber;
     public String qmNumber;
     public String name;
     public String major;

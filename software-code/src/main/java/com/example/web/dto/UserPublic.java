@@ -15,15 +15,25 @@ public class UserPublic {
 
     public static UserPublic from(com.example.web.model.User u) {
         UserPublic p = new UserPublic();
+        String mergedBuptNumber = u.qmNumber != null && !u.qmNumber.trim().isEmpty()
+                ? u.qmNumber
+                : u.buptNumber;
+        String technical = u.technicalAbility;
+        if (technical != null
+                && !technical.trim().isEmpty()
+                && u.username != null
+                && technical.trim().equalsIgnoreCase(u.username.trim())) {
+            technical = "";
+        }
         p.id = u.id;
         p.username = u.username;
         p.role = u.role;
-        p.buptNumber = u.qmNumber;
-        p.qmNumber = u.qmNumber;
+        p.buptNumber = mergedBuptNumber;
+        p.qmNumber = mergedBuptNumber;
         p.name = u.name;
         p.major = u.major;
         p.educationBackground = u.educationBackground;
-        p.technicalAbility = u.technicalAbility;
+        p.technicalAbility = technical;
         p.contact = u.contact;
         return p;
     }

@@ -32,8 +32,23 @@ public final class UserRepository {
         if (db.users == null) {
             db.users = new java.util.ArrayList<>();
         }
+        boolean dirty = false;
         for (User u : db.users) {
+            String beforeBupt = u == null ? "" : (u.buptNumber == null ? "" : u.buptNumber);
+            String beforeQm = u == null ? "" : (u.qmNumber == null ? "" : u.qmNumber);
+            String beforeTechnical = u == null ? "" : (u.technicalAbility == null ? "" : u.technicalAbility);
             normalizeUserFields(u);
+            if (u != null) {
+                String afterBupt = u.buptNumber == null ? "" : u.buptNumber;
+                String afterQm = u.qmNumber == null ? "" : u.qmNumber;
+                String afterTechnical = u.technicalAbility == null ? "" : u.technicalAbility;
+                if (!beforeBupt.equals(afterBupt) || !beforeQm.equals(afterQm) || !beforeTechnical.equals(afterTechnical)) {
+                    dirty = true;
+                }
+            }
+        }
+        if (dirty) {
+            JsonFileStore.write(ctx, FILE, db);
         }
         return db;
     }
@@ -134,7 +149,9 @@ public final class UserRepository {
         }
         String b = buptNumber.trim();
         for (User x : load().users) {
-            if (x.qmNumber != null && b.equalsIgnoreCase(x.qmNumber.trim())) {
+            String qm = x.qmNumber == null ? "" : x.qmNumber.trim();
+            String legacy = x.buptNumber == null ? "" : x.buptNumber.trim();
+            if (b.equalsIgnoreCase(qm) || b.equalsIgnoreCase(legacy)) {
                 return Optional.of(x);
             }
         }
@@ -200,6 +217,7 @@ public final class UserRepository {
         u.password = rawPassword;
         u.setPasswordHash(BCrypt.hashpw(rawPassword, BCrypt.gensalt(10)));
         u.role = cleanRole;
+        u.buptNumber = cleanBuptNumber;
         u.qmNumber = cleanBuptNumber;
         u.name = cleanTrueName;
         u.major = "";
@@ -218,12 +236,24 @@ public final class UserRepository {
         u.username = normalizeText(u.username);
         u.password = normalizeText(u.password);
         u.role = normalizeRole(u.role);
+        u.buptNumber = normalizeText(u.buptNumber);
         u.qmNumber = normalizeText(u.qmNumber);
+        if (u.qmNumber.isEmpty() && !u.buptNumber.isEmpty()) {
+            u.qmNumber = u.buptNumber;
+        }
+        if (u.buptNumber.isEmpty() && !u.qmNumber.isEmpty()) {
+            u.buptNumber = u.qmNumber;
+        }
         u.name = normalizeText(u.name);
         u.major = normalizeText(u.major);
         u.educationBackground = normalizeText(u.educationBackground);
         u.technicalAbility = normalizeText(u.technicalAbility);
         u.contact = normalizeText(u.contact);
+        if (!u.technicalAbility.isEmpty()
+                && u.technicalAbility.equalsIgnoreCase(u.username)
+                && isValidEmailAddress(u.technicalAbility)) {
+            u.technicalAbility = "";
+        }
     }
 
     private static String normalizeText(String v) {

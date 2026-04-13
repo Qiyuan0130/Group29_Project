@@ -1,5 +1,5 @@
 {
-  "nextUserId": 19,
+  "nextUserId": 20,
   "users": [
     {
       "id": 1,
@@ -13,6 +13,19 @@
       "educationBackground": "",
       "technicalAbility": "",
       "contact": "lixinyi@bupt.edu.cn"
+    },
+    {
+      "id": 19,
+      "username": "xiongzixin@bupt.edu.cn",
+      "password": "xiong111",
+      "passwordHash": "$2a$10$gY7HDxwTQ.9hF06VKktNn.VvplZBa89F9CXe4Fl.Hq2esZf4zeHhW",
+      "role": "TA",
+      "qmNumber": "2023213231",
+      "name": "Zixin Xiong",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "xiongzixin@bupt.edu.cn"
     }
   ]
 }

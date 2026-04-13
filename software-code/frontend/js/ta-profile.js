@@ -24,15 +24,31 @@
     var technicalInput = editCard ? editCard.querySelector("#ta-profile-technical-ability") : null;
     var contactInput = editCard ? editCard.querySelector("#ta-profile-contact") : null;
 
+    function looksLikeEmail(v) {
+      var s = v == null ? "" : String(v).trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+    }
+
+    function normalizeTechnicalAbility(user) {
+      var technical = user && user.technicalAbility != null ? String(user.technicalAbility).trim() : "";
+      var loginEmail = user && user.username != null ? String(user.username).trim() : "";
+      // Historical bad mapping could copy login email into Technical Ability.
+      if (technical && looksLikeEmail(technical) && loginEmail && technical.toLowerCase() === loginEmail.toLowerCase()) {
+        return "";
+      }
+      return technical;
+    }
+
     function applyToView(user) {
       if (!user) return;
       var buptNumber = user.buptNumber || user.qmNumber || "—";
+      var technicalAbility = normalizeTechnicalAbility(user);
       var vals = [
         user.name || "—",
         buptNumber,
         user.major || "—",
         user.educationBackground || user.major || "—",
-        user.technicalAbility || "—",
+        technicalAbility || "—",
         user.contact || "—",
       ];
       for (var i = 0; i < dds.length && i < vals.length; i++) {
@@ -43,11 +59,12 @@
     function applyToForm(user) {
       if (!user) return;
       var buptNumber = user.buptNumber != null ? user.buptNumber : user.qmNumber;
+      var technicalAbility = normalizeTechnicalAbility(user);
       if (nameInput) nameInput.value = user.name != null ? user.name : "";
       if (buptNumberInput) buptNumberInput.value = buptNumber != null ? buptNumber : "";
       if (majorInput) majorInput.value = user.major != null ? user.major : "";
       if (educationInput) educationInput.value = user.educationBackground != null ? user.educationBackground : (user.major != null ? user.major : "");
-      if (technicalInput) technicalInput.value = user.technicalAbility != null ? user.technicalAbility : "";
+      if (technicalInput) technicalInput.value = technicalAbility;
       if (contactInput) contactInput.value = user.contact != null ? user.contact : "";
     }
 
