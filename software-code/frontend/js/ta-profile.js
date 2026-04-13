@@ -17,7 +17,12 @@
 
     var dds = displayCard ? displayCard.querySelectorAll(".kv-list dd") : [];
     var form = editCard ? editCard.querySelector("form") : null;
-    var ctrls = editCard ? editCard.querySelectorAll(".form-control") : [];
+    var nameInput = editCard ? editCard.querySelector("#ta-profile-name") : null;
+    var buptNumberInput = editCard ? editCard.querySelector("#ta-profile-bupt-number") : null;
+    var majorInput = editCard ? editCard.querySelector("#ta-profile-major") : null;
+    var educationInput = editCard ? editCard.querySelector("#ta-profile-education-background") : null;
+    var technicalInput = editCard ? editCard.querySelector("#ta-profile-technical-ability") : null;
+    var contactInput = editCard ? editCard.querySelector("#ta-profile-contact") : null;
 
     function applyToView(user) {
       if (!user) return;
@@ -36,14 +41,14 @@
     }
 
     function applyToForm(user) {
-      if (!user || !ctrls.length) return;
+      if (!user) return;
       var buptNumber = user.buptNumber != null ? user.buptNumber : user.qmNumber;
-      ctrls[0].value = user.name != null ? user.name : "";
-      if (ctrls[1]) ctrls[1].value = buptNumber != null ? buptNumber : "";
-      if (ctrls[2]) ctrls[2].value = user.major != null ? user.major : "";
-      if (ctrls[3]) ctrls[3].value = user.educationBackground != null ? user.educationBackground : (user.major != null ? user.major : "");
-      if (ctrls[4]) ctrls[4].value = user.technicalAbility != null ? user.technicalAbility : "";
-      if (ctrls[5]) ctrls[5].value = user.contact != null ? user.contact : "";
+      if (nameInput) nameInput.value = user.name != null ? user.name : "";
+      if (buptNumberInput) buptNumberInput.value = buptNumber != null ? buptNumber : "";
+      if (majorInput) majorInput.value = user.major != null ? user.major : "";
+      if (educationInput) educationInput.value = user.educationBackground != null ? user.educationBackground : (user.major != null ? user.major : "");
+      if (technicalInput) technicalInput.value = user.technicalAbility != null ? user.technicalAbility : "";
+      if (contactInput) contactInput.value = user.contact != null ? user.contact : "";
     }
 
     function isProfileCompleteForJobs(user) {
@@ -101,12 +106,12 @@
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         var body = {
-          name: ctrls[0] ? ctrls[0].value : "",
-          qmNumber: ctrls[1] ? ctrls[1].value : "",
-          major: ctrls[2] ? ctrls[2].value : "",
-          educationBackground: ctrls[3] ? ctrls[3].value : "",
-          technicalAbility: ctrls[4] ? ctrls[4].value : "",
-          contact: ctrls[5] ? ctrls[5].value : "",
+          name: nameInput ? nameInput.value : "",
+          qmNumber: buptNumberInput ? buptNumberInput.value : "",
+          major: majorInput ? majorInput.value : "",
+          educationBackground: educationInput ? educationInput.value : "",
+          technicalAbility: technicalInput ? technicalInput.value : "",
+          contact: contactInput ? contactInput.value : "",
         };
         window.taApi
           .profileUpdate(body)
