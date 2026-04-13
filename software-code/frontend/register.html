@@ -174,19 +174,7 @@
           .then(function () {
             document.getElementById("form-register").reset();
             syncMoKeyVisibility();
-            var modal = document.getElementById("reg-success-modal");
-            var btn = document.getElementById("reg-success-continue");
-            if (modal && btn) {
-              modal.removeAttribute("hidden");
-              document.body.style.overflow = "hidden";
-              btn.focus();
-              btn.onclick = function () {
-                location.href = "login.html";
-              };
-            } else {
-              alert("Registration successful.\nWelcome to use.");
-              location.href = "login.html";
-            }
+            location.href = "login.html";
           })
           .catch(function (err) {
             alert(err.message || "Register failed");
