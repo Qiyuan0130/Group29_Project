@@ -94,11 +94,10 @@
     login: function (login, password) {
       return request("POST", "auth/login", { login: login, password: password });
     },
-    register: function (trueName, email, password, role, moKey, adminKey) {
+    register: function (trueName, buptNumber, email, password, role, moKey, adminKey) {
       return request("POST", "auth/register", {
         trueName: trueName,
-        // Keep legacy field for backward compatibility with older backend versions.
-        name: trueName,
+        buptNumber: buptNumber,
         email: email,
         password: password,
         role: role,

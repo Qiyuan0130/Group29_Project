@@ -128,6 +128,19 @@ public final class UserRepository {
         return Optional.empty();
     }
 
+    public Optional<User> findByBuptNumber(String buptNumber) throws IOException {
+        if (buptNumber == null) {
+            return Optional.empty();
+        }
+        String b = buptNumber.trim();
+        for (User x : load().users) {
+            if (x.qmNumber != null && b.equalsIgnoreCase(x.qmNumber.trim())) {
+                return Optional.of(x);
+            }
+        }
+        return Optional.empty();
+    }
+
     public Optional<User> findByLogin(String login) throws IOException {
         if (login == null) {
             return Optional.empty();
@@ -152,13 +165,17 @@ public final class UserRepository {
         return Optional.empty();
     }
 
-    public synchronized User register(String trueName, String email, String password, String role) throws IOException {
+    public synchronized User register(String trueName, String buptNumber, String email, String password, String role) throws IOException {
         String cleanTrueName = trueName == null ? "" : trueName.trim();
+        String cleanBuptNumber = buptNumber == null ? "" : buptNumber.trim();
         String cleanEmail = email == null ? "" : email.trim().toLowerCase();
         String rawPassword = password == null ? "" : password;
         String cleanRole = role == null ? "" : role.trim().toUpperCase();
         if (cleanTrueName.isEmpty()) {
             throw new IllegalArgumentException("True Name is required.");
+        }
+        if (cleanBuptNumber.isEmpty()) {
+            throw new IllegalArgumentException("BUPT Number is required.");
         }
         if (!isValidEmailAddress(cleanEmail)) {
             throw new IllegalArgumentException("Invalid email format.");
@@ -172,6 +189,9 @@ public final class UserRepository {
         if (findByEmail(cleanEmail).isPresent()) {
             throw new IllegalArgumentException("This email is already registered.");
         }
+        if (findByBuptNumber(cleanBuptNumber).isPresent()) {
+            throw new IllegalArgumentException("This BUPT Number is already registered.");
+        }
         UserDatabase db = load();
         User u = new User();
         u.id = db.nextUserId++;
@@ -180,7 +200,7 @@ public final class UserRepository {
         u.password = rawPassword;
         u.setPasswordHash(BCrypt.hashpw(rawPassword, BCrypt.gensalt(10)));
         u.role = cleanRole;
-        u.qmNumber = "";
+        u.qmNumber = cleanBuptNumber;
         u.name = cleanTrueName;
         u.major = "";
         u.educationBackground = "";

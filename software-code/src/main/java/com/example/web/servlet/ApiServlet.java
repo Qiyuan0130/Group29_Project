@@ -106,9 +106,10 @@ public class ApiServlet extends HttpServlet {
         }
         if ("/api/auth/register".equals(path) && "POST".equals(method)) {
             RegisterRequest body = HttpJson.readBody(req, RegisterRequest.class);
-            String trueName = body.trueName != null ? body.trueName : body.name;
-            if (trueName == null || body.email == null || body.password == null || body.role == null) {
-                throw new IllegalArgumentException("trueName, email, password, role required");
+            String trueName = body.trueName;
+            String buptNumber = body.buptNumber;
+            if (trueName == null || buptNumber == null || body.email == null || body.password == null || body.role == null) {
+                throw new IllegalArgumentException("trueName, buptNumber, email, password, role required");
             }
             String role = body.role.trim().toUpperCase();
             
@@ -128,7 +129,7 @@ public class ApiServlet extends HttpServlet {
                 }
             }
             
-            User created = ur.register(trueName, body.email, body.password, body.role);
+            User created = ur.register(trueName, buptNumber, body.email, body.password, body.role);
             
             // Issue auth token and session after registration
             String authToken = AuthTokenUtil.generateAuthToken();
