@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 public final class UserRepository {
 
     private static final String FILE = "users.json";
-    private static final Pattern NAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,10}$");
     private final ServletContext ctx;
@@ -153,13 +152,13 @@ public final class UserRepository {
         return Optional.empty();
     }
 
-    public synchronized User register(String name, String email, String password, String role) throws IOException {
-        String cleanName = name == null ? "" : name.trim();
+    public synchronized User register(String trueName, String email, String password, String role) throws IOException {
+        String cleanTrueName = trueName == null ? "" : trueName.trim();
         String cleanEmail = email == null ? "" : email.trim().toLowerCase();
         String rawPassword = password == null ? "" : password;
         String cleanRole = role == null ? "" : role.trim().toUpperCase();
-        if (!NAME_PATTERN.matcher(cleanName).matches()) {
-            throw new IllegalArgumentException("Name may only contain letters and numbers.");
+        if (cleanTrueName.isEmpty()) {
+            throw new IllegalArgumentException("True Name is required.");
         }
         if (!isValidEmailAddress(cleanEmail)) {
             throw new IllegalArgumentException("Invalid email format.");
@@ -170,21 +169,19 @@ public final class UserRepository {
         if (!Roles.TA.equals(cleanRole) && !Roles.MO.equals(cleanRole) && !Roles.ADMIN.equals(cleanRole)) {
             throw new IllegalArgumentException("Invalid role. Allowed values: TA, MO, ADMIN.");
         }
-        if (findByName(cleanName).isPresent()) {
-            throw new IllegalArgumentException("This name is already registered.");
-        }
         if (findByEmail(cleanEmail).isPresent()) {
             throw new IllegalArgumentException("This email is already registered.");
         }
         UserDatabase db = load();
         User u = new User();
         u.id = db.nextUserId++;
-        u.username = cleanName;
+        // Keep username unique and stable for internal usage.
+        u.username = cleanEmail;
         u.password = rawPassword;
         u.setPasswordHash(BCrypt.hashpw(rawPassword, BCrypt.gensalt(10)));
         u.role = cleanRole;
         u.qmNumber = "";
-        u.name = cleanName;
+        u.name = cleanTrueName;
         u.major = "";
         u.educationBackground = "";
         u.technicalAbility = "";
