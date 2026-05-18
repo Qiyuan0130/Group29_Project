@@ -34,6 +34,7 @@ import com.example.web.repo.CvRepository;
 import com.example.web.repo.JobRepository;
 import com.example.web.repo.UserRepository;
 import com.example.web.service.AiMatchingService;
+import com.example.web.service.WorkloadLlmService;
 import com.example.web.service.WorkloadService;
 import com.example.web.util.AuthTokenUtil;
 import com.example.web.util.HttpJson;
@@ -415,6 +416,24 @@ public class ApiServlet extends HttpServlet {
             resp.setContentType("text/csv;charset=UTF-8");
             resp.setHeader("Content-Disposition", "attachment; filename=\"workload.csv\"");
             resp.getWriter().write(csv);
+            return;
+        }
+
+        if ("/api/admin/workload/llm-balance".equals(path) && "POST".equals(method)) {
+            User admin = requireUser(ur, req);
+            if (!Roles.ADMIN.equals(admin.role)) {
+                throw new SecurityException("Admin only");
+            }
+            HttpJson.write(resp, 200, WorkloadLlmService.analyze(getServletContext(), ur, jr, ar));
+            return;
+        }
+
+        if ("/api/mo/workload/llm-balance".equals(path) && "POST".equals(method)) {
+            User mo = requireUser(ur, req);
+            if (!Roles.MO.equals(mo.role)) {
+                throw new SecurityException("MO only");
+            }
+            HttpJson.write(resp, 200, WorkloadLlmService.analyze(getServletContext(), ur, jr, ar));
             return;
         }
 

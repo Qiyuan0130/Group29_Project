@@ -165,5 +165,11 @@
     adminWorkloadCsvUrl: function () {
       return apiUrl("admin/workload.csv?_=" + Date.now());
     },
+    adminWorkloadLlmBalance: function () {
+      return request("POST", "admin/workload/llm-balance", {});
+    },
+    moWorkloadLlmBalance: function () {
+      return request("POST", "mo/workload/llm-balance", {});
+    },
   };
 })(typeof window !== "undefined" ? window : this);

@@ -71,6 +71,7 @@ public final class WorkloadService {
         List<String> titles = new ArrayList<>();
         Set<String> courses = new LinkedHashSet<>();
         List<String> hoursParts = new ArrayList<>();
+        int weeklyHoursTotal = 0;
         int pending = 0;
 
         for (ApplicationRecord a : ar.findByApplicant(ta.id)) {
@@ -92,7 +93,9 @@ public final class WorkloadService {
                 courses.add(j.courseName.trim());
             }
             if (j.workingHours != null && !j.workingHours.isBlank()) {
-                hoursParts.add(j.workingHours.trim());
+                String wh = j.workingHours.trim();
+                hoursParts.add(wh);
+                weeklyHoursTotal += parseWeeklyHours(wh);
             }
         }
 
@@ -108,6 +111,7 @@ public final class WorkloadService {
         row.put("qmNumber", safe(ta.qmNumber));
         row.put("acceptedJobCount", accepted);
         row.put("pendingApplicationCount", pending);
+        row.put("weeklyHoursTotal", weeklyHoursTotal);
         row.put("assignedPositions", positionsText);
         row.put("courses", coursesText);
         row.put("weeklyWorkloadSummary", hoursText);
@@ -141,6 +145,22 @@ public final class WorkloadService {
 
     private static double round1(double v) {
         return Math.round(v * 10.0) / 10.0;
+    }
+
+    /** Parses numeric hours from MO workingHours field (e.g. "4", "4 hrs/week"). */
+    static int parseWeeklyHours(String workingHours) {
+        if (workingHours == null || workingHours.isBlank()) {
+            return 0;
+        }
+        String digits = workingHours.replaceAll("[^0-9]", "");
+        if (digits.isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(digits);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public static String toCsv(Map<String, Object> report) {
