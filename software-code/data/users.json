@@ -9,9 +9,9 @@
       "role": "MO",
       "qmNumber": "QM200001",
       "name": "Dr. James Smith",
-      "major": "",
-      "educationBackground": "",
-      "technicalAbility": "",
+      "major": "Software Engineering",
+      "educationBackground": "PhD, University of Manchester",
+      "technicalAbility": "Software architecture, agile teaching",
       "contact": "j.smith@bupt.edu"
     },
     {
@@ -22,9 +22,9 @@
       "role": "MO",
       "qmNumber": "QM200002",
       "name": "Dr. Wei Chen",
-      "major": "",
-      "educationBackground": "",
-      "technicalAbility": "",
+      "major": "Computer Networks",
+      "educationBackground": "PhD, Tsinghua University",
+      "technicalAbility": "Network systems, database teaching",
       "contact": "w.chen@bupt.edu"
     },
     {
@@ -49,8 +49,8 @@
       "qmNumber": "QM230001",
       "name": "Alice Wang",
       "major": "Software Engineering",
-      "educationBackground": "BEng, BUPT",
-      "technicalAbility": "Java, Git, teamwork, communication",
+      "educationBackground": "BEng Software Engineering, BUPT (Year 3); Dean's List 2024–2025",
+      "technicalAbility": "Java, Spring Boot, Git, JUnit, technical writing, tutorial leading",
       "contact": "alice.wang@bupt.edu"
     },
     {
@@ -62,8 +62,8 @@
       "qmNumber": "QM230002",
       "name": "Bob Li",
       "major": "Computer Science",
-      "educationBackground": "BSc, BUPT",
-      "technicalAbility": "Java, computer networks, troubleshooting",
+      "educationBackground": "BSc Computer Science, BUPT (Year 3); CCNA coursework completed",
+      "technicalAbility": "Java, TCP/IP, Wireshark, Linux, network troubleshooting, lab demonstration",
       "contact": "bob.li@bupt.edu"
     },
     {
@@ -75,8 +75,8 @@
       "qmNumber": "QM230003",
       "name": "Charlie Zhang",
       "major": "Software Engineering",
-      "educationBackground": "BEng, BUPT",
-      "technicalAbility": "Python, data structures",
+      "educationBackground": "BEng Software Engineering, BUPT (Year 2); Python teaching volunteer 2025",
+      "technicalAbility": "Python, data structures, pandas, introductory teaching, peer mentoring",
       "contact": "charlie.zhang@bupt.edu"
     },
     {
@@ -88,8 +88,8 @@
       "qmNumber": "QM230004",
       "name": "Diana Liu",
       "major": "Artificial Intelligence",
-      "educationBackground": "MEng, BUPT",
-      "technicalAbility": "Python, machine learning, Java",
+      "educationBackground": "MEng Artificial Intelligence, BUPT (Year 1 postgraduate); BSc CS, Wuhan University",
+      "technicalAbility": "Python, PyTorch, scikit-learn, Java, research documentation, experiment automation",
       "contact": "diana.liu@bupt.edu"
     },
     {
@@ -101,8 +101,8 @@
       "qmNumber": "QM230005",
       "name": "Eve Chen",
       "major": "Telecommunications Engineering",
-      "educationBackground": "BEng, BUPT",
-      "technicalAbility": "C++, signal processing",
+      "educationBackground": "BEng Telecommunications Engineering, BUPT (Year 3); Android student project lead",
+      "technicalAbility": "C++, Android, signal processing basics, UI prototyping, student project coaching",
       "contact": "eve.chen@bupt.edu"
     }
   ]
