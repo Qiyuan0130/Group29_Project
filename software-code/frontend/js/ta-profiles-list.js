@@ -14,6 +14,19 @@
     return tr;
   }
 
+  function profileCells(p, tbodyId) {
+    var cells = [p.username || "", p.name || ""];
+    if (tbodyId !== "admin-ta-profiles-body") {
+      cells.push(p.qmNumber || "");
+    }
+    cells.push(p.major || "", p.technicalAbility || "", p.contact || "");
+    return cells;
+  }
+
+  function colSpanFor(tbodyId) {
+    return tbodyId === "admin-ta-profiles-body" ? 5 : 6;
+  }
+
   function loadInto(tbodyId) {
     var tbody = document.getElementById(tbodyId);
     if (!tbody) return;
@@ -26,30 +39,21 @@
         if (!list.length) {
           var tr0 = document.createElement("tr");
           var td0 = document.createElement("td");
-          td0.colSpan = 6;
+          td0.colSpan = colSpanFor(tbodyId);
           td0.textContent = "No TA profiles yet.";
           tr0.appendChild(td0);
           tbody.appendChild(tr0);
           return;
         }
         list.forEach(function (p) {
-          tbody.appendChild(
-            rowWithCells([
-              p.username || "",
-              p.name || "",
-              p.qmNumber || "",
-              p.major || "",
-              p.technicalAbility || "",
-              p.contact || "",
-            ])
-          );
+          tbody.appendChild(rowWithCells(profileCells(p, tbodyId)));
         });
       })
       .catch(function (err) {
         tbody.innerHTML = "";
         var trE = document.createElement("tr");
         var tdE = document.createElement("td");
-        tdE.colSpan = 6;
+        tdE.colSpan = colSpanFor(tbodyId);
         tdE.textContent = "Failed to load: " + (err && err.message ? err.message : "error");
         trE.appendChild(tdE);
         tbody.appendChild(trE);
