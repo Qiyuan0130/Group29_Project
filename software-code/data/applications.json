@@ -1,106 +1,85 @@
 {
-  "nextApplicationId": 15,
+  "nextApplicationId": 11,
   "applications": [
     {
       "id": 1,
       "jobId": 1,
-      "applicantId": 1,
-      "status": "PENDING",
-      "appliedAt": "2026-04-03T10:00:00Z"
-    },
-    {
-      "id": 2,
-      "jobId": 2,
-      "applicantId": 1,
+      "applicantId": 4,
+      "cvId": 1,
       "status": "ACCEPTED",
       "appliedAt": "2026-04-01T09:00:00Z"
     },
     {
+      "id": 2,
+      "jobId": 2,
+      "applicantId": 4,
+      "cvId": 1,
+      "status": "ACCEPTED",
+      "appliedAt": "2026-04-02T10:30:00Z"
+    },
+    {
       "id": 3,
-      "jobId": 1,
-      "applicantId": 2,
-      "status": "REJECTED",
-      "appliedAt": "2026-03-29T12:00:00Z"
+      "jobId": 3,
+      "applicantId": 5,
+      "cvId": 2,
+      "status": "ACCEPTED",
+      "appliedAt": "2026-04-03T11:00:00Z"
     },
     {
       "id": 4,
       "jobId": 4,
-      "applicantId": 1,
-      "status": "PENDING",
-      "appliedAt": "2026-03-28T18:22:57.732557600Z"
+      "applicantId": 7,
+      "cvId": 4,
+      "status": "ACCEPTED",
+      "appliedAt": "2026-04-04T14:00:00Z"
     },
     {
       "id": 5,
       "jobId": 5,
-      "applicantId": 1,
+      "applicantId": 6,
+      "cvId": 3,
       "status": "PENDING",
-      "appliedAt": "2026-03-28T19:01:19.926000600Z"
+      "appliedAt": "2026-04-05T09:15:00Z"
     },
     {
       "id": 6,
-      "jobId": 6,
-      "applicantId": 1,
+      "jobId": 1,
+      "applicantId": 7,
+      "cvId": 4,
       "status": "PENDING",
-      "appliedAt": "2026-03-28T19:13:00.358643200Z"
+      "appliedAt": "2026-04-06T08:00:00Z"
     },
     {
       "id": 7,
-      "jobId": 8,
-      "applicantId": 1,
+      "jobId": 6,
+      "applicantId": 7,
+      "cvId": 4,
       "status": "PENDING",
-      "appliedAt": "2026-03-29T11:27:00.810266800Z"
+      "appliedAt": "2026-04-06T08:30:00Z"
     },
     {
       "id": 8,
       "jobId": 3,
-      "applicantId": 1,
+      "applicantId": 8,
+      "cvId": 5,
       "status": "PENDING",
-      "appliedAt": "2026-03-29T11:34:44.765555800Z"
+      "appliedAt": "2026-04-07T16:20:00Z"
     },
     {
       "id": 9,
-      "jobId": 2,
-      "applicantId": 2,
-      "status": "PENDING",
-      "appliedAt": "2026-04-04T08:56:00.353798600Z"
+      "jobId": 1,
+      "applicantId": 8,
+      "cvId": 5,
+      "status": "REJECTED",
+      "appliedAt": "2026-04-08T10:00:00Z"
     },
     {
       "id": 10,
-      "jobId": 3,
-      "applicantId": 2,
-      "status": "PENDING",
-      "appliedAt": "2026-04-04T08:56:45.686276600Z"
-    },
-    {
-      "id": 11,
-      "jobId": 8,
-      "applicantId": 2,
-      "status": "PENDING",
-      "appliedAt": "2026-04-04T08:57:07.113225800Z"
-    },
-    {
-      "id": 12,
-      "jobId": 7,
-      "applicantId": 2,
-      "cvId": 6,
-      "status": "PENDING",
-      "appliedAt": "2026-04-04T09:42:25.531617Z"
-    },
-    {
-      "id": 13,
-      "jobId": 1,
-      "applicantId": 10,
-      "cvId": 7,
-      "status": "PENDING",
-      "appliedAt": "2026-04-04T09:53:28.495002400Z"
-    },
-    {
-      "id": 14,
-      "jobId": 1,
-      "applicantId": 11,
-      "cvId": 8,
-      "status": "PENDING",
-      "appliedAt": "2026-04-04T10:35:06.653801300Z"
+      "jobId": 2,
+      "applicantId": 5,
+      "cvId": 2,
+      "status": "REJECTED",
+      "appliedAt": "2026-04-09T12:00:00Z"
     }
   ]
 }

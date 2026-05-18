@@ -1,124 +1,71 @@
 {
-  "nextJobId": 11,
+  "nextJobId": 7,
   "jobs": [
     {
       "id": 1,
-      "title": "TA for EBU6304",
-      "courseName": "Software Engineering",
-      "requirements": "Basic Java, teamwork, communication skills",
-      "workingHours": "4 hrs/week",
-      "deadline": "2026-04-10",
-      "organizerId": 4
+      "title": "Teaching Assistant — EBU6304 Software Engineering",
+      "courseName": "EBU6304 Software Engineering",
+      "requirements": "Java, Git, teamwork, communication",
+      "requirementsTags": ["java", "git", "teamwork", "communication"],
+      "requirementsNote": "Support weekly tutorials and assignment marking.",
+      "workingHours": "4",
+      "deadline": "2026-05-30",
+      "organizerId": 1
     },
     {
       "id": 2,
-      "title": "Exam Invigilation Assistant",
-      "courseName": "School-wide",
-      "requirements": "Punctuality, responsibility",
-      "workingHours": "As scheduled",
-      "deadline": "2026-04-15",
-      "organizerId": 4
+      "title": "Lab Assistant — EBU6304 Software Engineering",
+      "courseName": "EBU6304 Software Engineering",
+      "requirements": "Java, lab supervision, debugging",
+      "requirementsTags": ["java", "lab", "debugging"],
+      "requirementsNote": "Assist in programming labs every Thursday afternoon.",
+      "workingHours": "3",
+      "deadline": "2026-05-30",
+      "organizerId": 1
     },
     {
       "id": 3,
-      "title": "TA for EBU5002",
-      "courseName": "Computer Networks",
-      "requirements": "Network stack, troubleshooting, communication",
-      "workingHours": "3 hrs/week",
-      "deadline": "2026-04-20",
-      "organizerId": 4
+      "title": "Teaching Assistant — EBU5002 Computer Networks",
+      "courseName": "EBU5002 Computer Networks",
+      "requirements": "networking, troubleshooting, communication",
+      "requirementsTags": ["networking", "troubleshooting", "communication"],
+      "requirementsNote": "Help with lab setup and coursework Q&A.",
+      "workingHours": "3",
+      "deadline": "2026-06-15",
+      "organizerId": 2
     },
     {
       "id": 4,
-      "title": "Programming Fundamentals TA",
-      "courseName": "General",
-      "requirements": "python, java",
-      "requirementsTags": [
-        "python",
-        "java"
-      ],
-      "requirementsNote": "11111111111111",
-      "workingHours": "44",
-      "deadline": "2026-03-27",
-      "organizerId": 3
+      "title": "Exam Invigilation Assistant",
+      "courseName": "School-wide Examination",
+      "requirements": "punctuality, responsibility",
+      "requirementsTags": ["punctuality", "responsibility"],
+      "requirementsNote": "Final examination period; schedule announced by school office.",
+      "workingHours": "2",
+      "deadline": "2026-06-20",
+      "organizerId": 2
     },
     {
       "id": 5,
-      "title": "Software Tools Support TA",
-      "courseName": "General",
-      "requirements": "java, github, 111, 1111, 11111",
-      "requirementsTags": [
-        "java",
-        "github",
-        "111",
-        "1111",
-        "11111"
-      ],
-      "requirementsNote": "22333333",
+      "title": "Python Lab Support TA",
+      "courseName": "EBU4201 Programming Fundamentals",
+      "requirements": "python, teaching assistance",
+      "requirementsTags": ["python", "teaching"],
+      "requirementsNote": "Support first-year Python labs.",
       "workingHours": "2",
-      "deadline": "2026-03-27",
-      "organizerId": 3
+      "deadline": "2026-05-25",
+      "organizerId": 1
     },
     {
       "id": 6,
-      "title": "Git Collaboration Assistant",
-      "courseName": "General",
-      "requirements": "github",
-      "requirementsTags": [
-        "github"
-      ],
-      "requirementsNote": "",
-      "workingHours": "2",
-      "deadline": "2026-03-27",
-      "organizerId": 3
-    },
-    {
-      "id": 7,
-      "title": "Python Lab Support TA",
-      "courseName": "General",
-      "requirements": "",
-      "requirementsTags": [],
-      "requirementsNote": "66666",
-      "workingHours": "",
-      "deadline": "",
-      "organizerId": 3
-    },
-    {
-      "id": 8,
-      "title": "Course Project Mentoring TA",
-      "courseName": "General",
-      "requirements": "",
-      "requirementsTags": [],
-      "requirementsNote": "",
-      "workingHours": "123",
-      "deadline": "",
-      "organizerId": 3
-    },
-    {
-      "id": 9,
-      "title": "engineering",
-      "courseName": "General",
-      "requirements": "java",
-      "requirementsTags": [
-        "java"
-      ],
-      "requirementsNote": "java，github",
-      "workingHours": "21",
-      "deadline": "2026-04-14",
-      "organizerId": 3
-    },
-    {
-      "id": 10,
-      "title": "GitHub",
-      "courseName": "General",
-      "requirements": "java",
-      "requirementsTags": [
-        "java"
-      ],
-      "requirementsNote": "github",
-      "workingHours": "12",
-      "deadline": "2026-04-11",
-      "organizerId": 3
+      "title": "Capstone Project Mentoring TA",
+      "courseName": "EBU6304 Software Engineering",
+      "requirements": "project management, java, communication",
+      "requirementsTags": ["project", "java", "communication"],
+      "requirementsNote": "Mentor student teams during capstone semester.",
+      "workingHours": "5",
+      "deadline": "2026-06-30",
+      "organizerId": 2
     }
   ]
 }
