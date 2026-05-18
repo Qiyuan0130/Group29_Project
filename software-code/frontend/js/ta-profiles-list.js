@@ -1,5 +1,5 @@
 /**
- * Admin / MO: load TA directory from GET /api/ta-profiles into a table body by id.
+ * Admin: load TA directory from GET /api/ta-profiles (no QM Number column).
  */
 (function () {
   "use strict";
@@ -14,21 +14,8 @@
     return tr;
   }
 
-  function profileCells(p, tbodyId) {
-    var cells = [p.username || "", p.name || ""];
-    if (tbodyId !== "admin-ta-profiles-body") {
-      cells.push(p.qmNumber || "");
-    }
-    cells.push(p.major || "", p.technicalAbility || "", p.contact || "");
-    return cells;
-  }
-
-  function colSpanFor(tbodyId) {
-    return tbodyId === "admin-ta-profiles-body" ? 5 : 6;
-  }
-
-  function loadInto(tbodyId) {
-    var tbody = document.getElementById(tbodyId);
+  function loadAdminTaProfiles() {
+    var tbody = document.getElementById("admin-ta-profiles-body");
     if (!tbody) return;
 
     window.taApi
@@ -39,21 +26,29 @@
         if (!list.length) {
           var tr0 = document.createElement("tr");
           var td0 = document.createElement("td");
-          td0.colSpan = colSpanFor(tbodyId);
+          td0.colSpan = 5;
           td0.textContent = "No TA profiles yet.";
           tr0.appendChild(td0);
           tbody.appendChild(tr0);
           return;
         }
         list.forEach(function (p) {
-          tbody.appendChild(rowWithCells(profileCells(p, tbodyId)));
+          tbody.appendChild(
+            rowWithCells([
+              p.username || "",
+              p.name || "",
+              p.major || "",
+              p.technicalAbility || "",
+              p.contact || "",
+            ])
+          );
         });
       })
       .catch(function (err) {
         tbody.innerHTML = "";
         var trE = document.createElement("tr");
         var tdE = document.createElement("td");
-        tdE.colSpan = colSpanFor(tbodyId);
+        tdE.colSpan = 5;
         tdE.textContent = "Failed to load: " + (err && err.message ? err.message : "error");
         trE.appendChild(tdE);
         tbody.appendChild(trE);
@@ -61,18 +56,9 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    loadInto("admin-ta-profiles-body");
-    loadInto("mo-ta-profiles-body");
-
+    loadAdminTaProfiles();
     document.querySelectorAll('[data-admin-tab="ta-profiles"]').forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        loadInto("admin-ta-profiles-body");
-      });
-    });
-    document.querySelectorAll('[data-mo-section="ta-profiles"]').forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        loadInto("mo-ta-profiles-body");
-      });
+      btn.addEventListener("click", loadAdminTaProfiles);
     });
   });
 })();
