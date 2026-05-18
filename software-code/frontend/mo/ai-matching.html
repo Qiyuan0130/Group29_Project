@@ -20,6 +20,13 @@
       <h2 class="dashboard__title">AI Matching Dashboard (MO)</h2>
 
       <div class="panel ai-table" id="ai-matching-mo">
+        <div class="form-row" style="margin-bottom: 1rem; align-items: center; gap: 0.75rem; flex-wrap: wrap">
+          <label for="mo-ai-job-select" style="font-weight: 600; margin: 0">Posted job</label>
+          <select id="mo-ai-job-select" class="form-control" style="min-width: 280px; max-width: 100%">
+            <option value="">Loading jobs…</option>
+          </select>
+          <span id="mo-ai-job-hint" class="text-muted" style="font-size: 0.9rem"></span>
+        </div>
         <div class="table-wrap">
           <table class="data-table">
             <thead>
@@ -31,36 +38,19 @@
                 <th>AI Analysis</th>
               </tr>
             </thead>
-            <tbody>
-              <tr class="ai-matching-row" data-ai-score="90%" data-ai-matched="Java, Git ✅" data-ai-missing="—" data-ai-note="Best match for posted Java/Git requirements; recommend interview on teaching experience.">
-                <td><strong>Alice</strong></td>
-                <td class="js-ai-cell-score"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-matched"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-missing"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-note"><span class="ai-pending">Pending analysis</span></td>
-              </tr>
-              <tr class="ai-matching-row" data-ai-score="50%" data-ai-matched="Java✅" data-ai-missing="Java, Git ❌" data-ai-note="Partial overlap: strong Java, weak evidence on Git collaboration — pair with technical screen.">
-                <td><strong>Bob</strong></td>
-                <td class="js-ai-cell-score"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-matched"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-missing"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-note"><span class="ai-pending">Pending analysis</span></td>
-              </tr>
-              <tr class="ai-matching-row" data-ai-score="0%" data-ai-matched="—" data-ai-missing="Git ❌" data-ai-note="Does not meet minimum toolchain expectations for this posting unless upskilling plan is provided.">
-                <td><strong>Charlie</strong></td>
-                <td class="js-ai-cell-score"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-matched"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-missing"><span class="ai-pending">—</span></td>
-                <td class="js-ai-cell-note"><span class="ai-pending">Pending analysis</span></td>
+            <tbody id="mo-ai-applicants-body">
+              <tr>
+                <td colspan="5"><span class="ai-pending">Select a job to load applicants.</span></td>
               </tr>
             </tbody>
           </table>
         </div>
         <div class="form-actions" style="margin-top: 1.25rem; justify-content: center">
-          <button type="button" class="btn btn-accent" id="ai-run-all-analysis">Run AI Analysis</button>
+          <button type="button" class="btn btn-accent" id="mo-ai-run-analysis" disabled>Run AI Analysis</button>
         </div>
       </div>
     </div>
-    <script src="../js/main.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/mo-ai-matching.js"></script>
   </body>
 </html>
