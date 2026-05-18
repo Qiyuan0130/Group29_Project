@@ -142,6 +142,9 @@
     moJobApplications: function (jobId) {
       return request("GET", "mo/jobs/" + encodeURIComponent(jobId) + "/applications", null);
     },
+    aiMatchMo: function (jobId) {
+      return request("POST", "ai/match-mo", { jobId: jobId });
+    },
     moApplicationDecision: function (applicationId, accept) {
       return request("POST", "mo/applications/" + encodeURIComponent(applicationId) + "/decision", {
         accept: !!accept,
