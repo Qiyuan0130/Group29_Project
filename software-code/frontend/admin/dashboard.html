@@ -16,9 +16,10 @@
 
     <!-- ====================== -->
     <!-- Admin accounts: register via register.html using key Group29admin -->
+    <!-- admin-dashboard-v2: 8-column workload + admin-workload.js (not Alice/Bob demo) -->
     <!-- ====================== -->
 
-    <div class="dashboard__main" style="max-width: 1000px; margin: 0 auto; padding: 1.5rem">
+    <div class="dashboard__main" style="max-width: 1100px; margin: 0 auto; padding: 1.5rem">
       <div class="mo-tabs" style="margin-bottom: 1.25rem">
         <button type="button" class="btn btn-secondary is-active" data-admin-tab="workload">TA Workload Statistics</button>
         <button type="button" class="btn btn-secondary" data-admin-tab="balance">AI Workload Balance</button>
@@ -29,32 +30,33 @@
       <div data-admin-panel="workload">
         <h2 class="admin-page-title">TA Workload Statistics</h2>
         <div class="panel">
+          <p id="admin-workload-summary" style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
+            Loading workload…
+          </p>
           <div class="table-wrap">
             <table class="data-table">
               <thead>
                 <tr>
                   <th>TA Name</th>
+                  <th>Login</th>
+                  <th>QM Number</th>
+                  <th>Accepted</th>
+                  <th>Pending</th>
+                  <th>Courses</th>
                   <th>Assigned Positions</th>
+                  <th>Weekly Workload</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="admin-workload-body">
                 <tr>
-                  <td>Alice</td>
-                  <td>Java TA, Lab TA</td>
-                </tr>
-                <tr>
-                  <td>Bob</td>
-                  <td>Web Dev TA</td>
-                </tr>
-                <tr>
-                  <td>Charlie</td>
-                  <td>None</td>
+                  <td colspan="8">Loading…</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div class="form-actions" style="margin-top: 1rem">
-            <button type="button" class="btn btn-accent" onclick="window.taRecruitment.showToast('Export CSV (demo)')">Export to CSV</button>
+            <button type="button" class="btn btn-secondary" id="admin-workload-refresh">Refresh</button>
+            <button type="button" class="btn btn-accent" id="admin-workload-export">Export to CSV</button>
           </div>
         </div>
       </div>
@@ -89,7 +91,7 @@
         <h2 class="admin-page-title">AI Workload Balance</h2>
         <div class="panel">
           <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
-            Click to generate workload balance suggestions
+            Suggestions based on each TA&apos;s accepted job count (same data as Workload Statistics).
           </p>
           <div class="table-wrap">
             <table class="data-table">
@@ -97,41 +99,25 @@
                 <tr>
                   <th>TA Name</th>
                   <th>Current Number Of Jobs</th>
-                  <th>AI Recommendation</th>
+                  <th>Recommendation</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="admin-balance-body">
                 <tr>
-                  <td>Alice</td>
-                  <td>2</td>
-                  <td>Can take 1 more job</td>
-                </tr>
-                <tr>
-                  <td>Bob</td>
-                  <td>1</td>
-                  <td>Can take up to 2 jobs</td>
-                </tr>
-                <tr>
-                  <td>Charlie</td>
-                  <td>0</td>
-                  <td>Avoid assigning new jobs</td>
+                  <td colspan="3">Loading…</td>
                 </tr>
               </tbody>
             </table>
-          </div>
-          <div class="form-actions" style="margin-top: 1rem">
-            <button type="button" class="btn btn-primary" onclick="window.taRecruitment.showToast('Generating suggestions (demo)')">
-              Generate workload balance suggestions
-            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <p class="page-footer-hint">Admin prototype — CSV export will call Servlet later</p>
+    <p class="page-footer-hint">Admin — workload from live application data (ACCEPTED = assigned)</p>
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/ta-profiles-list.js"></script>
+    <script src="../js/admin-workload.js"></script>
     <script>
       document.getElementById("logout-btn").addEventListener("click", function (e) {
         e.preventDefault();

@@ -34,6 +34,7 @@ import com.example.web.repo.CvRepository;
 import com.example.web.repo.JobRepository;
 import com.example.web.repo.UserRepository;
 import com.example.web.service.AiMatchingService;
+import com.example.web.service.WorkloadService;
 import com.example.web.util.AuthTokenUtil;
 import com.example.web.util.HttpJson;
 import com.example.web.util.JsonPaths;
@@ -399,7 +400,7 @@ public class ApiServlet extends HttpServlet {
             if (!Roles.ADMIN.equals(admin.role)) {
                 throw new SecurityException("Admin only");
             }
-            HttpJson.write(resp, 200, Map.of("rows", buildWorkloadRows(ur, jr, ar)));
+            HttpJson.write(resp, 200, WorkloadService.buildReport(ur, jr, ar));
             return;
         }
 
@@ -408,7 +409,7 @@ public class ApiServlet extends HttpServlet {
             if (!Roles.ADMIN.equals(admin.role)) {
                 throw new SecurityException("Admin only");
             }
-            String csv = toCsv(buildWorkloadRows(ur, jr, ar));
+            String csv = WorkloadService.toCsv(WorkloadService.buildReport(ur, jr, ar));
             resp.setStatus(200);
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/csv;charset=UTF-8");
@@ -498,46 +499,6 @@ public class ApiServlet extends HttpServlet {
             }
         }
         throw new IllegalStateException("Failed to generate unique CV file name");
-    }
-
-    private static List<Map<String, Object>> buildWorkloadRows(UserRepository ur, JobRepository jr, ApplicationRepository ar)
-            throws IOException {
-        List<Map<String, Object>> rows = new ArrayList<>();
-        for (User u : ur.load().users) {
-            if (!Roles.TA.equals(u.role)) {
-                continue;
-            }
-            List<String> titles = new ArrayList<>();
-            for (ApplicationRecord a : ar.findByApplicant(u.id)) {
-                if (ApplicationStatuses.ACCEPTED.equals(a.status)) {
-                    jr.findById(a.jobId).ifPresent(j -> titles.add(j.title));
-                }
-            }
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put("taName", u.name);
-            row.put("assignedPositions", titles.isEmpty() ? "None" : String.join(", ", titles));
-            rows.add(row);
-        }
-        return rows;
-    }
-
-    private static String toCsv(List<Map<String, Object>> rows) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("TA Name,Assigned Positions\n");
-        for (Map<String, Object> r : rows) {
-            sb.append(escapeCsv(String.valueOf(r.get("taName"))))
-                    .append(',')
-                    .append(escapeCsv(String.valueOf(r.get("assignedPositions"))))
-                    .append('\n');
-        }
-        return sb.toString();
-    }
-
-    private static String escapeCsv(String s) {
-        if (s.contains(",") || s.contains("\"") || s.contains("\n")) {
-            return '"' + s.replace("\"", "\"\"") + '"';
-        }
-        return s;
     }
 
     private static Map<String, Object> jobToPublicMap(Job j, UserRepository ur) throws IOException {

@@ -1,5 +1,5 @@
 {
-  "nextUserId": 18,
+  "nextUserId": 20,
   "users": [
     {
       "id": 1,
@@ -247,6 +247,32 @@
       "educationBackground": "",
       "technicalAbility": "",
       "contact": "yanhua@bupt.edu.cn"
+    },
+    {
+      "id": 18,
+      "username": "Qingrong",
+      "password": "qingrong1",
+      "passwordHash": "$2a$10$QijkR7qIefbHEaIbCVuf4enp1T7pJ5tl5VfkqfxIJH49ALvZedjq2",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "Qingrong",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "qingrong@bupt.edu.cn"
+    },
+    {
+      "id": 19,
+      "username": "ziyang",
+      "password": "ziyang1",
+      "passwordHash": "$2a$10$IRi3hno8/TXTKE5LSBL3uuei6wZDioMLmiK.HMMYvQ9S9sHA25UCm",
+      "role": "ADMIN",
+      "qmNumber": "",
+      "name": "ziyang",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "ziyang@bupt.edu.cn"
     }
   ]
 }
