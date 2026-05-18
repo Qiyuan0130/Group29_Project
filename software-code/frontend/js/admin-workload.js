@@ -49,7 +49,7 @@
     if (!rows || !rows.length) {
       var tr0 = document.createElement("tr");
       var td0 = document.createElement("td");
-      td0.colSpan = 8;
+      td0.colSpan = 7;
       td0.textContent = "No TA accounts yet.";
       tr0.appendChild(td0);
       tbody.appendChild(tr0);
@@ -60,7 +60,6 @@
         rowCells([
           textOrDash(r.taName),
           textOrDash(r.username),
-          textOrDash(r.qmNumber),
           r.acceptedJobCount != null ? r.acceptedJobCount : 0,
           r.pendingApplicationCount != null ? r.pendingApplicationCount : 0,
           textOrDash(r.courses),
@@ -116,7 +115,7 @@
           tbody.innerHTML = "";
           var trE = document.createElement("tr");
           var tdE = document.createElement("td");
-          tdE.colSpan = tbody.id === "admin-balance-body" ? 3 : 8;
+          tdE.colSpan = tbody.id === "admin-balance-body" ? 3 : 7;
           tdE.textContent = "Failed to load: " + msg;
           trE.appendChild(tdE);
           tbody.appendChild(trE);

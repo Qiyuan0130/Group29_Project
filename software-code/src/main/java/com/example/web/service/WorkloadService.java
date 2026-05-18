@@ -147,14 +147,13 @@ public final class WorkloadService {
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> rows = (List<Map<String, Object>>) report.get("rows");
         StringBuilder sb = new StringBuilder();
-        sb.append("TA Name,Login,QM Number,Accepted Jobs,Pending Apps,Courses,Assigned Positions,Weekly Workload,Recommendation\n");
+        sb.append("TA Name,Login,Accepted Jobs,Pending Apps,Courses,Assigned Positions,Weekly Workload,Recommendation\n");
         if (rows == null) {
             return sb.toString();
         }
         for (Map<String, Object> r : rows) {
             sb.append(escapeCsv(String.valueOf(r.get("taName")))).append(',')
                     .append(escapeCsv(String.valueOf(r.get("username")))).append(',')
-                    .append(escapeCsv(String.valueOf(r.get("qmNumber")))).append(',')
                     .append(r.get("acceptedJobCount")).append(',')
                     .append(r.get("pendingApplicationCount")).append(',')
                     .append(escapeCsv(String.valueOf(r.get("courses")))).append(',')
