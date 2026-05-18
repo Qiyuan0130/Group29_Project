@@ -159,5 +159,17 @@
     taProfiles: function () {
       return request("GET", "ta-profiles?_=" + Date.now(), null);
     },
+    adminWorkload: function () {
+      return request("GET", "admin/workload?_=" + Date.now(), null);
+    },
+    adminWorkloadCsvUrl: function () {
+      return apiUrl("admin/workload.csv?_=" + Date.now());
+    },
+    adminWorkloadLlmBalance: function () {
+      return request("POST", "admin/workload/llm-balance", {});
+    },
+    moWorkloadLlmBalance: function () {
+      return request("POST", "mo/workload/llm-balance", {});
+    },
   };
 })(typeof window !== "undefined" ? window : this);

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Workload Balance (MO) — TA Recruitment</title>
+    <link rel="stylesheet" href="../css/main.css" />
+  </head>
+  <body>
+    <header class="sys-header">
+      <div class="sys-header__inner">
+        <span class="sys-title">BUPT International School TA Recruitment System</span>
+        <div class="sys-header__actions">
+          <a class="btn btn-secondary" href="dashboard.html">Back to MO Dashboard</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard__main" style="max-width: 1100px; margin: 0 auto; padding: 1.5rem">
+      <h2 class="dashboard__title">AI Workload Balance (MO)</h2>
+      <p style="color: var(--muted); margin: 0 0 1rem">
+        LLM reviews all TAs by total weekly hours from <strong>accepted</strong> positions and suggests rebalancing before you approve more applications.
+      </p>
+      <div class="panel">
+        <div class="form-actions" style="margin-bottom: 1rem; justify-content: flex-start">
+          <button type="button" class="btn btn-accent" id="mo-llm-balance-btn">Run LLM Workload Analysis</button>
+        </div>
+        <p id="mo-llm-status" style="margin: 0 0 0.75rem; color: var(--muted); font-size: 0.9rem"></p>
+        <p id="mo-llm-team-advice" style="margin: 0 0 1rem; font-size: 0.95rem"></p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>TA Name</th>
+                <th>Weekly Hours</th>
+                <th>Reasonable?</th>
+                <th>Reason</th>
+                <th>Adjustment</th>
+              </tr>
+            </thead>
+            <tbody id="mo-balance-llm-body">
+              <tr>
+                <td colspan="5">Click the button above to start.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/mo-workload-llm.js"></script>
+  </body>
+</html>
