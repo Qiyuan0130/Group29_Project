@@ -88,7 +88,7 @@
           textOrDash(r.taName),
           r.weeklyHoursTotal != null ? r.weeklyHoursTotal + " h/wk" : "0 h/wk",
           r.acceptedJobCount != null ? r.acceptedJobCount : 0,
-          textOrDash(r.recommendation),
+          textOrDash(r.assignedPositions),
         ])
       );
     });

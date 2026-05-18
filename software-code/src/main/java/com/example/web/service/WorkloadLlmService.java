@@ -39,7 +39,7 @@ public final class WorkloadLlmService {
               ],
               "teamAdjustment": string
             }
-            Write reason, adjustment, and teamAdjustment in concise Chinese (1-2 sentences each for per-TA fields).
+            Write reason, adjustment, and teamAdjustment in concise English (1-2 sentences each for per-TA fields).
             """;
 
     private WorkloadLlmService() {
