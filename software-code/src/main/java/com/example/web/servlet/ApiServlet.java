@@ -322,9 +322,20 @@ public class ApiServlet extends HttpServlet {
             if (!u.id.equals(job.organizerId)) {
                 throw new SecurityException("Not your job");
             }
-            boolean accept = Boolean.TRUE.equals(body.accept);
-            ar.updateStatus(appId, accept ? ApplicationStatuses.ACCEPTED : ApplicationStatuses.REJECTED);
-            HttpJson.write(resp, 200, Map.of("ok", true, "status", accept ? ApplicationStatuses.ACCEPTED : ApplicationStatuses.REJECTED));
+            String status = ApplicationStatuses.normalize(body.status);
+            if (status == null && body.accept != null) {
+                status = Boolean.TRUE.equals(body.accept)
+                        ? ApplicationStatuses.ACCEPTED
+                        : ApplicationStatuses.REJECTED;
+            }
+            if (status == null) {
+                throw new IllegalArgumentException("status must be ACCEPTED or REJECTED");
+            }
+            if (ApplicationStatuses.PENDING.equals(status)) {
+                throw new IllegalArgumentException("Cannot set application back to pending");
+            }
+            ar.updateStatus(appId, status);
+            HttpJson.write(resp, 200, Map.of("ok", true, "status", status));
             return;
         }
 
@@ -625,20 +636,19 @@ public class ApiServlet extends HttpServlet {
         }
     }
 
-    /** CV attached to the application, or the applicant's first upload for legacy applications. */
+    /** CV on the application, or the applicant's latest upload when cvId is missing or stale. */
     private static Optional<CvRecord> resolveCvForApplication(ApplicationRecord a, CvRepository cr, long applicantId)
             throws IOException {
         if (a.cvId != null) {
             Optional<CvRecord> opt = cr.findById(a.cvId);
-            if (opt.isEmpty()) {
-                return Optional.empty();
+            if (opt.isPresent()) {
+                CvRecord c = opt.get();
+                if (c.userId != null && c.userId.equals(applicantId)) {
+                    return opt;
+                }
             }
-            CvRecord c = opt.get();
-            if (c.userId == null || c.userId != applicantId) {
-                return Optional.empty();
-            }
-            return opt;
         }
-        return cr.findByUser(applicantId).stream().findFirst();
+        return cr.findByUser(applicantId).stream()
+                .max(java.util.Comparator.comparing(c -> c.uploadedAt == null ? "" : c.uploadedAt));
     }
 }

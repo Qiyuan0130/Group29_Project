@@ -145,10 +145,14 @@
     aiMatchMo: function (jobId) {
       return request("POST", "ai/match-mo", { jobId: jobId });
     },
-    moApplicationDecision: function (applicationId, accept) {
-      return request("POST", "mo/applications/" + encodeURIComponent(applicationId) + "/decision", {
-        accept: !!accept,
-      });
+    moApplicationDecision: function (applicationId, statusOrAccept) {
+      var body = {};
+      if (typeof statusOrAccept === "boolean") {
+        body.accept = statusOrAccept;
+      } else {
+        body.status = String(statusOrAccept || "").toUpperCase();
+      }
+      return request("POST", "mo/applications/" + encodeURIComponent(applicationId) + "/decision", body);
     },
     moApplicationCvViewUrl: function (applicationId) {
       return apiUrl("mo/applications/" + encodeURIComponent(applicationId) + "/cv/view");
@@ -170,9 +174,6 @@
     },
     adminWorkloadLlmBalance: function () {
       return request("POST", "admin/workload/llm-balance", {});
-    },
-    moWorkloadLlmBalance: function () {
-      return request("POST", "mo/workload/llm-balance", {});
     },
   };
 })(typeof window !== "undefined" ? window : this);

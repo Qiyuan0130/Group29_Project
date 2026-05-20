@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MO Dashboard — TA Recruitment</title>
     <link rel="stylesheet" href="../css/main.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="../vendor/flatpickr/flatpickr.min.css" />
   </head>
   <body>
     <header class="sys-header">
@@ -22,7 +22,6 @@
         <a class="nav-link" href="my-jobs.html">My Posted Jobs</a>
         <a class="nav-link" href="#" data-mo-section="applications">Select Applications</a>
         <a class="nav-link" href="#" data-mo-section="ai">Match Applications With AI</a>
-        <a class="nav-link" href="workload-balance.html">AI Workload Balance (LLM)</a>
       </aside>
 
       <div class="dashboard__main">
@@ -57,7 +56,10 @@
             </div>
             <div class="form-group">
               <label for="mo-job-deadline">Deadline</label>
-              <input id="mo-job-deadline" class="form-control" name="deadline" type="text" placeholder="YYYY-MM-DD" autocomplete="off" />
+              <input id="mo-job-deadline" class="form-control" name="deadline" type="text" placeholder="Select date — e.g. 30 May 2026" autocomplete="off" lang="en" />
+              <p class="subtitle" style="margin: 0.35rem 0 0; color: var(--muted); font-size: 0.85rem">
+                Click to open the English calendar
+              </p>
             </div>
             <button type="submit" id="mo-post-submit-btn" class="btn btn-primary">Submit</button>
           </form>
@@ -69,7 +71,10 @@
           <div class="toolbar" style="margin-bottom: 1rem">
             <div class="form-group">
               <label for="mo-app-job-select">Job</label>
-              <select id="mo-app-job-select" class="form-control" style="min-width: 260px"></select>
+              <select id="mo-app-job-select" class="form-control" style="min-width: 260px">
+                <option value="">Loading jobs...</option>
+              </select>
+              <p id="mo-app-job-hint" class="subtitle" style="margin: 0.35rem 0 0"></p>
             </div>
           </div>
           <div class="table-wrap">
@@ -113,7 +118,8 @@
     </div>
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="../vendor/flatpickr/flatpickr.min.js"></script>
+    <script src="../js/mo-deadline-picker.js"></script>
     <script>
       function createMoJob(payload) {
         if (window.taApi && typeof window.taApi.jobsCreate === "function") {
@@ -202,8 +208,28 @@
         return d.getFullYear() === y && d.getMonth() === m - 1 && d.getDate() === day;
       }
 
+      function normalizeMoAppStatus(status) {
+        var s = String(status || "PENDING").toUpperCase();
+        if (s === "ACCEPT" || s === "ACCEPTED_BY_MO") return "ACCEPTED";
+        if (s === "REJECT" || s === "REJECTED_BY_MO") return "REJECTED";
+        if (s === "ACCEPTED" || s === "REJECTED" || s === "PENDING") return s;
+        return "PENDING";
+      }
+
+      function moAppStatusCellHtml(status) {
+        var cur = normalizeMoAppStatus(status);
+        var label = cur === "ACCEPTED" ? "Accepted" : cur === "REJECTED" ? "Rejected" : "Pending";
+        return (
+          '<span class="' +
+          getStatusPillClass(cur) +
+          '">' +
+          escHtml(label) +
+          "</span>"
+        );
+      }
+
       function getStatusPillClass(status) {
-        var s = String(status || "").toUpperCase();
+        var s = normalizeMoAppStatus(status);
         if (s === "ACCEPTED") return "status-pill status-approved";
         if (s === "REJECTED") return "status-pill status-rejected";
         return "status-pill status-pending";
@@ -223,7 +249,9 @@
             '<td style="text-align:center;vertical-align:middle">' + escHtml(r && r.applicantName ? r.applicantName : "-") + "</td>" +
             '<td style="text-align:center;vertical-align:middle">' + escHtml(r && r.major ? r.major : "-") + "</td>" +
             '<td style="text-align:center;vertical-align:middle">' + escHtml(r && r.technicalAbility ? r.technicalAbility : "-") + "</td>" +
-            '<td style="text-align:center;vertical-align:middle"><span class="' + getStatusPillClass(r && r.status ? r.status : "UPLOADED") + '">' + escHtml(r && r.status ? r.status : "UPLOADED") + "</span></td>" +
+            '<td style="text-align:center;vertical-align:middle">' +
+            moAppStatusCellHtml(r && r.status ? r.status : "PENDING") +
+            "</td>" +
             "</tr>"
           );
         }).join("");
@@ -259,8 +287,8 @@
         document.body.style.overflow = "";
       }
 
-      function applicationDetailHref(jobId, appId) {
-        return "application-detail.html?jobId=" + encodeURIComponent(String(jobId || "")) +
+      function moApplicationReviewHref(jobId, appId) {
+        return "mo-application-review.html?jobId=" + encodeURIComponent(String(jobId || "")) +
           "&appId=" + encodeURIComponent(String(appId || ""));
       }
 
@@ -281,23 +309,38 @@
           });
       }
 
+      function sameUserId(a, b) {
+        return String(a == null ? "" : a) === String(b == null ? "" : b);
+      }
+
+      function setMoAppJobHint(text) {
+        var hint = document.getElementById("mo-app-job-hint");
+        if (hint) hint.textContent = text || "";
+      }
+
       function loadMoSelectApplicationsData() {
         var select = document.getElementById("mo-app-job-select");
         if (!select) return;
+        select.innerHTML = '<option value="">Loading jobs...</option>';
+        setMoAppJobHint("");
         window.taApi
           .jobsList()
           .then(function (jobs) {
             var list = Array.isArray(jobs) ? jobs : [];
             return window.taApi.me().then(function (me) {
-              var myId = me && me.id != null ? String(me.id) : "";
+              var myId = me && me.id != null ? me.id : null;
               moOwnJobs = list.filter(function (j) {
-                return String(j && j.organizerId != null ? j.organizerId : "") === myId;
+                return sameUserId(j && j.organizerId, myId);
               });
               if (!moOwnJobs.length) {
-                select.innerHTML = '<option value="">No posted jobs</option>';
+                select.innerHTML = '<option value="">— No posted jobs —</option>';
+                setMoAppJobHint(
+                  "This list only shows jobs you posted. Use Post Job to create one, or sign in as demo MO (e.g. Dr. James Smith / j.smith@bupt.edu, password 123456a)."
+                );
                 renderMoApplicationsTable([]);
                 return;
               }
+              setMoAppJobHint("Select one of your posted jobs to view applications.");
               select.innerHTML = moOwnJobs.map(function (j) {
                 return '<option value="' + escHtml(j.id) + '">' + escHtml(j.title || ("Job #" + j.id)) + "</option>";
               }).join("");
@@ -316,10 +359,13 @@
           })
           .catch(function (err) {
             select.innerHTML = '<option value="">Load failed</option>';
+            setMoAppJobHint(err.message || "Could not load jobs. Please log in again.");
             renderMoApplicationsTable([]);
             alert(err.message || "Failed to load jobs.");
           });
       }
+
+      window.loadMoSelectApplicationsData = loadMoSelectApplicationsData;
 
       document.getElementById("mo-add-tag-btn").addEventListener("click", function () {
         var input = document.getElementById("mo-tag-input");
@@ -417,21 +463,16 @@
 
       document.getElementById("mo-applications-body").addEventListener("click", function (e) {
         var appRow = e.target.closest("[data-open-application]");
-        if (appRow && !e.target.closest("[data-app-action]") && !e.target.closest("a")) {
+        if (appRow && !e.target.closest("a")) {
           var appIdForRow = appRow.getAttribute("data-open-application");
           var currentJobId = document.getElementById("mo-app-job-select").value;
-          location.href = applicationDetailHref(currentJobId, appIdForRow);
-          return;
+          location.href = moApplicationReviewHref(currentJobId, appIdForRow);
         }
       });
 
       loadMoSelectApplicationsData();
-      if (window.flatpickr) {
-        window.flatpickr("#mo-job-deadline", {
-          dateFormat: "Y-m-d",
-          allowInput: true,
-          minDate: "today",
-        });
+      if (window.moDeadlinePicker) {
+        window.moDeadlinePicker.initDeadlinePicker("#mo-job-deadline");
       }
 
       document.getElementById("mo-ta-profile-modal-close").addEventListener("click", closeMoTaProfileModal);
@@ -441,109 +482,5 @@
         }
       });
     </script>
-        <!-- ===== ADDED: MO Application Review Link Enhancement ===== -->
-    <script>
-    (function() {
-      "use strict";
-      
-      // ADDED: Modify application table rows to link to review page instead of detail
-      var originalRenderMoApplicationsTable = window.renderMoApplicationsTable;
-      
-      if (originalRenderMoApplicationsTable) {
-        window.renderMoApplicationsTable = function(rows) {
-          // Call original function first
-          originalRenderMoApplicationsTable(rows);
-          
-          // Then enhance the rows with review links
-          var body = document.getElementById("mo-applications-body");
-          if (!body) return;
-          
-          // Update click handler to go to review page instead of detail
-          body.querySelectorAll("tr[data-open-application]").forEach(function(row) {
-            var appId = row.getAttribute("data-open-application");
-            var currentJobId = document.getElementById("mo-app-job-select").value;
-            
-            // Change cursor to indicate clickable
-            row.style.cursor = "pointer";
-            
-            // Add review action button
-            var actionCell = row.querySelector("td:last-child");
-            if (actionCell && !actionCell.querySelector(".review-btn")) {
-              var reviewBtn = document.createElement("a");
-              reviewBtn.className = "btn btn-sm btn-accent review-btn";
-              reviewBtn.href = "mo-application-review.html?jobId=" + encodeURIComponent(currentJobId) + 
-                               "&appId=" + encodeURIComponent(appId);
-              reviewBtn.textContent = "Review";
-              reviewBtn.style.marginLeft = "0.5rem";
-              actionCell.appendChild(reviewBtn);
-            }
-          });
-        };
-      }
-      
-      // ADDED: Helper function to get status pill with review indicator
-      window.getStatusPillWithReview = function(status, reviewNote) {
-        var pillClass = "status-pill status-pending";
-        var label = status || "UPLOADED";
-        
-        if (status === "ACCEPTED" || status === "ACCEPTED_BY_MO") {
-          pillClass = "status-pill status-approved";
-        } else if (status === "REJECTED" || status === "REJECTED_BY_MO") {
-          pillClass = "status-pill status-rejected";
-        }
-        
-        var html = '<span class="' + pillClass + '">' + escHtml(label) + '</span>';
-        
-        if (reviewNote) {
-          html += '<span class="review-indicator" title="' + escHtml(reviewNote) + '">📝</span>';
-        }
-        
-        return html;
-      };
-      
-      function escHtml(s) {
-        if (s == null) return "";
-        var d = document.createElement("div");
-        d.textContent = s;
-        return d.innerHTML;
-      }
-    })();
-    </script>
-    
-    <!-- ADDED: Quick review modal for batch operations -->
-    <div id="mo-quick-review-modal" class="modal" hidden role="dialog" aria-modal="true">
-      <div class="modal__card" style="max-width: 600px">
-        <h2 class="modal__title">Quick Review</h2>
-        <p class="modal__text">Review multiple applications at once</p>
-        <div id="quick-review-list" style="max-height: 400px; overflow-y: auto; margin: 1rem 0;"></div>
-        <div class="modal__actions">
-          <button type="button" class="btn btn-secondary" id="quick-review-cancel">Cancel</button>
-          <button type="button" class="btn btn-primary" id="quick-review-submit">Submit Reviews</button>
-        </div>
-      </div>
-    </div>
-    
-    <style>
-      /* ADDED: Review button styles */
-      .btn-accent {
-        background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
-        color: white;
-        border: none;
-      }
-      .btn-accent:hover {
-        background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
-      }
-      .review-indicator {
-        margin-left: 0.35rem;
-        cursor: help;
-      }
-      .review-btn {
-        animation: fadeIn 0.3s ease;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-5px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    </style>
   </body>
 </html>

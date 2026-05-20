@@ -193,10 +193,10 @@
         <!-- ADDED: Review Actions -->
         <div id="review-actions" class="review-actions">
           <button type="button" id="btn-approve" class="btn btn-approve">
-            ✅ Approve Application
+            Approve
           </button>
           <button type="button" id="btn-reject" class="btn btn-reject">
-            ❌ Reject Application
+            Reject
           </button>
         </div>
         
@@ -272,19 +272,18 @@
           if (status === 'ACCEPTED' || status === 'ACCEPTED_BY_MO') {
             badge.classList.add("status-accepted");
             icon.textContent = "✅";
-            text.textContent = "Approved";
-            if (actions) actions.style.display = "none";
+            text.textContent = "Accepted";
           } else if (status === 'REJECTED' || status === 'REJECTED_BY_MO') {
             badge.classList.add("status-rejected");
             icon.textContent = "❌";
             text.textContent = "Rejected";
-            if (actions) actions.style.display = "none";
           } else {
             badge.classList.add("status-pending");
             icon.textContent = "⏳";
-            text.textContent = "Pending Review";
-            if (actions) actions.style.display = "flex";
+            text.textContent = "Pending";
           }
+          var isPending = status === "PENDING" || status === "UPLOADED" || !status;
+          if (actions) actions.style.display = isPending ? "flex" : "none";
           
           if (reviewNote && noteBox) {
             noteBox.style.display = "block";
@@ -357,47 +356,26 @@
           cancelBtn.addEventListener("click", closeModal);
         }
 
-        function submitReview(decision) {
+        function submitReview(accept) {
           if (!currentAppId) return;
-          
+
           var btnApprove = document.getElementById("btn-approve");
           var btnReject = document.getElementById("btn-reject");
-          
+
           btnApprove.disabled = true;
           btnReject.disabled = true;
-          
-          // Use the new API
-          var apiFn = window.moReviewApi && window.moReviewApi.reviewApplication;
-          if (!apiFn) {
-            // Fallback: try to use generic api
-            apiFn = function(appId, decision) {
-              return fetch(window.taApi.url ? window.taApi.url("applications/" + appId + "/review") : "../api/applications/" + appId + "/review", {
-                method: "POST",
-                credentials: "same-origin",
-                headers: { "Content-Type": "application/json;charset=UTF-8" },
-                body: JSON.stringify({ decision: decision })
-              }).then(function(res) {
-                var ct = res.headers.get("Content-Type") || "";
-                var isJson = ct.indexOf("application/json") !== -1;
-                return (isJson ? res.json() : res.text()).then(function(data) {
-                  if (!res.ok) throw new Error(data && data.error ? data.error : "Review failed");
-                  return data;
-                });
-              });
-            };
-          }
-          
-          apiFn(currentAppId, decision)
-            .then(function(result) {
-              showToast("Application " + (decision === 'ACCEPT' ? "approved" : "rejected") + " successfully!", "success");
-              updateStatusUI(
-                decision === 'ACCEPT' ? 'ACCEPTED' : 'REJECTED',
-                result.reviewNote || (decision === 'ACCEPT' ? "Application approved by MO" : "Application rejected by MO"),
-                result.reviewedAt || new Date().toISOString()
-              );
+
+          window.taApi
+            .moApplicationDecision(currentAppId, accept)
+            .then(function (result) {
+              var saved = (result && result.status) || (accept ? "ACCEPTED" : "REJECTED");
+              showToast("Application " + (accept ? "approved" : "rejected") + " successfully!", "success");
+              updateStatusUI(saved, "", "");
             })
-            .catch(function(err) {
-              showToast("Failed to submit review: " + err.message, "error");
+            .catch(function (err) {
+              showToast("Failed to update status: " + err.message, "error");
+            })
+            .finally(function () {
               btnApprove.disabled = false;
               btnReject.disabled = false;
             });
@@ -434,16 +412,16 @@
         document.getElementById("btn-approve").addEventListener("click", function() {
           openConfirmModal(
             "Approve Application",
-            "Are you sure you want to approve this application? The TA will be notified of your decision.",
-            function() { submitReview('ACCEPT'); }
+            "Are you sure you want to approve this application?",
+            function() { submitReview(true); }
           );
         });
 
         document.getElementById("btn-reject").addEventListener("click", function() {
           openConfirmModal(
             "Reject Application",
-            "Are you sure you want to reject this application? The TA will be notified of your decision.",
-            function() { submitReview('REJECT'); }
+            "Are you sure you want to reject this application?",
+            function() { submitReview(false); }
           );
         });
 

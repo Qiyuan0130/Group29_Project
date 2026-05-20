@@ -1,148 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin — TA Recruitment</title>
-    <link rel="stylesheet" href="../css/main.css" />
-  </head>
-  <body>
-    <header class="sys-header">
-      <div class="sys-header__inner">
-        <span class="sys-title">Admin: BUPT International School TA Recruitment System</span>
-        <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
-      </div>
-    </header>
 
-    <!-- Admin accounts: register via register.html using key Group29admin -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — TA Recruitment</title>
+  <link rel="stylesheet" href="../css/main.css" />
+</head>
 
-    <div class="dashboard__main" style="max-width: 1100px; margin: 0 auto; padding: 1.5rem">
-      <div class="mo-tabs" style="margin-bottom: 1.25rem">
-        <button type="button" class="btn btn-secondary is-active" data-admin-tab="workload">TA Workload Statistics</button>
-        <button type="button" class="btn btn-secondary" data-admin-tab="balance">AI Workload Balance</button>
-        <button type="button" class="btn btn-secondary" data-admin-tab="ta-profiles">TA Profiles</button>
-      </div>
+<body>
+  <header class="sys-header">
+    <div class="sys-header__inner">
+      <span class="sys-title">Admin: BUPT International School TA Recruitment System</span>
+      <a href="#" id="logout-btn" class="btn btn-secondary" style="font-size: 0.85rem">Logout</a>
+    </div>
+  </header>
 
-      <div data-admin-panel="workload">
-        <h2 class="admin-page-title">TA Workload Statistics</h2>
-        <div class="panel">
-          <p id="admin-workload-summary" style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
-            Loading workload…
-          </p>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>TA Name</th>
-                  <th>Login</th>
-                  <th>Accepted</th>
-                  <th>Pending</th>
-                  <th>Weekly Hours</th>
-                  <th>Courses</th>
-                  <th>Assigned Positions</th>
-                </tr>
-              </thead>
-              <tbody id="admin-workload-body">
-                <tr>
-                  <td colspan="7">Loading…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="form-actions" style="margin-top: 1rem">
-            <button type="button" class="btn btn-secondary" id="admin-workload-refresh">Refresh</button>
-            <button type="button" class="btn btn-accent" id="admin-workload-export">Export to CSV</button>
-          </div>
+  <!-- Admin accounts: register via register.html using key Group29admin -->
+
+  <div class="dashboard__main" style="max-width: 1100px; margin: 0 auto; padding: 1.5rem">
+    <div class="mo-tabs" style="margin-bottom: 1.25rem">
+      <button type="button" class="btn btn-secondary is-active" data-admin-tab="workload">TA Workload
+        Statistics</button>
+      <button type="button" class="btn btn-secondary" data-admin-tab="balance">AI Workload Balance</button>
+      <button type="button" class="btn btn-secondary" data-admin-tab="ta-profiles">TA Profiles</button>
+    </div>
+
+    <div data-admin-panel="workload">
+      <h2 class="admin-page-title">TA Workload Statistics</h2>
+      <div class="panel">
+        <p id="admin-workload-summary" style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
+          Loading workload…
+        </p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>TA Name</th>
+                <th>Login</th>
+                <th>Accepted</th>
+                <th>Pending</th>
+                <th>Weekly Hours</th>
+                <th>Courses</th>
+                <th>Assigned Positions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-workload-body">
+              <tr>
+                <td colspan="7">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <div data-admin-panel="ta-profiles" class="hidden">
-        <h2 class="admin-page-title">TA Profiles</h2>
-        <div class="panel">
-          <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
-            Information entered by TAs on their Profile tab (same as <code>/api/profile</code>).
-          </p>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Login</th>
-                  <th>Name</th>
-                  <th>Major</th>
-                  <th>Technical Ability</th>
-                  <th>Contact</th>
-                </tr>
-              </thead>
-              <tbody id="admin-ta-profiles-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div data-admin-panel="balance" class="hidden">
-        <h2 class="admin-page-title">AI Workload Balance (LLM)</h2>
-        <div class="panel">
-          <p style="margin: 0 0 0.75rem; color: var(--muted); font-size: 0.95rem">
-            Uses weekly hours from accepted positions. Configure API in <code>WEB-INF/app-settings.local.properties</code>.
-          </p>
-          <div class="form-actions" style="margin-bottom: 1rem; justify-content: flex-start">
-            <button type="button" class="btn btn-accent" id="admin-llm-balance-btn">Run LLM Workload Analysis</button>
-          </div>
-          <p id="admin-llm-status" style="margin: 0 0 0.75rem; color: var(--muted); font-size: 0.9rem"></p>
-          <p id="admin-llm-team-advice" style="margin: 0 0 1rem; font-size: 0.95rem"></p>
-          <h3 class="panel__head" style="font-size: 1rem">Per-TA LLM assessment</h3>
-          <div class="table-wrap" style="margin-bottom: 1.25rem">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>TA Name</th>
-                  <th>Weekly Hours</th>
-                  <th>Reasonable?</th>
-                  <th>Reason</th>
-                  <th>Adjustment</th>
-                </tr>
-              </thead>
-              <tbody id="admin-balance-llm-body">
-                <tr>
-                  <td colspan="5">Click &quot;Run LLM Workload Analysis&quot; to start.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <h3 class="panel__head" style="font-size: 1rem">Quick rule-based view</h3>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>TA Name</th>
-                  <th>Weekly Hours</th>
-                  <th>Jobs</th>
-                  <th>Assigned Positions</th>
-                </tr>
-              </thead>
-              <tbody id="admin-balance-rule-body">
-                <tr>
-                  <td colspan="4">Loading…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="form-actions" style="margin-top: 1rem">
+          <button type="button" class="btn btn-secondary" id="admin-workload-refresh">Refresh</button>
+          <button type="button" class="btn btn-accent" id="admin-workload-export">Export to CSV</button>
         </div>
       </div>
     </div>
 
-    <p class="page-footer-hint">Admin — workload from live application data (ACCEPTED = assigned)</p>
-    <script src="../js/api.js"></script>
-    <script src="../js/main.js"></script>
-    <script src="../js/admin-ta-profiles.js"></script>
-    <script src="../js/admin-workload.js"></script>
-    <script>
-      document.getElementById("logout-btn").addEventListener("click", function (e) {
-        e.preventDefault();
-        window.taApi.logout().finally(function () {
-          location.href = "../index.html";
-        });
+    <div data-admin-panel="ta-profiles" class="hidden">
+      <h2 class="admin-page-title">TA Profiles</h2>
+      <div class="panel">
+        <p style="margin: 0 0 1rem; color: var(--muted); font-size: 0.95rem">
+          Information entered by TAs on their Profile tab (same as <code>/api/profile</code>).
+        </p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Login</th>
+                <th>Name</th>
+                <th>Major</th>
+                <th>Technical Ability</th>
+                <th>Contact</th>
+              </tr>
+            </thead>
+            <tbody id="admin-ta-profiles-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div data-admin-panel="balance" class="hidden">
+      <h2 class="admin-page-title">AI Workload Balance (LLM)</h2>
+      <div class="panel">
+        <p style="margin: 0 0 0.75rem; color: var(--muted); font-size: 0.95rem">
+          Uses weekly hours from accepted positions. Configure API in
+          <code>WEB-INF/app-settings.local.properties</code>.
+        </p>
+        <div class="form-actions" style="margin-bottom: 1rem; justify-content: flex-start">
+          <button type="button" class="btn btn-accent" id="admin-llm-balance-btn">Run LLM Workload Analysis</button>
+        </div>
+        <p id="admin-llm-status" style="margin: 0 0 0.75rem; color: var(--muted); font-size: 0.9rem"></p>
+        <p id="admin-llm-team-advice" style="margin: 0 0 1rem; font-size: 0.95rem"></p>
+        <h3 class="panel__head" style="font-size: 1rem">Per-TA LLM assessment</h3>
+        <div class="table-wrap" style="margin-bottom: 1.25rem">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>TA Name</th>
+                <th>Weekly Hours</th>
+                <th>Reasonable?</th>
+                <th>Reason</th>
+                <th>Adjustment</th>
+              </tr>
+            </thead>
+            <tbody id="admin-balance-llm-body">
+              <tr>
+                <td colspan="5">Click &quot;Run LLM Workload Analysis&quot; to start.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="panel__head" style="font-size: 1rem">Quick rule-based view</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>TA Name</th>
+                <th>Weekly Hours</th>
+                <th>Jobs</th>
+                <th>Assigned Positions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-balance-rule-body">
+              <tr>
+                <td colspan="4">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="page-footer-hint">Admin — workload from live application data (ACCEPTED = assigned)</p>
+  <script src="../js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/admin-ta-profiles.js"></script>
+  <script src="../js/admin-workload.js"></script>
+  <script>
+    document.getElementById("logout-btn").addEventListener("click", function (e) {
+      e.preventDefault();
+      window.taApi.logout().finally(function () {
+        location.href = "../index.html";
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
+
 </html>
