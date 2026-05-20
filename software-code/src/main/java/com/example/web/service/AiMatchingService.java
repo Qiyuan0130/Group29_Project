@@ -13,20 +13,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Rule-based, explainable matching (not an LLM) for TA/MO AI demo screens.
+ * Rule-based, explainable matching (not an LLM) for MO AI demo screens.
  */
 public final class AiMatchingService {
 
     private AiMatchingService() {
-    }
-
-    public static List<MatchResultRow> matchJobsForTa(User ta, List<Job> jobs) {
-        List<MatchResultRow> rows = new ArrayList<>();
-        String profile = safe(ta.technicalAbility) + " " + safe(ta.major);
-        for (Job j : jobs) {
-            rows.add(matchOneRow("job-" + j.id, j.title, safe(j.courseName), profile, safe(j.requirements)));
-        }
-        return rows;
     }
 
     public static List<MatchResultRow> matchApplicantsForMo(User applicant, Job job) {

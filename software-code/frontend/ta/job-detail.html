@@ -250,9 +250,38 @@
                   applyBtn.textContent =
                     "Already applied (" + appStatusLabel(myApp.status) + ")";
                 } else {
-                  applyBtn.className = "btn btn-primary";
-                  applyBtn.disabled = true;
-                  applyBtn.textContent = "Application pending review";
+                  applyBtn.className = "btn btn-secondary";
+                  applyBtn.disabled = false;
+                  applyBtn.textContent = "Withdraw application";
+                  applyBtn.onclick = function () {
+                    var appId = myApp.applicationId != null ? myApp.applicationId : myApp.id;
+                    if (appId == null) {
+                      window.taRecruitment.showToast("Cannot withdraw: missing application id.");
+                      return;
+                    }
+                    if (!confirm("Withdraw this application? You can apply again later.")) {
+                      return;
+                    }
+                    applyBtn.disabled = true;
+                    var withdrawFn =
+                      window.taApi && typeof window.taApi.applicationsWithdraw === "function"
+                        ? window.taApi.applicationsWithdraw.bind(window.taApi)
+                        : null;
+                    if (!withdrawFn) {
+                      window.taRecruitment.showToast("Please hard-refresh (Ctrl+F5) to load the latest api.js.");
+                      applyBtn.disabled = false;
+                      return;
+                    }
+                    withdrawFn(appId)
+                      .then(function () {
+                        window.taRecruitment.showToast("Application withdrawn.");
+                        location.reload();
+                      })
+                      .catch(function (e) {
+                        window.taRecruitment.showToast(e.message || "Withdraw failed");
+                        applyBtn.disabled = false;
+                      });
+                  };
                 }
               } else {
                 if (files.length === 0) {
@@ -306,6 +335,48 @@
           }
         }
 
+        function guardJobDetailAccess() {
+          if (!window.taApi || typeof window.taApi.me !== "function") return Promise.resolve();
+          return window.taApi
+            .me()
+            .then(function (user) {
+              var role = String(user && user.role ? user.role : "").toUpperCase();
+              if (role !== "TA") return true;
+              if (
+                window.taRecruitment &&
+                typeof window.taRecruitment.isTaProfileCompleteForJobs === "function" &&
+                !window.taRecruitment.isTaProfileCompleteForJobs(user)
+              ) {
+                showError(
+                  "Complete Name, Major, Education Background, Technical Ability, and Contact in Profile (Save) before viewing or applying for jobs.",
+                  { backHref: "dashboard.html#profile", backLabel: "Go to Profile" }
+                );
+                return false;
+              }
+              return window.taApi.cvList().catch(function () {
+                return { files: [] };
+              }).then(function (cvPayload) {
+                var cvFiles =
+                  cvPayload && cvPayload.files && Array.isArray(cvPayload.files) ? cvPayload.files : [];
+                if (
+                  window.taRecruitment &&
+                  typeof window.taRecruitment.isTaCvReadyForJobs === "function" &&
+                  !window.taRecruitment.isTaCvReadyForJobs(cvFiles)
+                ) {
+                  showError(
+                    "Upload at least one PDF resume in CV Upload before viewing or applying for jobs.",
+                    { backHref: "dashboard.html#cv", backLabel: "Go to CV Upload" }
+                  );
+                  return false;
+                }
+                return true;
+              });
+            })
+            .catch(function () {
+              return true;
+            });
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
           var params = new URLSearchParams(location.search);
           var rawId = params.get("id");
@@ -339,35 +410,25 @@
             return;
           }
 
-          window.taApi
-            .me()
-            .then(function (user) {
-              var role = String(user && user.role ? user.role : "").toUpperCase();
-              if (
-                role === "TA" &&
-                window.taRecruitment &&
-                typeof window.taRecruitment.isTaProfileCompleteForJobs === "function" &&
-                !window.taRecruitment.isTaProfileCompleteForJobs(user)
-              ) {
-                showError(
-                  "Complete Name, Major, Education Background, Technical Ability, and Contact in Profile (Save) before viewing or applying for jobs.",
-                  { backHref: "dashboard.html#profile", backLabel: "Go to Profile" }
-                );
-                return null;
-              }
-              return Promise.all([
-                window.taApi.jobsList(),
-                window.taApi.applicationsMe().catch(function () {
-                  return { applications: [] };
-                }),
-                window.taApi.cvList().catch(function (err) {
-                  console.warn("cv/list:", err);
-                  return { files: [] };
-                }),
-              ]);
-            })
+          guardJobDetailAccess().then(function (allowed) {
+            if (!allowed) return;
+            return window.taApi
+              .me()
+              .then(function () {
+                return Promise.all([
+                  window.taApi.jobsList(),
+                  window.taApi.applicationsMe().catch(function () {
+                    return { applications: [] };
+                  }),
+                  window.taApi.cvList().catch(function (err) {
+                    console.warn("cv/list:", err);
+                    return { files: [] };
+                  }),
+                ]);
+              });
+          })
             .then(function (results) {
-              if (results === null) return;
+              if (!results) return;
               try {
                 var list = Array.isArray(results[0]) ? results[0] : [];
                 var apps = results[1] && results[1].applications ? results[1].applications : [];
@@ -411,8 +472,21 @@
                 );
                 return;
               }
+              if (msg.indexOf("resume") !== -1 || msg.indexOf("CV Upload") !== -1) {
+                showError(
+                  "Upload at least one PDF resume in CV Upload before viewing or applying for jobs.",
+                  { backHref: "dashboard.html#cv", backLabel: "Go to CV Upload" }
+                );
+                return;
+              }
               showError("Failed to load: " + msg);
             });
+
+          window.addEventListener("pageshow", function (ev) {
+            if (ev.persisted) {
+              guardJobDetailAccess();
+            }
+          });
         });
       })();
     </script>
@@ -536,6 +610,11 @@
                   applyBtn.disabled = true;
                   applyBtn.className = "btn btn-secondary detail-apply-btn--final";
                   applyBtn.textContent = "Application " + (st.indexOf("ACCEPT") !== -1 ? "Approved" : "Rejected");
+                  applyBtn.onclick = null;
+                } else if (st === "PENDING") {
+                  applyBtn.className = "btn btn-secondary";
+                  applyBtn.disabled = false;
+                  applyBtn.textContent = "Withdraw application";
                 }
               }
             }

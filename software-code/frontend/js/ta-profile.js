@@ -50,48 +50,106 @@
       );
     }
 
-    function updateTaJobsTabLock(user) {
-      var nav = document.querySelector('.ta-nav-link[data-tab="jobs"]');
-      if (!nav) return;
-      var ok = isProfileCompleteForJobs(user);
-      nav.classList.toggle("ta-nav-link--locked", !ok);
-      nav.setAttribute("aria-disabled", ok ? "false" : "true");
-      nav.title = ok ? "" : window.taRecruitment.taProfileIncompleteToast;
+    function preferredFallbackTab(user, hasCv) {
+      if (!isProfileCompleteForJobs(user)) return "profile";
+      if (!hasCv) return "cv";
+      return "profile";
     }
 
-    function syncTaDashboardJobsHash(user) {
-      if (!document.getElementById("ta-panel-jobs")) return;
-      if (location.hash !== "#jobs") return;
-      if (isProfileCompleteForJobs(user)) {
-        var jobsTab = document.querySelector('.ta-nav-link[data-tab="jobs"]');
-        if (jobsTab) jobsTab.click();
-      } else {
-        if (history.replaceState) {
-          history.replaceState(null, "", "#profile");
-        } else {
-          location.hash = "#profile";
+    function activateDashboardTab(tabName) {
+      var nav = document.querySelector('.ta-nav-link[data-tab="' + tabName + '"]');
+      if (!nav || nav.classList.contains("ta-nav-link--locked")) return;
+      nav.click();
+    }
+
+    function leaveJobsPanelIfLocked(user, hasCv) {
+      var jobsPanel = document.getElementById("ta-panel-jobs");
+      if (!jobsPanel || jobsPanel.classList.contains("hidden")) return;
+      activateDashboardTab(preferredFallbackTab(user, hasCv));
+    }
+
+    function updateTaJobsTabLock(user, hasCv) {
+      var nav = document.querySelector('.ta-nav-link[data-tab="jobs"]');
+      if (!nav || !window.taRecruitment) return;
+      var profileOk = isProfileCompleteForJobs(user);
+      var cvOk = !!hasCv;
+      var ok = profileOk && cvOk;
+      nav.classList.toggle("ta-nav-link--locked", !ok);
+      nav.setAttribute("aria-disabled", ok ? "false" : "true");
+      nav.title = window.taRecruitment.taJobsLockToast(user, hasCv ? [{ id: 1 }] : []);
+      if (!ok) {
+        if (typeof window.taRecruitment.clearTaJobsList === "function") {
+          window.taRecruitment.clearTaJobsList();
         }
-        var profileTab = document.querySelector('.ta-nav-link[data-tab="profile"]');
-        if (profileTab) profileTab.click();
-        if (window.taRecruitment && window.taRecruitment.showToast) {
-          window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
+        leaveJobsPanelIfLocked(user, hasCv);
+      }
+    }
+
+    function applyDashboardHash(user, hasCv) {
+      if (!document.getElementById("ta-panel-profile")) return;
+      var hash = (location.hash || "").toLowerCase();
+      if (hash === "#cv") {
+        activateDashboardTab("cv");
+        return;
+      }
+      if (hash === "#profile") {
+        activateDashboardTab("profile");
+        return;
+      }
+      if (hash === "#status") {
+        activateDashboardTab("status");
+        return;
+      }
+      if (hash === "#jobs") {
+        var ready =
+          window.taRecruitment &&
+          typeof window.taRecruitment.isTaReadyForJobs === "function" &&
+          window.taRecruitment.isTaReadyForJobs(user, hasCv ? [{ id: 1 }] : []);
+        if (ready) {
+          activateDashboardTab("jobs");
+        } else {
+          var fallback = preferredFallbackTab(user, hasCv);
+          if (history.replaceState) {
+            history.replaceState(null, "", "#" + fallback);
+          } else {
+            location.hash = fallback;
+          }
+          activateDashboardTab(fallback);
+          if (window.taRecruitment && window.taRecruitment.showToast) {
+            window.taRecruitment.showToast(
+              window.taRecruitment.taJobsLockToast(user, hasCv ? [{ id: 1 }] : [])
+            );
+          }
         }
       }
     }
 
-    window.taApi
-      .me()
-      .then(function (user) {
-        applyToView(user);
-        applyToForm(user);
-        updateTaJobsTabLock(user);
-        syncTaDashboardJobsHash(user);
-      })
-      .catch(function (err) {
-        if (window.taRecruitment && window.taRecruitment.showToast) {
-          window.taRecruitment.showToast("Could not load profile: " + (err && err.message ? err.message : "error"));
-        }
-      });
+    window.taRecruitment.refreshTaJobsAccess = function () {
+      if (!window.taApi || typeof window.taApi.me !== "function") {
+        return Promise.resolve();
+      }
+      return window.taApi
+        .me()
+        .then(function (user) {
+          applyToView(user);
+          applyToForm(user);
+          return window.taApi.cvList().catch(function () {
+            return { files: [] };
+          }).then(function (res) {
+            var files = res && res.files ? res.files : [];
+            var hasCv = files.length > 0;
+            updateTaJobsTabLock(user, hasCv);
+            applyDashboardHash(user, hasCv);
+            return { user: user, hasCv: hasCv, files: files };
+          });
+        });
+    };
+
+    window.taRecruitment.refreshTaJobsAccess().catch(function (err) {
+      if (window.taRecruitment && window.taRecruitment.showToast) {
+        window.taRecruitment.showToast("Could not load profile: " + (err && err.message ? err.message : "error"));
+      }
+    });
 
     if (form) {
       form.addEventListener("submit", function (e) {
@@ -108,7 +166,9 @@
           .then(function (user) {
             applyToView(user);
             applyToForm(user);
-            updateTaJobsTabLock(user);
+            return window.taRecruitment.refreshTaJobsAccess();
+          })
+          .then(function () {
             window.taRecruitment.showToast("Profile saved");
           })
           .catch(function (err) {

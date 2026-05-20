@@ -113,6 +113,30 @@ public final class ApplicationRepository {
         return r;
     }
 
+    public synchronized void withdraw(long applicationId, long applicantId) throws IOException {
+        ApplicationDatabase db = load();
+        for (int i = 0; i < db.applications.size(); i++) {
+            ApplicationRecord r = db.applications.get(i);
+            if (r.id == null || r.id != applicationId) {
+                continue;
+            }
+            if (r.applicantId == null || !r.applicantId.equals(applicantId)) {
+                throw new SecurityException("Not your application");
+            }
+            String st = ApplicationStatuses.normalize(r.status);
+            if (st == null) {
+                st = r.status == null ? "" : r.status.trim().toUpperCase();
+            }
+            if (!ApplicationStatuses.PENDING.equals(st)) {
+                throw new IllegalArgumentException("Only pending applications can be withdrawn");
+            }
+            db.applications.remove(i);
+            save(db);
+            return;
+        }
+        throw new IllegalArgumentException("Application not found");
+    }
+
     public synchronized void updateStatus(long applicationId, String status) throws IOException {
         String normalized = ApplicationStatuses.normalize(status);
         if (normalized == null || ApplicationStatuses.PENDING.equals(normalized)) {

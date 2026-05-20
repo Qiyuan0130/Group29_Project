@@ -129,19 +129,16 @@ public final class UserRepository {
         return Optional.empty();
     }
 
-    public Optional<User> findByLogin(String login) throws IOException {
-        if (login == null) {
+    /** Login identifier: email only (case-insensitive). */
+    public Optional<User> findByLogin(String email) throws IOException {
+        if (email == null) {
             return Optional.empty();
         }
-        String key = login.trim();
+        String key = email.trim().toLowerCase();
         if (key.isEmpty()) {
             return Optional.empty();
         }
-        Optional<User> byEmail = findByEmail(key);
-        if (byEmail.isPresent()) {
-            return byEmail;
-        }
-        return findByName(key);
+        return findByEmail(key);
     }
 
     public Optional<User> findById(long id) throws IOException {
@@ -169,9 +166,6 @@ public final class UserRepository {
         }
         if (!Roles.TA.equals(cleanRole) && !Roles.MO.equals(cleanRole) && !Roles.ADMIN.equals(cleanRole)) {
             throw new IllegalArgumentException("Invalid role. Allowed values: TA, MO, ADMIN.");
-        }
-        if (findByName(cleanName).isPresent()) {
-            throw new IllegalArgumentException("This name is already registered.");
         }
         if (findByEmail(cleanEmail).isPresent()) {
             throw new IllegalArgumentException("This email is already registered.");

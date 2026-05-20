@@ -91,8 +91,8 @@
 
   global.taApi = {
     url: apiUrl,
-    login: function (login, password) {
-      return request("POST", "auth/login", { login: login, password: password });
+    login: function (email, password) {
+      return request("POST", "auth/login", { email: email, password: password });
     },
     register: function (name, email, password, role, moKey, adminKey) {
       return request("POST", "auth/register", {
@@ -138,6 +138,9 @@
     },
     applicationsApply: function (jobId, cvId) {
       return request("POST", "applications", { jobId: jobId, cvId: cvId });
+    },
+    applicationsWithdraw: function (applicationId) {
+      return request("DELETE", "applications/" + encodeURIComponent(applicationId), null);
     },
     moJobApplications: function (jobId) {
       return request("GET", "mo/jobs/" + encodeURIComponent(jobId) + "/applications", null);

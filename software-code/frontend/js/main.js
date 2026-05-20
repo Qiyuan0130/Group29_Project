@@ -9,6 +9,9 @@
     taProfileIncompleteToast:
       "Please complete Name, Major, Education Background, Technical Ability, and Contact in Profile, then save.",
 
+    taCvRequiredToast:
+      "Please upload at least one PDF resume in CV Upload before viewing or applying for jobs.",
+
     /** Same rule as server: all five fields non-empty (trimmed). */
     isTaProfileCompleteForJobs: function (user) {
       if (!user) return false;
@@ -24,6 +27,24 @@
       );
     },
 
+    isTaCvReadyForJobs: function (cvFiles) {
+      return Array.isArray(cvFiles) && cvFiles.length > 0;
+    },
+
+    isTaReadyForJobs: function (user, cvFiles) {
+      return this.isTaProfileCompleteForJobs(user) && this.isTaCvReadyForJobs(cvFiles);
+    },
+
+    taJobsLockToast: function (user, cvFiles) {
+      if (!this.isTaProfileCompleteForJobs(user)) {
+        return this.taProfileIncompleteToast;
+      }
+      if (!this.isTaCvReadyForJobs(cvFiles)) {
+        return this.taCvRequiredToast;
+      }
+      return "";
+    },
+
     /** TA / MO dashboard tab switching */
     bindTabs: function (navSelector, panelPrefix) {
       var links = document.querySelectorAll(navSelector);
@@ -32,7 +53,10 @@
           e.preventDefault();
           if (link.classList.contains("ta-nav-link--locked")) {
             if (window.taRecruitment && window.taRecruitment.showToast) {
-              window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
+              var msg =
+                (link.title && String(link.title).trim()) ||
+                window.taRecruitment.taProfileIncompleteToast;
+              window.taRecruitment.showToast(msg);
             }
             return;
           }
@@ -128,46 +152,6 @@
           });
           chip.classList.add("is-active");
         });
-      });
-    },
-
-    /**
-     * AI Matching page: one button fills scores/notes for all rows (replace with fetch when backend is ready).
-     */
-    initAiMatchingRunAll: function () {
-      var btn = document.getElementById("ai-run-all-analysis");
-      if (!btn) return;
-
-      function fillRow(row) {
-        var score = row.getAttribute("data-ai-score") || "—";
-        var matched = row.getAttribute("data-ai-matched") || "—";
-        var missing = row.getAttribute("data-ai-missing") || "—";
-        var note = row.getAttribute("data-ai-note") || "";
-
-        var elScore = row.querySelector(".js-ai-cell-score");
-        var elMatched = row.querySelector(".js-ai-cell-matched");
-        var elMissing = row.querySelector(".js-ai-cell-missing");
-        var elNote = row.querySelector(".js-ai-cell-note");
-
-        if (elScore) elScore.innerHTML = '<span class="score">' + score + "</span>";
-        if (elMatched) {
-          if (matched === "—") elMatched.textContent = "—";
-          else elMatched.innerHTML = '<span class="skills-ok">' + matched + "</span>";
-        }
-        if (elMissing) {
-          if (missing === "—") elMissing.textContent = "—";
-          else elMissing.innerHTML = '<span class="skills-bad">' + missing + "</span>";
-        }
-        if (elNote) elNote.textContent = note;
-
-        row.classList.add("is-analyzed");
-      }
-
-      btn.addEventListener("click", function () {
-        document.querySelectorAll(".ai-matching-row").forEach(fillRow);
-        btn.disabled = true;
-        btn.textContent = "Analysis complete";
-        window.taRecruitment.showToast("Analysis generated for all rows.");
       });
     },
 
@@ -294,6 +278,5 @@
     window.taRecruitment.bindMoSectionTabs();
     window.taRecruitment.bindAdminTabs();
     window.taRecruitment.bindJobChips();
-    window.taRecruitment.initAiMatchingRunAll();
   });
 })();
