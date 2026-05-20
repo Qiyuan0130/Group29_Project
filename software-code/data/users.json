@@ -1,5 +1,5 @@
 {
-  "nextUserId": 9,
+  "nextUserId": 11,
   "users": [
     {
       "id": 1,
@@ -49,7 +49,7 @@
       "qmNumber": "QM230001",
       "name": "Alice Wang",
       "major": "Software Engineering",
-      "educationBackground": "BEng Software Engineering, BUPT (Year 3); Dean's List 2024–2025",
+      "educationBackground": "BEng Software Engineering, BUPT (Year 3); Dean\u0027s List 2024–2025",
       "technicalAbility": "Java, Spring Boot, Git, JUnit, technical writing, tutorial leading",
       "contact": "alice.wang@bupt.edu"
     },
@@ -104,6 +104,32 @@
       "educationBackground": "BEng Telecommunications Engineering, BUPT (Year 3); Android student project lead",
       "technicalAbility": "C++, Android, signal processing basics, UI prototyping, student project coaching",
       "contact": "eve.chen@bupt.edu"
+    },
+    {
+      "id": 9,
+      "username": "thea",
+      "password": "123456T",
+      "passwordHash": "$2a$10$MAzwVaokmvHKhUVC63xdteIs2jl0/Yw0jZGXSA/n88DK/R967uWp6",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "thea",
+      "major": "Telecommunications",
+      "educationBackground": "phd",
+      "technicalAbility": "java，ui",
+      "contact": "thea@163.com"
+    },
+    {
+      "id": 10,
+      "username": "thea",
+      "password": "111111T",
+      "passwordHash": "$2a$10$.wRub5AHRHQoBje4xTxOAOT/CyCiPRqAXc2VHUT57Ey7tjRASUDPG",
+      "role": "TA",
+      "qmNumber": "",
+      "name": "thea",
+      "major": "",
+      "educationBackground": "",
+      "technicalAbility": "",
+      "contact": "thea1@163.com"
     }
   ]
 }

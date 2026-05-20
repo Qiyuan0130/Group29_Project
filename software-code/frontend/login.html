@@ -18,11 +18,11 @@
     <div class="auth-wrap">
       <div class="auth-card">
         <h1>Login</h1>
-        <p class="subtitle">Sign in with your name or email.</p>
+        <p class="subtitle">Sign in with your email.</p>
         <form id="form-login" action="#" method="post" autocomplete="on">
           <div class="form-group">
-            <label for="login">Name / Email</label>
-            <input class="form-control" id="login" name="login" type="text" autocomplete="username" required />
+            <label for="email">Email</label>
+            <input class="form-control" id="email" name="email" type="email" autocomplete="username" required />
           </div>
           <div class="form-group">
             <label for="password">Password</label>
@@ -40,10 +40,10 @@
     <script>
       document.getElementById("form-login").addEventListener("submit", function (e) {
         e.preventDefault();
-        var login = document.getElementById("login").value.trim();
+        var email = document.getElementById("email").value.trim();
         var p = document.getElementById("password").value;
         window.taApi
-          .login(login, p)
+          .login(email, p)
           .then(function (data) {
             var r = data.user && data.user.role ? String(data.user.role).trim().toUpperCase() : "";
             if (r === "TA") location.href = "ta/dashboard.html";

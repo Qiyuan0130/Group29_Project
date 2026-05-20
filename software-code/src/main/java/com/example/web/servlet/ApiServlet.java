@@ -90,9 +90,9 @@ public class ApiServlet extends HttpServlet {
 
         if ("/api/auth/login".equals(path) && "POST".equals(method)) {
             LoginRequest body = HttpJson.readBody(req, LoginRequest.class);
-            Optional<User> u = ur.findByLogin(body.login);
+            Optional<User> u = ur.findByLogin(body.email);
             if (u.isEmpty()) {
-                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "User is not registered.");
+                HttpJson.error(resp, HttpServletResponse.SC_UNAUTHORIZED, "Email is not registered.");
                 return;
             }
             if (!ur.verifyPassword(u.get(), body.password)) {
@@ -192,10 +192,17 @@ public class ApiServlet extends HttpServlet {
         }
         if ("/api/jobs".equals(path) && "GET".equals(method)) {
             User u = requireUser(ur, req);
-            if (Roles.TA.equals(u.role) && !isTaProfileCompleteForJobs(u)) {
-                HttpJson.error(resp, HttpServletResponse.SC_FORBIDDEN,
-                        "Complete your profile (Name, Major, Education Background, Technical Ability, Contact) before viewing jobs.");
-                return;
+            if (Roles.TA.equals(u.role)) {
+                if (!isTaProfileCompleteForJobs(u)) {
+                    HttpJson.error(resp, HttpServletResponse.SC_FORBIDDEN,
+                            "Complete your profile (Name, Major, Education Background, Technical Ability, Contact) before viewing jobs.");
+                    return;
+                }
+                if (!hasTaUploadedCv(cr, u.id)) {
+                    HttpJson.error(resp, HttpServletResponse.SC_FORBIDDEN,
+                            "Upload at least one PDF resume in CV Upload before viewing jobs.");
+                    return;
+                }
             }
             List<Map<String, Object>> jobRows = new ArrayList<>();
             for (Job j : jr.findAll()) {
@@ -264,6 +271,9 @@ public class ApiServlet extends HttpServlet {
                 throw new SecurityException(
                         "Complete your profile (Name, Major, Education Background, Technical Ability, Contact) before applying.");
             }
+            if (!hasTaUploadedCv(cr, u.id)) {
+                throw new SecurityException("Upload at least one PDF resume in CV Upload before applying.");
+            }
             ApplyRequest body = HttpJson.readBody(req, ApplyRequest.class);
             if (body.jobId == null) {
                 throw new IllegalArgumentException("jobId required");
@@ -273,6 +283,16 @@ public class ApiServlet extends HttpServlet {
             }
             ApplicationRecord created = ar.apply(body.jobId, u.id, body.cvId, cr);
             HttpJson.write(resp, 200, created);
+            return;
+        }
+        if (path.matches("/api/applications/\\d+") && "DELETE".equals(method)) {
+            User u = requireUser(ur, req);
+            if (!Roles.TA.equals(u.role)) {
+                throw new SecurityException("TA only");
+            }
+            long appId = Long.parseLong(path.replaceFirst("/api/applications/(\\d+)", "$1"));
+            ar.withdraw(appId, u.id);
+            HttpJson.write(resp, 200, Map.of("ok", true));
             return;
         }
 
@@ -448,17 +468,6 @@ public class ApiServlet extends HttpServlet {
             return;
         }
 
-        if ("/api/ai/match-ta".equals(path) && "POST".equals(method)) {
-            User u = requireUser(ur, req);
-            if (!Roles.TA.equals(u.role)) {
-                throw new SecurityException("TA only");
-            }
-            User fresh = ur.findById(u.id).orElse(u);
-            List<MatchResultRow> rows = AiMatchingService.matchJobsForTa(fresh, jr.findAll());
-            HttpJson.write(resp, 200, Map.of("rows", rows));
-            return;
-        }
-
         if ("/api/ai/match-mo".equals(path) && "POST".equals(method)) {
             User u = requireUser(ur, req);
             if (!Roles.MO.equals(u.role)) {
@@ -572,6 +581,10 @@ public class ApiServlet extends HttpServlet {
                 && isNonEmptyField(u.educationBackground)
                 && isNonEmptyField(u.technicalAbility)
                 && isNonEmptyField(u.contact);
+    }
+
+    private static boolean hasTaUploadedCv(CvRepository cr, long userId) throws IOException {
+        return !cr.findByUser(userId).isEmpty();
     }
 
     private static User requireUser(UserRepository ur, HttpServletRequest req) throws IOException {

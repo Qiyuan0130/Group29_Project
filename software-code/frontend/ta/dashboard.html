@@ -27,7 +27,7 @@
           href="#"
           data-tab="jobs"
           aria-disabled="true"
-          title="Please complete Name, Major, Education Background, Technical Ability, and Contact in Profile, then save."
+          title="Complete Profile and upload at least one CV before opening Jobs."
           >Jobs</a
         >
         <a class="nav-link ta-nav-link" href="#" data-tab="status">Status</a>
@@ -36,8 +36,7 @@
       <div class="dashboard__main">
         <h2 class="dashboard__title">TA Dashboard</h2>
 
-        <div class="ta-layout">
-          <div>
+        <div>
             <!-- Profile -->
             <section id="ta-panel-profile" class="panel">
               <h3 class="panel__head">Profile</h3>
@@ -164,25 +163,13 @@
                       <th>Job Title</th>
                       <th>Application Time</th>
                       <th>Application State</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody id="ta-status-body"></tbody>
                 </table>
               </div>
             </section>
-          </div>
-
-          <aside class="ai-widget">
-            <h4>My AI matching recommendation</h4>
-            <p style="margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--muted)">
-              Based on your profile, you are a strong match for <strong>EBU6304 TA</strong> (Java &amp; teamwork).
-            </p>
-            <ul>
-              <li>Highlight communication skills in CV</li>
-              <li>Consider invigilation roles for flexible hours</li>
-            </ul>
-            <a class="btn btn-primary" href="ai-matching.html" style="width: 100%; margin-top: 0.75rem">Open AI Matching Dashboard</a>
-          </aside>
         </div>
       </div>
     </div>
@@ -324,6 +311,11 @@
                   setSelectedFile(null);
                   return loadCvList();
                 })
+                .then(function () {
+                  if (window.taRecruitment.refreshTaJobsAccess) {
+                    return window.taRecruitment.refreshTaJobsAccess();
+                  }
+                })
                 .catch(function (err) {
                   window.taRecruitment.showToast("Upload failed: " + err.message);
                 })
@@ -368,6 +360,11 @@
                   window.taRecruitment.showToast("Deleted");
                   return loadCvList();
                 })
+                .then(function () {
+                  if (window.taRecruitment.refreshTaJobsAccess) {
+                    return window.taRecruitment.refreshTaJobsAccess();
+                  }
+                })
                 .catch(function (err) {
                   window.taRecruitment.showToast("Delete failed: " + err.message);
                 })
@@ -387,6 +384,20 @@
         var allJobs = [];
         /** jobId string -> { status, appliedAt } */
         var myAppsByJobId = {};
+
+        window.taRecruitment.clearTaJobsList = function () {
+          allJobs = [];
+          var root = document.getElementById("jobs-list-root");
+          var empty = document.getElementById("jobs-list-empty");
+          var summary = document.getElementById("jobs-list-summary");
+          if (root) root.innerHTML = "";
+          if (summary) summary.textContent = "";
+          if (empty) {
+            empty.textContent =
+              "Upload at least one PDF resume in CV Upload before browsing jobs.";
+            empty.classList.remove("hidden");
+          }
+        };
 
         function escapeHtml(s) {
           if (s == null) return "";
@@ -647,8 +658,26 @@
           root.querySelectorAll(".job-card--clickable").forEach(function (card) {
             card.addEventListener("click", function (ev) {
               if (ev.target.closest("a")) return;
+              var navJobs = document.querySelector('.ta-nav-link[data-tab="jobs"]');
+              if (navJobs && navJobs.classList.contains("ta-nav-link--locked")) {
+                if (window.taRecruitment && window.taRecruitment.showToast) {
+                  window.taRecruitment.showToast(navJobs.title || window.taRecruitment.taCvRequiredToast);
+                }
+                return;
+              }
               var id = card.getAttribute("data-job-id");
               if (id) location.href = detailHref(id);
+            });
+          });
+          root.querySelectorAll(".job-card a[href*='job-detail']").forEach(function (link) {
+            link.addEventListener("click", function (ev) {
+              var navJobs = document.querySelector('.ta-nav-link[data-tab="jobs"]');
+              if (navJobs && navJobs.classList.contains("ta-nav-link--locked")) {
+                ev.preventDefault();
+                if (window.taRecruitment && window.taRecruitment.showToast) {
+                  window.taRecruitment.showToast(navJobs.title || window.taRecruitment.taCvRequiredToast);
+                }
+              }
             });
           });
         }
@@ -674,7 +703,14 @@
                 return;
               }
               if (msg.indexOf("Complete your profile") !== -1 || msg.indexOf("403") !== -1) {
-                window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
+                if (msg.indexOf("resume") !== -1 || msg.indexOf("CV Upload") !== -1) {
+                  window.taRecruitment.showToast(window.taRecruitment.taCvRequiredToast);
+                } else {
+                  window.taRecruitment.showToast(window.taRecruitment.taProfileIncompleteToast);
+                }
+                if (window.taRecruitment.refreshTaJobsAccess) {
+                  window.taRecruitment.refreshTaJobsAccess();
+                }
                 return;
               }
               window.taRecruitment.showToast("Failed to load jobs: " + msg);
@@ -763,7 +799,7 @@
             .then(function (res) {
               var apps = res && res.applications ? res.applications : [];
               if (!apps.length) {
-                body.innerHTML = '<tr><td colspan="3">No applications yet.</td></tr>';
+                body.innerHTML = '<tr><td colspan="4">No applications yet.</td></tr>';
                 return;
               }
               body.innerHTML = apps
@@ -780,6 +816,15 @@
                   var modHtml = mod ? "<br /><small>" + escapeHtml(mod) + "</small>" : "";
                   var pill = statusPillClass(a.status);
                   var lab = escapeHtml(statusLabel(a.status));
+                  var stUp = String(a.status || "").toUpperCase();
+                  var appId = a.applicationId != null ? a.applicationId : a.id;
+                  var actionsHtml = "—";
+                  if (stUp === "PENDING" && appId != null) {
+                    actionsHtml =
+                      '<button type="button" class="btn btn-secondary btn-sm ta-withdraw-btn" data-app-id="' +
+                      escapeHtml(String(appId)) +
+                      '">Withdraw</button>';
+                  }
                   return (
                     "<tr><td>" +
                     titleInner +
@@ -790,10 +835,38 @@
                     pill +
                     '">' +
                     lab +
-                    "</span></td></tr>"
+                    '</span></td><td class="ta-status-actions">' +
+                    actionsHtml +
+                    "</td></tr>"
                   );
                 })
                 .join("");
+              body.querySelectorAll(".ta-withdraw-btn").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                  var appId = btn.getAttribute("data-app-id");
+                  if (!appId || !window.taApi || typeof window.taApi.applicationsWithdraw !== "function") {
+                    window.taRecruitment.showToast("Cannot withdraw. Please refresh the page.");
+                    return;
+                  }
+                  if (!confirm("Withdraw this application? You can apply again later.")) {
+                    return;
+                  }
+                  btn.disabled = true;
+                  window.taApi
+                    .applicationsWithdraw(appId)
+                    .then(function () {
+                      window.taRecruitment.showToast("Application withdrawn.");
+                      loadTaStatus();
+                      if (typeof window.refreshApplicationStatuses === "function") {
+                        window.refreshApplicationStatuses();
+                      }
+                    })
+                    .catch(function (err) {
+                      btn.disabled = false;
+                      window.taRecruitment.showToast(err.message || "Withdraw failed");
+                    });
+                });
+              });
             })
             .catch(function (err) {
               var msg = err.message || "";
@@ -802,7 +875,7 @@
                 location.href = "../index.html";
                 return;
               }
-              if (body) body.innerHTML = '<tr><td colspan="3">Failed to load status.</td></tr>';
+              if (body) body.innerHTML = '<tr><td colspan="4">Failed to load status.</td></tr>';
               window.taRecruitment.showToast("Failed to load applications: " + msg);
             });
         }
