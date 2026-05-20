@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Edit Posted Job — MO</title>
     <link rel="stylesheet" href="../css/main.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="../vendor/flatpickr/flatpickr.min.css" />
   </head>
   <body>
     <header class="sys-header">
@@ -45,7 +45,10 @@
           </div>
           <div class="form-group">
             <label for="edit-job-deadline">Deadline</label>
-            <input id="edit-job-deadline" class="form-control" type="text" placeholder="YYYY-MM-DD" autocomplete="off" />
+            <input id="edit-job-deadline" class="form-control" type="text" placeholder="Select date — e.g. 30 May 2026" autocomplete="off" lang="en" />
+            <p class="subtitle" style="margin: 0.35rem 0 0; color: var(--muted); font-size: 0.85rem">
+              Click to open the English calendar
+            </p>
           </div>
           <div class="form-actions">
             <button type="submit" id="edit-job-save-btn" class="btn btn-primary">Save</button>
@@ -56,7 +59,8 @@
     </div>
 
     <script src="../js/api.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="../vendor/flatpickr/flatpickr.min.js"></script>
+    <script src="../js/mo-deadline-picker.js"></script>
     <script>
       (function () {
         var params = new URLSearchParams(location.search);
@@ -295,12 +299,8 @@
             });
         });
 
-        if (window.flatpickr) {
-          editDeadlinePicker = window.flatpickr("#edit-job-deadline", {
-            dateFormat: "Y-m-d",
-            allowInput: true,
-            minDate: "today",
-          });
+        if (window.moDeadlinePicker) {
+          editDeadlinePicker = window.moDeadlinePicker.initDeadlinePicker("#edit-job-deadline");
         }
       })();
     </script>

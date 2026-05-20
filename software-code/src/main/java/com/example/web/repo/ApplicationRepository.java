@@ -114,10 +114,14 @@ public final class ApplicationRepository {
     }
 
     public synchronized void updateStatus(long applicationId, String status) throws IOException {
+        String normalized = ApplicationStatuses.normalize(status);
+        if (normalized == null || ApplicationStatuses.PENDING.equals(normalized)) {
+            throw new IllegalArgumentException("status must be ACCEPTED or REJECTED");
+        }
         ApplicationDatabase db = load();
         for (ApplicationRecord r : db.applications) {
             if (r.id != null && r.id == applicationId) {
-                r.status = status;
+                r.status = normalized;
                 save(db);
                 return;
             }

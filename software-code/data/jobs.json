@@ -1,12 +1,17 @@
 {
-  "nextJobId": 11,
+  "nextJobId": 12,
   "jobs": [
     {
       "id": 1,
       "title": "Teaching Assistant — EBU6304 Software Engineering",
       "courseName": "EBU6304 Software Engineering",
       "requirements": "Java, Git, teamwork, communication",
-      "requirementsTags": ["java", "git", "teamwork", "communication"],
+      "requirementsTags": [
+        "java",
+        "git",
+        "teamwork",
+        "communication"
+      ],
       "requirementsNote": "Lead weekly tutorials, mark assignments, and attend module meetings.",
       "workingHours": "5",
       "deadline": "2026-05-30",
@@ -17,7 +22,11 @@
       "title": "Lab Assistant — EBU6304 Software Engineering",
       "courseName": "EBU6304 Software Engineering",
       "requirements": "Java, lab supervision, debugging",
-      "requirementsTags": ["java", "lab", "debugging"],
+      "requirementsTags": [
+        "java",
+        "lab",
+        "debugging"
+      ],
       "requirementsNote": "Supervise programming labs every Thursday 14:00–17:00.",
       "workingHours": "4",
       "deadline": "2026-05-30",
@@ -28,8 +37,12 @@
       "title": "Teaching Assistant — EBU5002 Computer Networks",
       "courseName": "EBU5002 Computer Networks",
       "requirements": "networking, troubleshooting, communication",
-      "requirementsTags": ["networking", "troubleshooting", "communication"],
-      "requirementsNote": "Support lab setup, coursework Q&A, and online forum moderation.",
+      "requirementsTags": [
+        "networking",
+        "troubleshooting",
+        "communication"
+      ],
+      "requirementsNote": "Support lab setup, coursework Q\u0026A, and online forum moderation.",
       "workingHours": "4",
       "deadline": "2026-06-15",
       "organizerId": 2
@@ -39,7 +52,10 @@
       "title": "Exam Invigilation Assistant",
       "courseName": "School-wide Examination",
       "requirements": "punctuality, responsibility",
-      "requirementsTags": ["punctuality", "responsibility"],
+      "requirementsTags": [
+        "punctuality",
+        "responsibility"
+      ],
       "requirementsNote": "Final examination period; roster published two weeks in advance.",
       "workingHours": "3",
       "deadline": "2026-06-20",
@@ -50,7 +66,10 @@
       "title": "Python Lab Support TA",
       "courseName": "EBU4201 Programming Fundamentals",
       "requirements": "python, teaching assistance",
-      "requirementsTags": ["python", "teaching"],
+      "requirementsTags": [
+        "python",
+        "teaching"
+      ],
       "requirementsNote": "Assist first-year students during Python lab sessions.",
       "workingHours": "3",
       "deadline": "2026-05-25",
@@ -61,7 +80,11 @@
       "title": "Capstone Project Mentoring TA",
       "courseName": "EBU6304 Software Engineering",
       "requirements": "project management, java, communication",
-      "requirementsTags": ["project", "java", "communication"],
+      "requirementsTags": [
+        "project",
+        "java",
+        "communication"
+      ],
       "requirementsNote": "Mentor undergraduate teams on agile delivery and demos.",
       "workingHours": "6",
       "deadline": "2026-06-30",
@@ -72,7 +95,11 @@
       "title": "Database Systems Lab TA",
       "courseName": "EBU5103 Database Systems",
       "requirements": "sql, database design, java",
-      "requirementsTags": ["sql", "database", "java"],
+      "requirementsTags": [
+        "sql",
+        "database",
+        "java"
+      ],
       "requirementsNote": "Help students with SQL exercises and schema design workshops.",
       "workingHours": "4",
       "deadline": "2026-06-10",
@@ -83,7 +110,11 @@
       "title": "Mobile Application Workshop TA",
       "courseName": "EBU6201 Mobile Development",
       "requirements": "android, java, ui design",
-      "requirementsTags": ["android", "java", "ui"],
+      "requirementsTags": [
+        "android",
+        "java",
+        "ui"
+      ],
       "requirementsNote": "Coach students on Android studio projects and code reviews.",
       "workingHours": "4",
       "deadline": "2026-06-05",
@@ -94,7 +125,11 @@
       "title": "Research Assistant — Intelligent Systems Lab",
       "courseName": "Research Support (AI Lab)",
       "requirements": "python, machine learning, research writing",
-      "requirementsTags": ["python", "machine learning", "research"],
+      "requirementsTags": [
+        "python",
+        "machine learning",
+        "research"
+      ],
       "requirementsNote": "Literature survey, experiment scripts, and weekly progress reports.",
       "workingHours": "6",
       "deadline": "2026-07-01",
@@ -105,7 +140,11 @@
       "title": "Online Course Forum Moderator",
       "courseName": "EBU6304 Software Engineering",
       "requirements": "communication, organization, english",
-      "requirementsTags": ["communication", "organization", "english"],
+      "requirementsTags": [
+        "communication",
+        "organization",
+        "english"
+      ],
       "requirementsNote": "Monitor discussion boards and summarize FAQs for the module lead.",
       "workingHours": "3",
       "deadline": "2026-05-28",

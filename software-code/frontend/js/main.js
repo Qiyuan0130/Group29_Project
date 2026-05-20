@@ -63,6 +63,9 @@
         document.querySelectorAll("[data-mo-panel]").forEach(function (p) {
           p.classList.toggle("hidden", p.getAttribute("data-mo-panel") !== sec);
         });
+        if (sec === "applications" && typeof window.loadMoSelectApplicationsData === "function") {
+          window.loadMoSelectApplicationsData();
+        }
       }
 
       tabs.forEach(function (btn) {
