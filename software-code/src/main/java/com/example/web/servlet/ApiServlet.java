@@ -113,7 +113,7 @@ public class ApiServlet extends HttpServlet {
             }
             String role = body.role.trim().toUpperCase();
             
-            // MO role: validate registration key
+            // MO role: validate registration key.
             if (Roles.MO.equals(role)) {
                 String moKey = body.moKey == null ? "" : body.moKey.trim();
                 if (!MO_REGISTER_KEY.equals(moKey)) {
@@ -121,7 +121,7 @@ public class ApiServlet extends HttpServlet {
                 }
             }
             
-            // ADMIN role: validate registration key
+            // ADMIN role: validate registration key.
             if (Roles.ADMIN.equals(role)) {
                 String adminKey = body.adminKey == null ? "" : body.adminKey.trim();
                 if (!ADMIN_REGISTER_KEY.equals(adminKey)) {
