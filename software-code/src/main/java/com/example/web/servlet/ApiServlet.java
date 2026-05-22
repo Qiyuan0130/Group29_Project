@@ -573,6 +573,7 @@ public class ApiServlet extends HttpServlet {
 
     /** TA must fill all profile fields used in the dashboard before browsing jobs or applying. */
     private static boolean isTaProfileCompleteForJobs(User u) {
+        // Return false if user object is null
         if (u == null) {
             return false;
         }
