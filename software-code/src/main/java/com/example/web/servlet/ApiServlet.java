@@ -590,6 +590,21 @@ public class ApiServlet extends HttpServlet {
     private static boolean hasTaUploadedCv(CvRepository cr, long userId) throws IOException {
         return !cr.findByUser(userId).isEmpty();
     }
+// ============================================================================
+// User Authentication Helpers
+// ============================================================================
+
+/**
+ * Retrieves the currently authenticated user from the HTTP session.
+ * This method extracts the USER_ID attribute from the session and fetches
+ * the corresponding User object from the repository.
+ *
+ * @param ur  the UserRepository for database lookup
+ * @param req the HttpServletRequest containing the session
+ * @return the authenticated User object
+ * @throws IOException          if a servlet I/O error occurs
+ * @throws SecurityException    if the user is not logged in or session is invalid
+ */
 
     private static User requireUser(UserRepository ur, HttpServletRequest req) throws IOException {
         HttpSession session = req.getSession(false);
