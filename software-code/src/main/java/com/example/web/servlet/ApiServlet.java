@@ -566,13 +566,14 @@ public class ApiServlet extends HttpServlet {
         m.put("organizerName", moName.isEmpty() ? "Unknown" : moName);
         return m;
     }
-
+    // Check if string is valid and not empty after trimming whitespace
     private static boolean isNonEmptyField(String s) {
         return s != null && !s.trim().isEmpty();
     }
 
     /** TA must fill all profile fields used in the dashboard before browsing jobs or applying. */
     private static boolean isTaProfileCompleteForJobs(User u) {
+        // Return false if user object is null
         if (u == null) {
             return false;
         }
@@ -582,10 +583,28 @@ public class ApiServlet extends HttpServlet {
                 && isNonEmptyField(u.technicalAbility)
                 && isNonEmptyField(u.contact);
     }
+// ============================================================================
+// CV Upload Verification
+// ============================================================================
 
     private static boolean hasTaUploadedCv(CvRepository cr, long userId) throws IOException {
         return !cr.findByUser(userId).isEmpty();
     }
+// ============================================================================
+// User Authentication Helpers
+// ============================================================================
+
+/**
+ * Retrieves the currently authenticated user from the HTTP session.
+ * This method extracts the USER_ID attribute from the session and fetches
+ * the corresponding User object from the repository.
+ *
+ * @param ur  the UserRepository for database lookup
+ * @param req the HttpServletRequest containing the session
+ * @return the authenticated User object
+ * @throws IOException          if a servlet I/O error occurs
+ * @throws SecurityException    if the user is not logged in or session is invalid
+ */
 
     private static User requireUser(UserRepository ur, HttpServletRequest req) throws IOException {
         HttpSession session = req.getSession(false);

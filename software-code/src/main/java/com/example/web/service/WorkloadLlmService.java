@@ -1,26 +1,55 @@
 package com.example.web.service;
 
-import com.example.web.util.LlmSettings;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.example.web.repo.ApplicationRepository;
-import com.example.web.repo.JobRepository;
-import com.example.web.repo.UserRepository;
-
-import jakarta.servlet.ServletContext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.web.repo.ApplicationRepository;
+import com.example.web.repo.JobRepository;
+import com.example.web.repo.UserRepository;
+import com.example.web.util.LlmSettings;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import jakarta.servlet.ServletContext;
+
 /**
- * Calls an external LLM to assess whether each TA's weekly workload is reasonable.
+ * Service class for LLM-based TA workload analysis.
+ * Uses AI to evaluate TA workload distribution and provide adjustment recommendations.
  */
 public final class WorkloadLlmService {
 
+    /**
+     * System prompt defining the AI's role and output format.
+     * The LLM acts as an academic TA workload advisor for university recruitment.
+     * 
+     * Key evaluation criteria:
+     * - Judges each TA primarily by total weekly hours from ACCEPTED positions
+     * - Recommended workload limit: 12-15 hours per week per TA
+     * 
+     * Output Schema:
+     * {
+     *   "assessments": [
+     *     {
+     *       "taId": number,           // Unique identifier for the TA
+     *       "taName": string,         // Full name of the TA
+     *       "weeklyHoursTotal": number, // Sum of hours from accepted positions
+     *       "reasonable": boolean,    // Whether workload is within guidelines
+     *       "reason": string,         // Brief explanation of the assessment
+     *       "adjustment": string      // Suggested changes if workload is excessive
+     *     }
+     *   ],
+     *   "teamAdjustment": string      // Overall team-level recommendation
+     * }
+     * 
+     * Output requirements:
+     * - Return ONLY valid JSON (no markdown code fences)
+     * - Write reason, adjustment, and teamAdjustment in concise English (1-2 sentences)
+     */
+    
     private static final String SYSTEM_PROMPT = """
             You are an academic TA workload advisor for a university recruitment system.
             Judge each TA mainly by total weekly hours from ACCEPTED positions (weeklyHoursTotal).
@@ -94,6 +123,7 @@ public final class WorkloadLlmService {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> parseLlmJson(String raw) {
+        // Remove markdown fences (```json ... ```) if present, default to empty string on null
         String json = stripMarkdownFences(raw == null ? "" : raw.trim());
         try {
             JsonObject root = JsonParser.parseString(json).getAsJsonObject();
