@@ -566,7 +566,7 @@ public class ApiServlet extends HttpServlet {
         m.put("organizerName", moName.isEmpty() ? "Unknown" : moName);
         return m;
     }
-
+    // Check if string is valid and not empty after trimming whitespace
     private static boolean isNonEmptyField(String s) {
         return s != null && !s.trim().isEmpty();
     }
