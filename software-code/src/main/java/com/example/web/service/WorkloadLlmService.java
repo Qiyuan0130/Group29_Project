@@ -1,23 +1,24 @@
 package com.example.web.service;
 
-import com.example.web.util.LlmSettings;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.example.web.repo.ApplicationRepository;
-import com.example.web.repo.JobRepository;
-import com.example.web.repo.UserRepository;
-
-import jakarta.servlet.ServletContext;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.example.web.repo.ApplicationRepository;
+import com.example.web.repo.JobRepository;
+import com.example.web.repo.UserRepository;
+import com.example.web.util.LlmSettings;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import jakarta.servlet.ServletContext;
+
 /**
- * Calls an external LLM to assess whether each TA's weekly workload is reasonable.
+ * Service class for LLM-based TA workload analysis.
+ * Uses AI to evaluate TA workload distribution and provide adjustment recommendations.
  */
 public final class WorkloadLlmService {
 
