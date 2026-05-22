@@ -123,6 +123,7 @@ public final class WorkloadLlmService {
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> parseLlmJson(String raw) {
+        // Remove markdown fences (```json ... ```) if present, default to empty string on null
         String json = stripMarkdownFences(raw == null ? "" : raw.trim());
         try {
             JsonObject root = JsonParser.parseString(json).getAsJsonObject();
