@@ -583,6 +583,9 @@ public class ApiServlet extends HttpServlet {
                 && isNonEmptyField(u.technicalAbility)
                 && isNonEmptyField(u.contact);
     }
+// ============================================================================
+// CV Upload Verification
+// ============================================================================
 
     private static boolean hasTaUploadedCv(CvRepository cr, long userId) throws IOException {
         return !cr.findByUser(userId).isEmpty();
