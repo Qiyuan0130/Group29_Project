@@ -22,6 +22,34 @@ import jakarta.servlet.ServletContext;
  */
 public final class WorkloadLlmService {
 
+    /**
+     * System prompt defining the AI's role and output format.
+     * The LLM acts as an academic TA workload advisor for university recruitment.
+     * 
+     * Key evaluation criteria:
+     * - Judges each TA primarily by total weekly hours from ACCEPTED positions
+     * - Recommended workload limit: 12-15 hours per week per TA
+     * 
+     * Output Schema:
+     * {
+     *   "assessments": [
+     *     {
+     *       "taId": number,           // Unique identifier for the TA
+     *       "taName": string,         // Full name of the TA
+     *       "weeklyHoursTotal": number, // Sum of hours from accepted positions
+     *       "reasonable": boolean,    // Whether workload is within guidelines
+     *       "reason": string,         // Brief explanation of the assessment
+     *       "adjustment": string      // Suggested changes if workload is excessive
+     *     }
+     *   ],
+     *   "teamAdjustment": string      // Overall team-level recommendation
+     * }
+     * 
+     * Output requirements:
+     * - Return ONLY valid JSON (no markdown code fences)
+     * - Write reason, adjustment, and teamAdjustment in concise English (1-2 sentences)
+     */
+    
     private static final String SYSTEM_PROMPT = """
             You are an academic TA workload advisor for a university recruitment system.
             Judge each TA mainly by total weekly hours from ACCEPTED positions (weeklyHoursTotal).
