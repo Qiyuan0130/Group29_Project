@@ -218,3 +218,16 @@ Log in with **username** or **email** and password:
 **TA workflow:** Profile → CV upload → Jobs → apply → Status.
 
 ---
+
+## 9. Run automated tests
+
+Requires Maven on PATH:
+
+```powershell
+cd software-code
+.\run-tests.ps1
+```
+
+Or: `mvn test`
+
+---
