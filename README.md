@@ -201,3 +201,20 @@ Environment variables `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` override file v
 
 
 ---
+
+## 8. Demo accounts (seed data in `data/users.json`)
+
+Log in with **username** or **email** and password:
+
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `admin1234` |
+| MO | `dr_smith` | `123456a` |
+| MO | `dr_chen` | `123456a` |
+| TA | `alice` | `123456a` |
+| TA | `bob` | `123456a` |
+
+**Password rules:** 6–10 characters, must include **letters and numbers**.
+**TA workflow:** Profile → CV upload → Jobs → apply → Status.
+
+---
