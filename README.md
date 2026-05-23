@@ -46,3 +46,18 @@
 | Yangxinyue Zhou | Responsible for designing the full project prototype, defining page layouts, user flows and interaction logic, and guiding the front-end implementation based on this prototype. | Subsequent front-end maintenance |
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+## 1. What this software is
+
+A lightweight **Java Servlet / JSP** web application for recruiting Teaching Assistants (TAs):
+
+| Role | Main capabilities |
+|------|-------------------|
+| **TA** | Profile, CV upload (PDF), browse/apply for jobs, check application status |
+| **MO** | Post and edit jobs, review applications (approve/reject), AI skill matching, AI workload balance |
+| **ADMIN** | TA workload statistics (CSV export), AI workload view, browse TA profiles |
+
+- **No database** — data stored in **JSON** files and PDF uploads.
+- Deployed as **`java-web-json.war`** on **Apache Tomcat 10.1.x**.
+- Browser context path: **`/java-web-json/`**
+
+---
