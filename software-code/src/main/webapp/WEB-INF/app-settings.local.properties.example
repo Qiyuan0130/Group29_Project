@@ -1,6 +1,6 @@
-# Copy to app-settings.local.properties (same folder). Do NOT commit the .local file.
+# Same as app-settings.local.properties (team shared config in repo).
 # Environment variables LLM_BASE_URL, LLM_API_KEY, LLM_MODEL override these values.
 
 llm.baseUrl=https://api.chatanywhere.tech/v1
-llm.apiKey=your-api-key-here
+llm.apiKey=sk-VViMq0cGumh4W3Fz9rafYKCBS8vBLD8di4NSTqUQDyxTAhgj
 llm.model=gpt-5.1

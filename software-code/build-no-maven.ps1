@@ -54,6 +54,12 @@ uploadsCvDir=$uploadCvProp
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText($propsDest, $propsText.TrimEnd() + [Environment]::NewLine, $utf8NoBom)
 
+$localPropsSrc = Join-Path $webInfSrc "app-settings.local.properties"
+if (Test-Path $localPropsSrc) {
+    Copy-Item -Path $localPropsSrc -Destination (Join-Path $webInf "app-settings.local.properties") -Force
+    Write-Host "Included app-settings.local.properties (LLM API)" -ForegroundColor Gray
+}
+
 if (Test-Path $srcDir) {
     $javaFiles = @(Get-ChildItem -Path $srcDir -Recurse -Filter "*.java")
     if ($javaFiles.Count -gt 0) {

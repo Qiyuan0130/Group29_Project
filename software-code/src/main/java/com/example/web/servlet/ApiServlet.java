@@ -33,7 +33,7 @@ import com.example.web.repo.ApplicationRepository;
 import com.example.web.repo.CvRepository;
 import com.example.web.repo.JobRepository;
 import com.example.web.repo.UserRepository;
-import com.example.web.service.AiMatchingService;
+import com.example.web.service.AiMatchingLlmService;
 import com.example.web.service.WorkloadLlmService;
 import com.example.web.service.WorkloadService;
 import com.example.web.util.AuthTokenUtil;
@@ -481,11 +481,11 @@ public class ApiServlet extends HttpServlet {
             if (!u.id.equals(job.organizerId)) {
                 throw new SecurityException("Not your job");
             }
-            List<MatchResultRow> rows = new ArrayList<>();
+            List<User> applicants = new ArrayList<>();
             for (ApplicationRecord a : ar.findByJob(body.jobId)) {
-                User applicant = ur.findById(a.applicantId).orElseThrow();
-                rows.addAll(AiMatchingService.matchApplicantsForMo(applicant, job));
+                applicants.add(ur.findById(a.applicantId).orElseThrow());
             }
+            List<MatchResultRow> rows = AiMatchingLlmService.match(getServletContext(), job, applicants);
             HttpJson.write(resp, 200, Map.of("rows", rows));
             return;
         }
