@@ -231,3 +231,16 @@ cd software-code
 Or: `mvn test`
 
 ---
+
+## 10. Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| `startup.bat` window closes immediately | Port **8080** or **8005** in use — run `shutdown.bat` first, or `netstat -ano \| findstr :8080` then `taskkill /PID <pid> /F` |
+| Old UI after deploy | Delete `webapps\java-web-json\`, copy new WAR, restart Tomcat, browser **Ctrl+F5** |
+| TA **Jobs** tab locked | Complete Profile and save; upload at least one CV |
+| Cannot apply for a job | Profile complete + at least one CV |
+| `mvn` not found | Use `.\build-no-maven.ps1` or install Maven |
+| Server errors | Check `Tomcat\logs\catalina.<date>.log` |
+
+---
