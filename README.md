@@ -120,3 +120,43 @@ mvn clean package -DskipTests
 After building, confirm the WAR **modification time** is today. Do not copy an old WAR from weeks ago.
 
 ---
+
+## 5. Deploy to Tomcat
+
+Example Tomcat path (adjust to your machine):
+
+`D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49`
+
+### Steps
+
+1. **Stop** Tomcat: `bin\shutdown.bat`
+2. **Remove** old deployment:
+   - `webapps\java-web-json.war`
+   - `webapps\java-web-json\` (exploded folder)
+3. **Copy** the newly built WAR to `webapps\java-web-json.war`
+4. **Start** Tomcat: `bin\startup.bat`
+
+### PowerShell copy example
+
+```powershell
+$tomcat = "D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49"
+$war    = "D:\MSD\Group29_Project\software-code\build\java-web-json.war"
+
+Remove-Item "$tomcat\webapps\java-web-json" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item "$tomcat\webapps\java-web-json.war" -Force -ErrorAction SilentlyContinue
+Copy-Item $war "$tomcat\webapps\java-web-json.war"
+```
+
+### Deploy script (optional)
+
+```powershell
+cd software-code
+$env:CATALINA_HOME = "D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49"
+.\deploy-tomcat.ps1          # uses build\java-web-json.war
+# .\deploy-tomcat.ps1 -Maven # uses target\java-web-json.war
+```
+
+Then restart Tomcat.
+
+---
+
