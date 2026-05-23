@@ -72,3 +72,25 @@ A lightweight **Java Servlet / JSP** web application for recruiting Teaching Ass
 | **OS** | Windows recommended (PowerShell scripts); manual steps work on macOS/Linux |
 
 ---
+
+## 3. Project structure
+
+```
+Group29_Project/
+├── SETUP_README.md          ← this file (setup / run)
+├── README.md                ← group info & meeting records (do not replace)
+├── docs/
+│   └── User_Manual.md       ← user manual + screenshot checklist
+└── software-code/
+    ├── frontend/            ← HTML / CSS / JavaScript
+    ├── src/main/java/       ← Servlets, services, repositories
+    ├── src/test/java/       ← JUnit 5 tests
+    ├── data/                ← users.json, jobs.json, applications.json, cvs.json
+    ├── uploads/cv/          ← uploaded PDF resumes
+    ├── pom.xml
+    ├── build-no-maven.ps1   ← build WAR without Maven
+    ├── deploy-tomcat.ps1    ← copy WAR to Tomcat webapps
+    └── run-tests.ps1        ← run tests (requires Maven)
+```
+
+---
