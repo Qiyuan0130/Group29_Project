@@ -22,61 +22,180 @@
 
 ---
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-## 1. What this software is
+# BUPT TA Recruitment System — Setup, Configuration & Run Guide
 
-A lightweight **Java Servlet / JSP** web application for recruiting Teaching Assistants (TAs):
+This document explains how to set up, configure, and run the **BUPT International School TA Recruitment System** (Group 29, EBU6304).
 
-| Role | Main capabilities |
-|------|-------------------|
-| **TA** | Profile, CV upload (PDF), browse/apply for jobs, check application status |
-| **MO** | Post and edit jobs, review applications (approve/reject), AI skill matching, AI workload balance |
-| **ADMIN** | TA workload statistics (CSV export), AI workload view, browse TA profiles |
-
-- **No database** — data stored in **JSON** files and PDF uploads.
-- Deployed as **`java-web-json.war`** on **Apache Tomcat 10.1.x**.
-- Browser context path: **`/java-web-json/`**
+Application code is in the `software-code/` folder.
 
 ---
 
-## 2. Prerequisites
+## Table of Contents
 
-| Software | Requirement |
-|----------|-------------|
-| **JDK** | 17+ (project `maven.compiler.release=17`; JDK 23 tested) |
-| **Apache Tomcat** | 10.1.x (Jakarta Servlet 5 / EE 9+) |
-| **Maven** | 3.9+ (optional — see build without Maven below) |
-| **OS** | Windows recommended (PowerShell scripts); manual steps work on macOS/Linux |
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Project Structure](#project-structure)
+4. [Quick Start](#quick-start)
+5. [Configuration](#configuration)
+6. [Build the Application](#build-the-application)
+7. [Deploy & Run on Tomcat](#deploy--run-on-tomcat)
+8. [Access the Application](#access-the-application)
+9. [Demo Accounts](#demo-accounts)
+10. [Run Unit Tests](#run-unit-tests)
+11. [Troubleshooting](#troubleshooting)
 
 ---
 
-## 3. Project structure
+## Overview
+
+| Item | Detail |
+|------|--------|
+| **Purpose** | TA recruitment: job posting (MO), applications (TA), workload & AI analysis (Admin) |
+| **Roles** | TA, MO (Module Organiser), ADMIN |
+| **Backend** | Java 17, Jakarta Servlet, JSON file storage (no database) |
+| **Frontend** | HTML / CSS / JavaScript |
+| **Server** | Apache Tomcat 10.1+ |
+| **Context path** | `/java-web-json` |
+
+---
+
+## Prerequisites
+
+| Requirement | Version / Notes |
+|-------------|-----------------|
+| **JDK** | 17+ (`java -version`, `javac -version`) |
+| **Apache Tomcat** | 10.1+ (Jakarta EE; **not** Tomcat 9 or earlier) |
+| **Maven** | 3.9+ (optional — see no-Maven build below) |
+| **PowerShell** | Windows — for build/deploy scripts |
+| **Network** | Required once to download dependencies |
+
+Install examples (Windows):
+
+```powershell
+winget install Microsoft.OpenJDK.17
+winget install Apache.Maven
+```
+
+Tomcat 10.1 download: [https://tomcat.apache.org/download-10.cgi](https://tomcat.apache.org/download-10.cgi)
+
+---
+
+## Project Structure
 
 ```
 Group29_Project/
-├── SETUP_README.md          ← this file (setup / run)
-├── README.md                ← group info & meeting records (do not replace)
-├── docs/
-│   └── User_Manual.md       ← user manual + screenshot checklist
+├── Software_Setup_README.md     ← this file
+├── README.md                    ← group project info (unchanged)
 └── software-code/
-    ├── frontend/            ← HTML / CSS / JavaScript
-    ├── src/main/java/       ← Servlets, services, repositories
-    ├── src/test/java/       ← JUnit 5 tests
-    ├── data/                ← users.json, jobs.json, applications.json, cvs.json
-    ├── uploads/cv/          ← uploaded PDF resumes
-    ├── pom.xml
-    ├── build-no-maven.ps1   ← build WAR without Maven
-    ├── deploy-tomcat.ps1    ← copy WAR to Tomcat webapps
-    └── run-tests.ps1        ← run tests (requires Maven)
+    ├── frontend/                # HTML / CSS / JS pages
+    ├── src/main/java/           # Java backend
+    ├── src/main/webapp/WEB-INF/
+    │   ├── web.xml
+    │   └── app-settings.local.properties.example
+    ├── data/                    # JSON data (users, jobs, applications, CVs)
+    ├── uploads/cv/              # Uploaded PDF résumés
+    ├── build-no-maven.ps1       # Build WAR without Maven
+    ├── deploy-tomcat.ps1        # Deploy WAR to Tomcat
+    ├── run-tests.ps1            # Run JUnit tests
+    └── pom.xml                  # Maven build (alternative)
 ```
+
+At runtime the app reads/writes:
+
+- `software-code/data/*.json` — accounts, jobs, applications, CV metadata
+- `software-code/uploads/cv/*.pdf` — TA résumés (max 5 MB each)
+
+Paths are set in `WEB-INF/app-settings.properties`, generated automatically when you build.
 
 ---
 
-## 4. Build the WAR
+## Quick Start
 
-Open PowerShell in `software-code/`.
+```powershell
+# 1. Go to the application folder
+cd software-code
 
-### Option A — Without Maven
+# 2. Build the WAR file
+.\build-no-maven.ps1
+
+# 3. Point to your Tomcat installation (change the path if needed)
+$env:CATALINA_HOME = "D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49"
+
+# 4. Deploy the WAR
+.\deploy-tomcat.ps1
+
+# 5. Start Tomcat, then open in browser:
+#    http://localhost:8080/java-web-json/
+```
+
+After deploying, **restart Tomcat** and press **Ctrl+F5** in the browser to avoid cached pages.
+
+---
+
+## Configuration
+
+### Data and upload directories
+
+Each build writes `WEB-INF/app-settings.properties` inside the WAR with absolute paths to:
+
+- `software-code/data`
+- `software-code/uploads/cv`
+
+Data is stored **outside** the exploded WAR so redeploying does not delete your JSON files or PDFs.
+
+If you move the project folder, **rebuild the WAR** so paths stay correct.
+
+### LLM / AI features (optional)
+
+Used by **Admin** (workload balance) and **MO** (AI application matching).
+
+1. Copy the example config:
+
+   ```powershell
+   cd software-code
+   copy src\main\webapp\WEB-INF\app-settings.local.properties.example `
+        src\main\webapp\WEB-INF\app-settings.local.properties
+   ```
+
+2. Edit `src/main/webapp/WEB-INF/app-settings.local.properties`:
+
+   ```properties
+   llm.baseUrl=https://api.chatanywhere.tech/v1
+   llm.apiKey=your-api-key-here
+   llm.model=gpt-5.1
+   ```
+
+3. Rebuild and redeploy the WAR.
+
+**Environment variables** (override file settings):
+
+| Variable | Description |
+|----------|-------------|
+| `LLM_BASE_URL` | API base URL |
+| `LLM_API_KEY` | API key |
+| `LLM_MODEL` | Model name |
+
+Without LLM config, MO matching falls back to rule-based logic; Admin LLM analysis will report a configuration error.
+
+### Registration keys
+
+| Role | Registration key |
+|------|------------------|
+| MO | `qwert1234` |
+| Admin | `Group29admin` |
+| TA | No key required |
+
+### Password rules
+
+- 6–10 characters
+- Must include both letters and numbers
+- Letters and digits only (no special symbols)
+
+---
+
+## Build the Application
+
+### Option A — Without Maven (recommended on Windows)
 
 ```powershell
 cd software-code
@@ -84,6 +203,13 @@ cd software-code
 ```
 
 **Output:** `software-code/build/java-web-json.war`
+
+The script:
+
+1. Copies `frontend/` into the WAR
+2. Compiles Java sources (downloads JARs if needed)
+3. Generates `app-settings.properties` with correct data paths
+4. Includes `app-settings.local.properties` if it exists
 
 ### Option B — With Maven
 
@@ -94,137 +220,123 @@ mvn clean package -DskipTests
 
 **Output:** `software-code/target/java-web-json.war`
 
-After building, confirm the WAR **modification time** is today. Do not copy an old WAR from weeks ago.
+If Maven is bundled in the repo:
+
+```powershell
+..\.tools\apache-maven-3.9.6\bin\mvn.cmd clean package -DskipTests
+```
 
 ---
 
-## 5. Deploy to Tomcat
+## Deploy & Run on Tomcat
 
-Example Tomcat path (adjust to your machine):
-
-`D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49`
-
-### Steps
-
-1. **Stop** Tomcat: `bin\shutdown.bat`
-2. **Remove** old deployment:
-   - `webapps\java-web-json.war`
-   - `webapps\java-web-json\` (exploded folder)
-3. **Copy** the newly built WAR to `webapps\java-web-json.war`
-4. **Start** Tomcat: `bin\startup.bat`
-
-### PowerShell copy example
-
-```powershell
-$tomcat = "D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49"
-$war    = "D:\MSD\Group29_Project\software-code\build\java-web-json.war"
-
-Remove-Item "$tomcat\webapps\java-web-json" -Recurse -Force -ErrorAction SilentlyContinue
-Remove-Item "$tomcat\webapps\java-web-json.war" -Force -ErrorAction SilentlyContinue
-Copy-Item $war "$tomcat\webapps\java-web-json.war"
-```
-
-### Deploy script (optional)
+### Using the deploy script
 
 ```powershell
 cd software-code
-$env:CATALINA_HOME = "D:\Tomcat\apache-tomcat-10.1.49-windows-x64\apache-tomcat-10.1.49"
-.\deploy-tomcat.ps1          # uses build\java-web-json.war
-# .\deploy-tomcat.ps1 -Maven # uses target\java-web-json.war
+$env:CATALINA_HOME = "C:\path\to\apache-tomcat-10.1.49"
+
+# Default: builds with build-no-maven.ps1, then copies WAR
+.\deploy-tomcat.ps1
+
+# Or deploy a Maven-built WAR:
+.\deploy-tomcat.ps1 -Maven
 ```
 
-Then restart Tomcat.
+### Manual deploy
+
+1. Copy `java-web-json.war` to `<TOMCAT>/webapps/`
+2. Start Tomcat:
+
+   ```powershell
+   & "$env:CATALINA_HOME\bin\startup.bat"
+   ```
+
+3. Wait for Tomcat to expand the WAR, then open the URLs below.
+
+### VS Code / Cursor Tomcat extension
+
+1. Run `.\build-no-maven.ps1` (or VS Code task **Build WAR**)
+2. Publish `build/java-web-json.war` from the Tomcat extension
+3. Restart the server
 
 ---
 
-## 6. Access URLs
+## Access the Application
 
-Replace `localhost:8080` if your Tomcat uses another host/port.
+Base URL (default port 8080):
+
+```
+http://localhost:8080/java-web-json/
+```
 
 | Page | URL |
 |------|-----|
-| Home | http://localhost:8080/java-web-json/ |
-| Login | http://localhost:8080/java-web-json/login.html |
-| Register | http://localhost:8080/java-web-json/register.html |
-| TA dashboard | http://localhost:8080/java-web-json/ta/dashboard.html |
-| MO dashboard | http://localhost:8080/java-web-json/mo/dashboard.html |
-| Admin dashboard | http://localhost:8080/java-web-json/admin/dashboard.html |
+| Home | `/java-web-json/index.html` |
+| Register | `/java-web-json/register.html` |
+| Login | `/java-web-json/login.html` |
+| TA dashboard | `/java-web-json/ta/dashboard.html` |
+| MO dashboard | `/java-web-json/mo/dashboard.html` |
+| Admin dashboard | `/java-web-json/admin/dashboard.html` |
+
+REST API base: `/java-web-json/api/`
 
 ---
 
-## 7. Configuration
+## Demo Accounts
 
-### 7.1 Data and upload directories
+Pre-seeded in `software-code/data/users.json`. Use the **email** as login username.
 
-At build time, `WEB-INF/app-settings.properties` is generated with paths to:
-
-- `software-code/data/` — JSON data files
-- `software-code/uploads/cv/` — TA resume PDFs
-
-If you move the project folder, **rebuild and redeploy** the WAR.
-
-### 7.2 AI / LLM (optional)
-
-MO **AI Matching** and **AI Workload Balance** need an LLM API when enabled.
-
-1. Copy  
-   `src/main/webapp/WEB-INF/app-settings.local.properties.example`  
-   to `app-settings.local.properties` (same folder).
-2. Set `llm.baseUrl`, `llm.apiKey`, `llm.model`.
-3. Rebuild and redeploy.
-
-Environment variables `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` override file values.  
-**Do not commit real API keys.**
-
+| Role | Login (email) | Password | Name |
+|------|---------------|----------|------|
+| MO | `j.smith@bupt.edu` | `123456a` | Dr. James Smith |
+| MO | `w.chen@bupt.edu` | `123456a` | Dr. Wei Chen |
+| Admin | `admin@bupt.edu` | `admin1234` | System Administrator |
+| TA | `alice.wang@bupt.edu` | `123456a` | Alice Wang |
+| TA | `bob.li@bupt.edu` | `123456a` | Bob Li |
+| TA | `charlie.zhang@bupt.edu` | `123456a` | Charlie Zhang |
+| TA | `diana.liu@bupt.edu` | `123456a` | Diana Liu |
+| TA | `eve.chen@bupt.edu` | `123456a` | Eve Chen |
 
 ---
 
-## 8. Demo accounts (seed data in `data/users.json`)
-
-Log in with **username** or **email** and password:
-
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `admin` | `admin1234` |
-| MO | `dr_smith` | `123456a` |
-| MO | `dr_chen` | `123456a` |
-| TA | `alice` | `123456a` |
-| TA | `bob` | `123456a` |
-
-**Password rules:** 6–10 characters, must include **letters and numbers**.
-**TA workflow:** Profile → CV upload → Jobs → apply → Status.
-
----
-
-## 9. Run automated tests
+## Run Unit Tests
 
 Requires Maven on PATH:
 
 ```powershell
 cd software-code
-.\run-tests.ps1
+.\run-tests.ps1 test
 ```
 
-Or: `mvn test`
+Or:
+
+```powershell
+mvn test
+```
 
 ---
 
-## 10. Troubleshooting
+## Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
-| `startup.bat` window closes immediately | Port **8080** or **8005** in use — run `shutdown.bat` first, or `netstat -ano \| findstr :8080` then `taskkill /PID <pid> /F` |
-| Old UI after deploy | Delete `webapps\java-web-json\`, copy new WAR, restart Tomcat, browser **Ctrl+F5** |
-| TA **Jobs** tab locked | Complete Profile and save; upload at least one CV |
-| Cannot apply for a job | Profile complete + at least one CV |
-| `mvn` not found | Use `.\build-no-maven.ps1` or install Maven |
-| Server errors | Check `Tomcat\logs\catalina.<date>.log` |
+| **404 or blank page** | Check Tomcat is running and WAR is in `webapps/`. Context path must be `/java-web-json`. |
+| **Login / network error** | Open via Tomcat URL, not by double-clicking HTML files. |
+| **Old UI after deploy** | Delete `webapps/java-web-json/`, redeploy WAR, restart Tomcat, **Ctrl+F5**. |
+| **TA cannot open Jobs** | Complete all five Profile fields, Save, upload at least one PDF on CV Upload. |
+| **Cannot apply for a job** | Complete profile/CV, or job deadline may have passed. |
+| **LLM analysis failed** | Set API key in `app-settings.local.properties` and rebuild/redeploy. |
+| **Data not saved** | Rebuild WAR so `app-settings.properties` points to the correct `data/` folder. |
+| **`javac` / `mvn` not found** | Install JDK 17 and/or Maven; reopen terminal. |
 
 ---
 
-## 11. Technology stack
+## Related Documents
 
-- **Backend:** Java 17, Jakarta Servlet 5, Gson, jBCrypt  
-- **Frontend:** HTML, CSS, JavaScript (packaged in WAR)  
-- **Storage:** JSON + PDF files (no SQL)  
-- **Server:** Apache Tomcat 10.1.x
+- **Group info & meeting records:** [README.md](README.md)
+- **User manuals:** `docs/User_Manual_Group_29_English.docx`, `docs/User_Manual_Group_29_Chinese.docx` (if present in your workspace)
+
+---
+
+*Group 29 · EBU6304 Software Engineering · BUPT International School*
