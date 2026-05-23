@@ -174,3 +174,30 @@ Replace `localhost:8080` if your Tomcat uses another host/port.
 | Admin dashboard | http://localhost:8080/java-web-json/admin/dashboard.html |
 
 ---
+
+## 7. Configuration
+
+### 7.1 Data and upload directories
+
+At build time, `WEB-INF/app-settings.properties` is generated with paths to:
+
+- `software-code/data/` — JSON data files
+- `software-code/uploads/cv/` — TA resume PDFs
+
+If you move the project folder, **rebuild and redeploy** the WAR.
+
+### 7.2 AI / LLM (optional)
+
+MO **AI Matching** and **AI Workload Balance** need an LLM API when enabled.
+
+1. Copy  
+   `src/main/webapp/WEB-INF/app-settings.local.properties.example`  
+   to `app-settings.local.properties` (same folder).
+2. Set `llm.baseUrl`, `llm.apiKey`, `llm.model`.
+3. Rebuild and redeploy.
+
+Environment variables `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` override file values.  
+**Do not commit real API keys.**
+
+
+---
