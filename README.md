@@ -61,3 +61,14 @@ A lightweight **Java Servlet / JSP** web application for recruiting Teaching Ass
 - Browser context path: **`/java-web-json/`**
 
 ---
+
+## 2. Prerequisites
+
+| Software | Requirement |
+|----------|-------------|
+| **JDK** | 17+ (project `maven.compiler.release=17`; JDK 23 tested) |
+| **Apache Tomcat** | 10.1.x (Jakarta Servlet 5 / EE 9+) |
+| **Maven** | 3.9+ (optional — see build without Maven below) |
+| **OS** | Windows recommended (PowerShell scripts); manual steps work on macOS/Linux |
+
+---
