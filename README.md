@@ -94,3 +94,29 @@ Group29_Project/
 ```
 
 ---
+
+## 4. Build the WAR
+
+Open PowerShell in `software-code/`.
+
+### Option A — Without Maven
+
+```powershell
+cd software-code
+.\build-no-maven.ps1
+```
+
+**Output:** `software-code/build/java-web-json.war`
+
+### Option B — With Maven
+
+```powershell
+cd software-code
+mvn clean package -DskipTests
+```
+
+**Output:** `software-code/target/java-web-json.war`
+
+After building, confirm the WAR **modification time** is today. Do not copy an old WAR from weeks ago.
+
+---
