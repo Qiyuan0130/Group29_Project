@@ -244,3 +244,10 @@ Or: `mvn test`
 | Server errors | Check `Tomcat\logs\catalina.<date>.log` |
 
 ---
+
+## 11. Technology stack
+
+- **Backend:** Java 17, Jakarta Servlet 5, Gson, jBCrypt  
+- **Frontend:** HTML, CSS, JavaScript (packaged in WAR)  
+- **Storage:** JSON + PDF files (no SQL)  
+- **Server:** Apache Tomcat 10.1.x
