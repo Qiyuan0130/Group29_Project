@@ -160,3 +160,17 @@ Then restart Tomcat.
 
 ---
 
+## 6. Access URLs
+
+Replace `localhost:8080` if your Tomcat uses another host/port.
+
+| Page | URL |
+|------|-----|
+| Home | http://localhost:8080/java-web-json/ |
+| Login | http://localhost:8080/java-web-json/login.html |
+| Register | http://localhost:8080/java-web-json/register.html |
+| TA dashboard | http://localhost:8080/java-web-json/ta/dashboard.html |
+| MO dashboard | http://localhost:8080/java-web-json/mo/dashboard.html |
+| Admin dashboard | http://localhost:8080/java-web-json/admin/dashboard.html |
+
+---
