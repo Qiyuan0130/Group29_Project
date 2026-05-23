@@ -79,7 +79,7 @@ public final class WorkloadLlmService {
         LlmSettings settings = LlmSettings.load(ctx);
         if (!settings.isConfigured()) {
             throw new IllegalStateException(
-                    "LLM API key missing. Create WEB-INF/app-settings.local.properties (see .example file).");
+                    "LLM API key missing. Check WEB-INF/app-settings.local.properties in the WAR.");
         }
 
         Map<String, Object> report = WorkloadService.buildReport(ur, jr, ar);

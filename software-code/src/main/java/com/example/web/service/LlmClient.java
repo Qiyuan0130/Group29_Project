@@ -26,7 +26,7 @@ public final class LlmClient {
     public static String chat(LlmSettings settings, String systemPrompt, String userPrompt) throws IOException {
         if (!settings.isConfigured()) {
             throw new IllegalStateException(
-                    "LLM is not configured. Copy app-settings.local.properties.example to app-settings.local.properties and set llm.apiKey.");
+                    "LLM is not configured. Check WEB-INF/app-settings.local.properties in the WAR.");
         }
 
         JsonObject body = new JsonObject();

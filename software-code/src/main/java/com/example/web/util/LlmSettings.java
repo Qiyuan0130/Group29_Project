@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 /**
- * LLM config: env vars override {@code app-settings.local.properties} (not committed).
+ * LLM config: env vars override {@code app-settings.local.properties} (team default in repo).
  */
 public final class LlmSettings {
 
@@ -46,12 +46,12 @@ public final class LlmSettings {
         String model = firstNonBlank(
                 System.getenv("LLM_MODEL"),
                 merged.getProperty("llm.model"),
-                "gpt-4o-mini");
+                "gpt-5.1");
 
         return new LlmSettings(
                 trimTrailingSlash(baseUrl),
                 apiKey == null ? "" : apiKey.trim(),
-                model == null ? "gpt-4o-mini" : model.trim());
+                model == null ? "gpt-5.1" : model.trim());
     }
 
     private static void loadInto(Properties target, ServletContext ctx, String resource) {
