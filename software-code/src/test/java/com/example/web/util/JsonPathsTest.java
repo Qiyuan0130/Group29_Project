@@ -41,11 +41,10 @@ class JsonPathsTest {
     }
 
     @Test
-    void dataDirectory_respectsAbsolutePathInSettings(@TempDir Path webappRoot, @TempDir Path customData) throws Exception {
+    void dataDirectory_respectsAbsolutePathInSettings(@TempDir Path customData) throws Exception {
         String props = "dataDir=" + customData.toString().replace('\\', '/') + "\n";
         ByteArrayInputStream in = new ByteArrayInputStream(props.getBytes(StandardCharsets.UTF_8));
         when(servletContext.getResourceAsStream("/WEB-INF/app-settings.properties")).thenReturn(in);
-        when(servletContext.getRealPath("/")).thenReturn(webappRoot.toString());
 
         Path data = JsonPaths.dataDirectory(servletContext);
 
