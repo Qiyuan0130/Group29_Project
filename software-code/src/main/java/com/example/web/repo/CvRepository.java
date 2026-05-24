@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * JSON-backed repository for uploaded CV metadata ({@code cvs.json}).
+ *
+ * <p>PDF files themselves are stored on disk under the configured uploads directory.</p>
+ */
 public final class CvRepository {
 
     private static final String FILE = "cvs.json";

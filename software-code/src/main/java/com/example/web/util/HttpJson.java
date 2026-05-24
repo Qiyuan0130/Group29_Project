@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Helpers for reading JSON request bodies and writing JSON HTTP responses.
+ */
 public final class HttpJson {
 
     private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
@@ -17,6 +20,14 @@ public final class HttpJson {
     private HttpJson() {
     }
 
+    /**
+     * Deserialises the request body as JSON into the given type.
+     *
+     * @param req HTTP request
+     * @param type target class
+     * @return parsed object
+     * @throws IOException if JSON is malformed
+     */
     public static <T> T readBody(HttpServletRequest req, Class<T> type) throws IOException {
         try (Reader reader = req.getReader()) {
             return GSON.fromJson(reader, type);
@@ -25,6 +36,9 @@ public final class HttpJson {
         }
     }
 
+    /**
+     * Writes a JSON response with UTF-8 encoding and no-cache headers.
+     */
     public static void write(HttpServletResponse resp, int status, Object body) throws IOException {
         resp.setStatus(status);
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -37,11 +51,14 @@ public final class HttpJson {
         }
     }
 
+    /** Writes {@code {"error":"message"}} with the given HTTP status. */
     public static void error(HttpServletResponse resp, int status, String message) throws IOException {
         write(resp, status, new ErrorBody(message));
     }
 
+    /** Standard API error JSON shape. */
     public static class ErrorBody {
+        /** Human-readable error message. */
         public final String error;
 
         public ErrorBody(String error) {

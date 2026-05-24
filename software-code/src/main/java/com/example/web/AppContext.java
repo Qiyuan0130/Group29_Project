@@ -7,6 +7,12 @@ import com.example.web.repo.UserRepository;
 
 import jakarta.servlet.ServletContext;
 
+/**
+ * Application-wide singleton holding JSON-backed repositories.
+ *
+ * <p>Stored as a {@link ServletContext} attribute so all servlets and filters share
+ * the same repository instances.</p>
+ */
 public final class AppContext {
 
     public final UserRepository users;
@@ -21,6 +27,12 @@ public final class AppContext {
         cvs = new CvRepository(ctx);
     }
 
+    /**
+     * Returns the shared application context, creating it on first access.
+     *
+     * @param ctx servlet context
+     * @return singleton {@code AppContext}
+     */
     public static AppContext get(ServletContext ctx) {
         synchronized (ctx) {
             AppContext a = (AppContext) ctx.getAttribute("appContext");

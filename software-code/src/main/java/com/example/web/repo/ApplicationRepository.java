@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * JSON-backed repository for TA job applications ({@code applications.json}).
+ */
 public final class ApplicationRepository {
 
     private static final String FILE = "applications.json";
@@ -89,6 +92,11 @@ public final class ApplicationRepository {
         return Optional.empty();
     }
 
+    /**
+     * Submits a new application linking a job, applicant, and CV.
+     *
+     * @throws IllegalArgumentException if already applied or CV invalid
+     */
     public synchronized ApplicationRecord apply(long jobId, long applicantId, long cvId, CvRepository cvs)
             throws IOException {
         CvRecord cv = cvs.findById(cvId).orElseThrow(() -> new IllegalArgumentException("CV not found"));
@@ -113,6 +121,12 @@ public final class ApplicationRepository {
         return r;
     }
 
+    /**
+     * Removes a pending application owned by the given applicant.
+     *
+     * @throws SecurityException if the application belongs to another user
+     * @throws IllegalArgumentException if not pending or not found
+     */
     public synchronized void withdraw(long applicationId, long applicantId) throws IOException {
         ApplicationDatabase db = load();
         for (int i = 0; i < db.applications.size(); i++) {
