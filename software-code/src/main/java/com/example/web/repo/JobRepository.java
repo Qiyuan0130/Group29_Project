@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * JSON-backed repository for MO job postings ({@code jobs.json}).
+ */
 public final class JobRepository {
 
     private static final String FILE = "jobs.json";

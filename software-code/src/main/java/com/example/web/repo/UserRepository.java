@@ -13,6 +13,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+/**
+ * JSON-backed repository for user accounts ({@code users.json}).
+ *
+ * <p>Handles registration, login lookup by email, password hashing (BCrypt),
+ * profile updates, and demo seed data.</p>
+ */
 public final class UserRepository {
 
     private static final String FILE = "users.json";
@@ -21,6 +27,11 @@ public final class UserRepository {
     private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,10}$");
     private final ServletContext ctx;
 
+    /**
+     * Creates a repository bound to the servlet data directory.
+     *
+     * @param ctx servlet context used to resolve JSON file paths
+     */
     public UserRepository(ServletContext ctx) {
         this.ctx = ctx;
     }
@@ -150,6 +161,16 @@ public final class UserRepository {
         return Optional.empty();
     }
 
+    /**
+     * Registers a new user after validating name, email, password, and role.
+     *
+     * @param name display name (letters and digits only)
+     * @param email unique login email stored in {@code contact}
+     * @param password plain password (6–10 chars, letters and digits)
+     * @param role {@link com.example.web.Roles#TA}, {@link com.example.web.Roles#MO}, or {@link com.example.web.Roles#ADMIN}
+     * @return newly created user
+     * @throws IllegalArgumentException if validation fails or email is duplicate
+     */
     public synchronized User register(String name, String email, String password, String role) throws IOException {
         String cleanName = name == null ? "" : name.trim();
         String cleanEmail = email == null ? "" : email.trim().toLowerCase();
@@ -244,6 +265,13 @@ public final class UserRepository {
         return true;
     }
 
+    /**
+     * Verifies a plain password against the stored BCrypt hash.
+     *
+     * @param user account with password hash
+     * @param plain plaintext password from login form
+     * @return {@code true} if the password matches
+     */
     public boolean verifyPassword(User user, String plain) {
         return user.getPasswordHash() != null && BCrypt.checkpw(plain, user.getPasswordHash());
     }

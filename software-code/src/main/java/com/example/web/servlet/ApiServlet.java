@@ -46,6 +46,28 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+
+/**
+ * Central JSON REST API servlet for the TA Recruitment system.
+ *
+ * <p>Mapped to {@code /api/*}. Handles authentication, profiles, jobs, applications,
+ * CV upload, MO review workflows, admin workload reports, and AI matching.</p>
+ *
+ * <h2>Main endpoint groups</h2>
+ * <ul>
+ *   <li><b>Auth</b> — {@code POST /api/auth/login}, {@code register}, {@code logout}; {@code GET /api/auth/me}</li>
+ *   <li><b>Profile</b> — {@code GET|PUT /api/profile}; {@code GET /api/ta-profiles} (admin/MO)</li>
+ *   <li><b>Jobs</b> — {@code GET|POST /api/jobs}; {@code PUT /api/jobs/{id}} (MO)</li>
+ *   <li><b>Applications</b> — {@code GET /api/applications/me}; {@code POST /api/applications};
+ *       {@code DELETE /api/applications/{id}} (TA withdraw pending)</li>
+ *   <li><b>CV</b> — {@code POST /api/cv/upload}; {@code GET /api/cv/list}; {@code GET /api/cv/{id}/view};
+ *       {@code DELETE /api/cv/{id}}</li>
+ *   <li><b>MO</b> — job applications list, decision, CV view; AI match applicants</li>
+ *   <li><b>Admin</b> — workload report and LLM analysis</li>
+ * </ul>
+ *
+ * @see com.example.web.filter.AuthFilter
+ */
 public class ApiServlet extends HttpServlet {
     private static final long MAX_CV_SIZE_BYTES = 5L * 1024 * 1024; // 5 MB
     private static final String MO_REGISTER_KEY = "qwert1234";

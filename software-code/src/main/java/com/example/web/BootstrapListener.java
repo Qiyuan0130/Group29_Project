@@ -7,8 +7,15 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import java.io.IOException;
 
+/**
+ * Servlet context listener that initialises JSON seed data on application startup.
+ *
+ * <p>Creates demo users, jobs, and sample applications when the corresponding JSON
+ * files are empty. Clears cached path settings on shutdown.</p>
+ */
 public class BootstrapListener implements ServletContextListener {
 
+    /** Loads seed users, jobs, and applications if data files are empty. */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext ctx = sce.getServletContext();
@@ -22,6 +29,7 @@ public class BootstrapListener implements ServletContextListener {
         }
     }
 
+    /** Clears cached directory settings. */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         JsonPaths.clearSettingsCache();

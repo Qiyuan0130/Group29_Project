@@ -7,6 +7,9 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import java.io.IOException;
 
+/**
+ * Sets UTF-8 character encoding on all HTTP requests and responses.
+ */
 public class EncodingFilter implements Filter {
 
     @Override

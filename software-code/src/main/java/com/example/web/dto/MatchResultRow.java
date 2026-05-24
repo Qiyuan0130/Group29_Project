@@ -1,5 +1,8 @@
 package com.example.web.dto;
 
+/**
+ * One row in an AI matching result table (MO applicant or job match).
+ */
 public class MatchResultRow {
 
     public String idKey;

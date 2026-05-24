@@ -1,5 +1,8 @@
 package com.example.web.dto;
 
+/**
+ * User profile exposed via the API (password fields omitted).
+ */
 public class UserPublic {
 
     public Long id;
@@ -12,6 +15,12 @@ public class UserPublic {
     public String technicalAbility;
     public String contact;
 
+    /**
+     * Builds a safe DTO from a domain {@link com.example.web.model.User}.
+     *
+     * @param u source user entity
+     * @return public profile without password hash
+     */
     public static UserPublic from(com.example.web.model.User u) {
         UserPublic p = new UserPublic();
         p.id = u.id;
